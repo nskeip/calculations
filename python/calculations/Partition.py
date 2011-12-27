@@ -5,8 +5,15 @@ class Partitions:
     r"""
     Class providing iterator on partitions and size method
     """
-    def __init__(self, arg):
-        self.number = arg
+    def __init__(self, number, **kwargs):
+        self.number = number
+        self.length = kwargs.get("length") or 0
+        self.min_length = kwargs.get("min_length") or 1
+        self.max_length = kwargs.get("max_length") or 0
+        self.min_part = kwargs.get("min_part") or 1
+        self.max_part = kwargs.get("max_part") or 0
+
+
 
     def __iter__(self):
         self.current = Partition(self.number)
@@ -23,6 +30,12 @@ class Partitions:
         """
         # TODO
         pass
+
+    def list(self):
+        r"""
+        Returns list of all partitions
+        """
+        return [x for x in self]
 
 
 class Partition(list):
@@ -64,6 +77,9 @@ class Partition(list):
 
 
     def next(self):
+        r"""
+        Based on ZS1 algorithm from http://www.site.uottawa.ca/~ivan/F49-int-part.pdf
+        """
         if not len(self):
             return Partition([self.number])
 

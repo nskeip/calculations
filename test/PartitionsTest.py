@@ -11,9 +11,7 @@ class PartitionsTest(unittest.TestCase):
         self.assertEqual(transposed, [8, 7, 7, 4, 4, 3, 2, 2])
 
     def test_next(self):
-        allPartitions = []
-        for p in Partitions(10):
-            allPartitions.append(p)
+        allPartitions = Partitions(10).list()
 
         expected = [[10], [9, 1], [8, 2], [8, 1, 1], [7, 3],
             [7, 2, 1], [7, 1, 1, 1], [6, 4], [6, 3, 1],
