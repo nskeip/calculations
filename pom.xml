@@ -5,20 +5,22 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>ru.nsc.math.spectrum_project</groupId>
     <artifactId>calculations</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <build>
 
         <resources>
             <resource>
-                <directory>python</directory>
+                <directory>src/main/python</directory>
                 <excludes>
                     <exclude>**/*.pyc</exclude>
                 </excludes>
             </resource>
         </resources>
 
-        <sourceDirectory>python</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
+        <sourceDirectory>src/main/python</sourceDirectory>
+        <testSourceDirectory>src/test/python</testSourceDirectory>
 
         <plugins>
             <plugin>
@@ -30,12 +32,12 @@
                     <execution>
                         <configuration>
                             <executable>python</executable>
-                            <workingDirectory>test</workingDirectory>
+                            <workingDirectory>src/test/python</workingDirectory>
                             <arguments>
                                 <argument>PartitionsTest.py</argument>
                             </arguments>
                             <environmentVariables>
-                                <PYTHONPATH>../python:$PYTHONPATH</PYTHONPATH>
+                                <PYTHONPATH>../../main/python:$PYTHONPATH</PYTHONPATH>
                             </environmentVariables>
                         </configuration>
                         <id>python-test</id>
@@ -56,7 +58,7 @@
                             <arguments>
                                 <argument>-m</argument>
                                 <argument>compileall</argument>
-                                <argument>.</argument>
+                                <argument>src</argument>
                             </arguments>
                         </configuration>
                     </execution>

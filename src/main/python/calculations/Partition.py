@@ -1,28 +1,80 @@
 __author__ = 'Daniel Lytkin'
 
 
+class PartitionConstraints:
+    __defaultConstraints = {"length" : 0,
+                            "min_length" : 1, "max_length" : 0,
+                            "min_part" : 1, "max_part" : 0,
+                            "min_slope" : 0, "max_slope" : 0}
+
+    def __init__(self, **kwargs):
+        d = PartitionConstraints.__defaultConstraints
+        self.constraints = dict([(key, kwargs.get(key) or d[key]) for key in d.iterkeys()])
+
+    def isEmpty(self):
+        d = PartitionConstraints.__defaultConstraints
+        return all(self.constraints.get(key) == d.get(key) for key in d.iterkeys())
+
+    def isValid(self, partition):
+        length = self.constraints.get("length")
+        if length and len(partition) != length: return False
+
+        if len(partition) < self.constraints.get("min_length"): return False
+
+        max_length  = self.constraints.get("max_length")
+        if max_length and len(partition) > max_length: return False
+
+        min_part = self.constraints.get("min_part")
+        if min_part > 1 and any(x < min_part for x in partition): return False
+
+        max_part = self.constraints.get("max_part")
+        if max_part and any(x > max_part for x in partition): return False
+
+        slopes = map(lambda x,y: x-y, partition, partition[1:] + [0])
+
+        min_slope = self.constraints.get("min_slope")
+        if min_slope and any(x < min_slope for x in slopes): return False
+
+        max_slope = self.constraints.get("max_slope")
+        if max_slope and any(x > max_slope for x in slopes): return False
+
+        return True
+
+
 class Partitions:
     r"""
     Class providing iterator on partitions and size method
     """
     def __init__(self, number, **kwargs):
         self.number = number
-        self.length = kwargs.get("length") or 0
-        self.min_length = kwargs.get("min_length") or 1
-        self.max_length = kwargs.get("max_length") or 0
-        self.min_part = kwargs.get("min_part") or 1
-        self.max_part = kwargs.get("max_part") or 0
+        self.constraints = PartitionConstraints(**kwargs)
 
 
 
     def __iter__(self):
-        self.current = Partition(self.number)
-        return self
+        number = self.number
+        if self.constraints.isEmpty():
+            class PartitionsIterator:
+                def __init__(self):
+                    self.current = Partition(number)
 
-    def next(self):
-        nextPartition = self.current.next()
-        self.current = nextPartition
-        return self.current
+                def next(self):
+                    self.current = self.current.next()
+                    return self.current
+            return PartitionsIterator()
+        else:
+            constraints = self.constraints
+            class PartitionsConstrainedIterator:
+                def __init__(self):
+                    self.current = Partition(number)
+
+                def next(self):
+                    while True:
+                        self.current = self.current.next()
+                        if constraints.isValid(self.current): break
+                    return self.current
+            return PartitionsConstrainedIterator()
+
 
     def size(self):
         r"""
@@ -31,11 +83,6 @@ class Partitions:
         # TODO
         pass
 
-    def list(self):
-        r"""
-        Returns list of all partitions
-        """
-        return [x for x in self]
 
 
 class Partition(list):
@@ -87,7 +134,7 @@ class Partition(list):
         if self[0] == 1:
             raise StopIteration
 
-        x = Partition(self)
+        x = Partition(self)  # make a copy of this partition
         h = x._h
         if x[h-1] == 2:
             x[h-1]=1
