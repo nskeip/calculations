@@ -5,6 +5,13 @@ from calculations.set import *
 __author__ = 'Daniel Lytkin'
 
 class SetTest(unittest.TestCase):
+    @staticmethod
+    def filterContained(sets):
+        """
+        Returns only those sets, that are not contained in any other set
+        """
+        return filter(lambda x: not any(set(x)<set(y) for y in sets), sets)
+
     def test_sets(self):
         sets = list(BoundedSets(10))
         expected = [[10], [9, 1], [9], [8, 2], [8, 1], [8], [7, 3], [7, 2, 1],
@@ -16,15 +23,20 @@ class SetTest(unittest.TestCase):
         self.assertSequenceEqual(expected, sets)
 
     def test_maximal_sets(self):
-        sets = list(BoundedSets(10, maximal=True))
-        expected = [[10], [9, 1], [8, 2], [8, 1], [7, 3], [7, 2, 1],
-                    [6, 4], [6, 3, 1], [6, 2, 1],
-                    [5, 4, 1], [5, 3, 2], [5, 3, 1],
-                    [5, 2, 1], [4, 3, 2, 1]]
+        """
+        Maximal sets are exactly the sets that are not contained in any other
+        """
+        n = 50
+        sets = list(BoundedSets(n, maximal=True))
+        expected = self.filterContained(list(BoundedSets(n)))
         self.assertSequenceEqual(expected, sets)
 
-    def test_minus_partitions(self):
-        n = 20
+    def test_containing_partitions(self):
+        """
+        Every partition must have the set of its parts contained in some bounded set for the same n.
+        We only need sets that are maximal by containment
+        """
+        n = 50
         minusPartitions = list(BoundedSets(n, maximal=True))
         allPartitions = list(Partitions(n))
 
