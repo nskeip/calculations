@@ -11,7 +11,7 @@ class PartitionTest(unittest.TestCase):
         self.assertEqual(sum(partition), sum(transposed))
         self.assertEqual(transposed, [8, 7, 7, 4, 4, 3, 2, 2])
 
-    def test_next(self):
+    def test_partition(self):
         allPartitions = list(Partitions(10))
 
         expected = [[10], [9, 1], [8, 2], [8, 1, 1], [7, 3],
@@ -38,10 +38,10 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, p)
 
     def test_length(self):
-        p = list(Partitions(10, length=5))
-        expected = [[6, 1, 1, 1, 1], [5, 2, 1, 1, 1],
-            [4, 3, 1, 1, 1], [4, 2, 2, 1, 1],
-            [3, 3, 2, 1, 1], [3, 2, 2, 2, 1], [2, 2, 2, 2, 2]]
+        n = 10
+        k = 5
+        p = list(Partitions(n, length=k))
+        expected = filter(lambda x: len(x)==k, Partitions(n))
         self.assertSequenceEqual(expected, p)
 
     def test_max_part(self):

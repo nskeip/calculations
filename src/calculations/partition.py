@@ -41,6 +41,9 @@ class PartitionConstraints:
 
         return True
 
+    def get(self, key):
+        return self.constraints.get(key)
+
 
 class Partitions:
     # TODO: doc
@@ -54,7 +57,11 @@ class Partitions:
 
 
     def __iter__(self):
-        current = Partition(self.number)
+        length = self.constraints.get("length")
+        if length:
+            current = FixedLengthPartition(self.number, length=length)
+        else:
+            current = Partition(self.number)
         if self.constraints.isEmpty():
             while current is not None:
                 yield current
@@ -138,3 +145,16 @@ class Partition(list):
         x._h = h
         return x
 
+class FixedLengthPartition(list):
+    def __init__(self, *args, **kwargs):
+        length = kwargs.get("length")
+        if length >= len(args) > 0:
+            # first partition:
+            super(FixedLengthPartition, self).__init__([args[0]-length+1]+[1]*(length-1))
+            self._length = length
+        else:
+            super(FixedLengthPartition, self).__init__(args)
+            self._length = len(args)
+
+    def next(self):
+        pass # TODO: implement
