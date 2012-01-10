@@ -1,11 +1,12 @@
 import unittest
-from calculations.Partition import *
+from calculations.partition import *
+
 
 __author__ = 'Daniel Lytkin'
 
-class PartitionsTest(unittest.TestCase):
+class PartitionTest(unittest.TestCase):
     def test_transpose(self):
-        partition = Partition([8, 8, 6,5,3,3,3,1])
+        partition = Partition(8, 8, 6,5,3,3,3,1)
         transposed = partition.transpose()
         self.assertEqual(sum(partition), sum(transposed))
         self.assertEqual(transposed, [8, 7, 7, 4, 4, 3, 2, 2])
@@ -115,5 +116,3 @@ class PartitionsTest(unittest.TestCase):
         self.assertTrue(constraints.isValid([6,4,2]))
         self.assertFalse(constraints.isValid([5,2,2,1]))
 
-#if __name__ == '__main__':
-#    unittest.main()

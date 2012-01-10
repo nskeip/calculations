@@ -2,6 +2,7 @@ __author__ = 'Daniel Lytkin'
 
 
 class PartitionConstraints:
+    # TODO: doc
     __defaultConstraints = {"length" : 0,
                             "min_length" : 1, "max_length" : 0,
                             "min_part" : 1, "max_part" : 0,
@@ -42,6 +43,7 @@ class PartitionConstraints:
 
 
 class Partitions:
+    # TODO: doc
     r"""
     Class providing iterator on partitions and size method
     """
@@ -52,28 +54,16 @@ class Partitions:
 
 
     def __iter__(self):
-        number = self.number
+        current = Partition(self.number)
         if self.constraints.isEmpty():
-            class PartitionsIterator:
-                def __init__(self):
-                    self.current = Partition(number)
-
-                def next(self):
-                    self.current = self.current.next()
-                    return self.current
-            return PartitionsIterator()
+            while current is not None:
+                yield current
+                current = current.next()
         else:
-            constraints = self.constraints
-            class PartitionsConstrainedIterator:
-                def __init__(self):
-                    self.current = Partition(number)
-
-                def next(self):
-                    while True:
-                        self.current = self.current.next()
-                        if constraints.isValid(self.current): break
-                    return self.current
-            return PartitionsConstrainedIterator()
+            while current is not None:
+                if self.constraints.isValid(current):
+                    yield current
+                current = current.next()
 
 
     def size(self):
@@ -89,22 +79,13 @@ class Partition(list):
     r"""
     This class provides methods to generate partitions of natural numbers.
     """
-    def __init__(self, arg):
-        r"""
-        When called with integer argument n, creates zero partition, which is []. By calling next() you'll get [5].
-        If the argument is list, it is treated as partition
-        """
-        if isinstance(arg, long) or isinstance(arg, int):
-            self.number = arg
-            self._h = 1  # number of elements distinct from 1
-            super(Partition, self).__init__()
-        elif isinstance(arg, Partition):
-            super(Partition, self).__init__(arg)
-            self._h = arg._h
+    def __init__(self, *arg):
+        if isinstance(arg[0], list):
+            super(Partition, self).__init__(arg[0])
         else:
-            # self.number = sum(arg) # possibly redundant
             super(Partition, self).__init__(arg)
-            self._h = len(filter(lambda x: x>1, self))
+        self._h = arg[0]._h if isinstance(arg[0], Partition) else len(filter(lambda x: x>1, self))
+
 
     def transpose(self):
         r"""
@@ -120,19 +101,15 @@ class Partition(list):
                 i += 1
             else:
                 break
-        return Partition(transposed)
+        return Partition(*transposed)
 
 
     def next(self):
         r"""
         Based on ZS1 algorithm from http://www.site.uottawa.ca/~ivan/F49-int-part.pdf
         """
-        if not len(self):
-            return Partition([self.number])
-
-
         if self[0] == 1:
-            raise StopIteration
+            return None
 
         x = Partition(self)  # make a copy of this partition
         h = x._h
