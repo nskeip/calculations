@@ -46,12 +46,18 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, p)
 
     def test_length(self):
-        self.maxDiff = None
-        n = 20
-        k = 5
+        # self.maxDiff = None
+        n = 30
+        k = 11
         p = list(Partitions(n, length=k))
         expected = filter(lambda x: len(x)==k, Partitions(n))
         self.assertSequenceEqual(expected, p)
+
+    def test_invalid_length(self):
+        n = 10
+        k = 11
+        p = list(Partitions(n, length=k))
+        self.assertSequenceEqual([], p)
 
     def test_max_part(self):
         p = list(Partitions(10, max_part=5))

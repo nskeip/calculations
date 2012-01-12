@@ -148,7 +148,7 @@ class Partition(list):
 class FixedLengthPartition(list):
     def __init__(self, *args, **kwargs):
         length = kwargs.get("length")
-        if length >= len(args) > 0:
+        if 0 < len(args) <= length <= args[0]:
             # first partition:
             super(FixedLengthPartition, self).__init__([args[0]-length+1]+[1]*(length-1))
             self._length = length
@@ -157,39 +157,20 @@ class FixedLengthPartition(list):
             self._length = len(args)
 
     def next(self):
-        # first search for the first index of the smallest part
         smallest = self[-1]
         i = 1
         try:
-            while self[-i-1] == smallest:
+            while self[-i-1] - smallest < 2:
                 i += 1
-        except IndexError: # this means that every element equals to smallest
-            return None
-
-        # now search for index j such that self[-j-1] - self[-j] >= 2
-        # if found, decrement self[-j-1] and increment self[-j]
-        try:
-            j = i
-            while self[-j-1] - self[-j] < 2:
-                j += 1
-
-            x = list(self)
-            x[-j-1] -= 1
-            x[-j] += 1
-            return FixedLengthPartition(*x)
-        except IndexError:
-            pass
-
-        # finally search for index k such that self[-k] - self[-j] >=2
-        try:
-            k = i+2
-            while self[-k] - self[-i] < 2:
-                k += 1
-
-            x = list(self)
-            x[-k] -= 1
-            x[-i] += 1
-            return FixedLengthPartition(*x)
-
         except IndexError:
             return None
+
+        x = list(self)
+        x[-i-1] -= 1
+        s = sum(x[-i:]) + 1
+        while i > 0:
+            x[-i] = min(x[-i-1], s-i+1)
+            s -= x[-i]
+            i -= 1
+
+        return FixedLengthPartition(*x)
