@@ -32,13 +32,22 @@ class PartitionTest(unittest.TestCase):
 
         self.assertSequenceEqual(expected, allPartitions)
 
+    def test_first_fixed_length_partition(self):
+        n = 10
+        k = 5
+        p = Partitions(n, length=k).__iter__().next()
+        expected = [n-k+1] + [1]*(k-1)
+        self.assertSequenceEqual(p, expected)
+
+
     def test_pairs(self):
         p = list(Partitions(10, length=2))
         expected = [[9,1], [8,2], [7,3], [6,4], [5,5]]
         self.assertSequenceEqual(expected, p)
 
     def test_length(self):
-        n = 10
+        self.maxDiff = None
+        n = 20
         k = 5
         p = list(Partitions(n, length=k))
         expected = filter(lambda x: len(x)==k, Partitions(n))

@@ -26,7 +26,7 @@ class SetTest(unittest.TestCase):
         """
         Maximal sets are exactly the sets that are not contained in any other
         """
-        n = 50
+        n = 30
         sets = list(BoundedSets(n, maximal=True))
         expected = self.filterContained(list(BoundedSets(n)))
         self.assertSequenceEqual(expected, sets)
@@ -36,7 +36,7 @@ class SetTest(unittest.TestCase):
         Every partition must have the set of its parts contained in some bounded set for the same n.
         We only need sets that are maximal by containment
         """
-        n = 50
+        n = 30
         minusPartitions = list(BoundedSets(n, maximal=True))
         allPartitions = list(Partitions(n))
 

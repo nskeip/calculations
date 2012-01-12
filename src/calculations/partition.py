@@ -157,4 +157,39 @@ class FixedLengthPartition(list):
             self._length = len(args)
 
     def next(self):
-        pass # TODO: implement
+        # first search for the first index of the smallest part
+        smallest = self[-1]
+        i = 1
+        try:
+            while self[-i-1] == smallest:
+                i += 1
+        except IndexError: # this means that every element equals to smallest
+            return None
+
+        # now search for index j such that self[-j-1] - self[-j] >= 2
+        # if found, decrement self[-j-1] and increment self[-j]
+        try:
+            j = i
+            while self[-j-1] - self[-j] < 2:
+                j += 1
+
+            x = list(self)
+            x[-j-1] -= 1
+            x[-j] += 1
+            return FixedLengthPartition(*x)
+        except IndexError:
+            pass
+
+        # finally search for index k such that self[-k] - self[-j] >=2
+        try:
+            k = i+2
+            while self[-k] - self[-i] < 2:
+                k += 1
+
+            x = list(self)
+            x[-k] -= 1
+            x[-i] += 1
+            return FixedLengthPartition(*x)
+
+        except IndexError:
+            return None
