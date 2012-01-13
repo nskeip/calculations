@@ -115,18 +115,21 @@ class PartitionTest(unittest.TestCase):
         expected = [[10], [8, 2], [7, 3], [6, 4]]
         self.assertSequenceEqual(expected, p)
 
-    def test_constraints(self):
+    def test_empty_constraints(self):
         constraints = PartitionConstraints()
         self.assertTrue(constraints.isEmpty())
 
+    def test_length_part_constraints(self):
         constraints = PartitionConstraints(length=5, max_part=5)
         self.assertTrue(constraints.isValid([5, 2, 1, 1, 1]))
         self.assertFalse(constraints.isValid([5, 2, 1, 1]))
 
+    def test_max_slope_constraints(self):
         constraints = PartitionConstraints(max_slope=2)
         self.assertTrue(constraints.isValid([5,5,3,1]))
         self.assertFalse(constraints.isValid([5,2,2,1]))
 
+    def test_min_slope_constraints(self):
         constraints = PartitionConstraints(min_slope=2)
         self.assertTrue(constraints.isValid([6,4,2]))
         self.assertFalse(constraints.isValid([5,2,2,1]))

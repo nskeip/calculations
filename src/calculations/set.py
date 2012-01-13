@@ -28,7 +28,7 @@ class BoundedSets:
 
 
 class BoundedSet(list):
-
+    # TODO: doc
     def __init__(self, *args, **kwargs):
         if isinstance(args[0], list):
             super(BoundedSet, self).__init__(args[0])

@@ -48,7 +48,7 @@ class PartitionConstraints:
 class Partitions:
     # TODO: doc
     r"""
-    Class providing iterator on partitions and size method
+    Class providing iterator on partitions
     """
     def __init__(self, number, **kwargs):
         self.number = number
