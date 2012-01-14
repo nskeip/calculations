@@ -30,13 +30,16 @@ class SemisimpleElements:
             for ni in BoundedSets(n, maximal=True):
                 yield evaluate(q, ni)
         else:
-            for minuses in range(n+1):
-                pluses = n - minuses
-                minusLcms = (evaluate(q, ni) for ni in BoundedSets(minuses, maximal=True)) if minuses else [1]
-                for m in minusLcms:
-                    plusLcms = (evaluate(q, ni, ei=1) for ni in BoundedSets(pluses, maximal=True)) if pluses else [1]
-                    for p in plusLcms:
-                        yield lcm(m,p)
+            for left in range((n+2)//2):
+                right = n - left
+                leftPartitions = BoundedSets(left, maximal=True)
+                leftLcms = ((evaluate(q, ni), evaluate(q, ni, ei=1)) for ni in leftPartitions) if left else [(1,1)]
+                for m in leftLcms:
+                    rigthPartitions = BoundedSets(right, maximal=True)
+                    rightLcms = ((evaluate(q, ni, ei=1), evaluate(q, ni)) for ni in rigthPartitions) if right else [(1,1)]
+                    for p in rightLcms:
+                        yield lcm(m[0], p[0])
+                        yield lcm(m[1], p[1])
 
 
 class Signs:

@@ -24,8 +24,8 @@ class SemisimpleTest(unittest.TestCase):
         """
         Test elements [q^{n_1}-1, ..., q^{n_k}-1] for all n_1+...+n_k=n
         """
-        n = 10
-        q = 4
+        n = 20
+        q = 5
         ss = SemisimpleElements(q, n, minus=True)
         for ni in Partitions(n):
             elem = semisimple.evaluate(q, ni)
@@ -44,8 +44,9 @@ class SemisimpleTest(unittest.TestCase):
         self.assertSequenceEqual(expected, signs)
 
     def test_all_semisimple(self):
-        n = 10
-        q = 4
+        # very slow! For every partition of size n it calculates 2^n sign tuples.
+        n = 12
+        q = 5
         ss = list(SemisimpleElements(q, n))
 
         for ni in Partitions(n):
