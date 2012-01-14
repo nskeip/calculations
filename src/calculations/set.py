@@ -41,7 +41,7 @@ class BoundedSet(list):
         self.next = self._nextMax if self._maximal else self._next
 
     def _next(self): # generate next set
-        if self[0] == 1:
+        if self[0] <= 1:
             return None
 
         x = BoundedSet(self)

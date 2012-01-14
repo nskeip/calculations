@@ -1,29 +1,42 @@
-from calculations.numeric import lcm
-from calculations.set import BoundedSet
+from numeric import lcm
+from set import  BoundedSets
 
 __author__ = 'Daniel Lytkin'
 
-def evaluate(q, ni, ei = None):
+def evaluate(q, ni, ei = -1):
     """Calculates sesmisimple element with base q, partition ni and signs ei, which is precisely
     lcm(q^ni[1] + ei[1], ..., q^ni[k] + ei[k]) where k is the length of partition.
+    ei may be a single integer - in this it is considered as same sign for each element.
     """
     try:
-        return reduce(lcm, (q**n + e for (n, e) in zip(ni, ei)))
+    # for integer ei
+        return reduce(lcm, (q**n + ei for n in ni))
     except TypeError:
-        return reduce(lcm, (q**n - 1 for n in ni))
+    # for sequence ei
+        return reduce(lcm, (q**n + e for (n, e) in zip(ni, ei)))
 
 
 class SemisimpleElements:
     # TODO: doc
-    def __init__(self, q, n, onlyMinus=False):
+    def __init__(self, q, n, minus=False):
         self._q = q
         self._n = n
-        self._onlyMinus = onlyMinus
+        self._onlyMinus = minus
 
     def __iter__(self):
+        q = self._q
+        n = self._n
         if self._onlyMinus:
-            return (evaluate(self._q, ni) for ni in BoundedSet(self._n, maximal=True))
-
+            for ni in BoundedSets(n, maximal=True):
+                yield evaluate(q, ni)
+        else:
+            for minuses in range(n+1):
+                pluses = n - minuses
+                minusLcms = (evaluate(q, ni) for ni in BoundedSets(minuses, maximal=True)) if minuses else [1]
+                for m in minusLcms:
+                    plusLcms = (evaluate(q, ni, ei=1) for ni in BoundedSets(pluses, maximal=True)) if pluses else [1]
+                    for p in plusLcms:
+                        yield lcm(m,p)
 
 
 class Signs:

@@ -26,10 +26,10 @@ class SemisimpleTest(unittest.TestCase):
         """
         n = 10
         q = 4
-        ss = SemisimpleElements(q, n, onlyMinus=True)
-        allElements = (semisimple.evaluate(q, ni) for ni in Partitions(n))
-        for elem in allElements:
-            self.assertTrue(any(x % elem == 0 for x in ss))
+        ss = SemisimpleElements(q, n, minus=True)
+        for ni in Partitions(n):
+            elem = semisimple.evaluate(q, ni)
+            self.assertTrue(any(x % elem == 0 for x in ss), msg=str(ni))
 
     def test_signs(self):
         signs = list(Signs(4))
@@ -42,3 +42,15 @@ class SemisimpleTest(unittest.TestCase):
             [-1, -1, 1, 1], [1, -1, 1, 1],
             [-1, 1, 1, 1], [1, 1, 1, 1]]
         self.assertSequenceEqual(expected, signs)
+
+    def test_all_semisimple(self):
+        n = 10
+        q = 4
+        ss = list(SemisimpleElements(q, n))
+
+        for ni in Partitions(n):
+            for ei in Signs(len(ni)):
+                elem = semisimple.evaluate(q, ni, ei)
+                self.assertTrue(any(x % elem == 0 for x in ss),
+                    msg="element with base {}, partition {} and signs {} = {} " \
+                        "doesn't divide any of {}".format(str(q), str(ni), str(ei), str(elem), str(ss)))
