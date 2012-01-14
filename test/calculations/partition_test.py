@@ -6,8 +6,8 @@ __author__ = 'Daniel Lytkin'
 
 class PartitionTest(unittest.TestCase):
     def test_transpose(self):
-        partition = Partition(8, 8, 6,5,3,3,3,1)
-        transposed = partition.transpose()
+        partition = [8, 8, 6,5,3,3,3,1]
+        transposed = Partitions.transpose(partition)
         self.assertEqual(sum(partition), sum(transposed))
         self.assertEqual(transposed, [8, 7, 7, 4, 4, 3, 2, 2])
 
@@ -114,23 +114,3 @@ class PartitionTest(unittest.TestCase):
         p = list(Partitions(10, min_slope=2))
         expected = [[10], [8, 2], [7, 3], [6, 4]]
         self.assertSequenceEqual(expected, p)
-
-    def test_empty_constraints(self):
-        constraints = PartitionConstraints()
-        self.assertTrue(constraints.isEmpty())
-
-    def test_length_part_constraints(self):
-        constraints = PartitionConstraints(length=5, max_part=5)
-        self.assertTrue(constraints.isValid([5, 2, 1, 1, 1]))
-        self.assertFalse(constraints.isValid([5, 2, 1, 1]))
-
-    def test_max_slope_constraints(self):
-        constraints = PartitionConstraints(max_slope=2)
-        self.assertTrue(constraints.isValid([5,5,3,1]))
-        self.assertFalse(constraints.isValid([5,2,2,1]))
-
-    def test_min_slope_constraints(self):
-        constraints = PartitionConstraints(min_slope=2)
-        self.assertTrue(constraints.isValid([6,4,2]))
-        self.assertFalse(constraints.isValid([5,2,2,1]))
-

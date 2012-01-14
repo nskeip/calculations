@@ -1,125 +1,56 @@
 __author__ = 'Daniel Lytkin'
 
-
-class PartitionConstraints:
-    # TODO: doc
-    __defaultConstraints = {"length" : 0,
-                            "min_length" : 1, "max_length" : 0,
-                            "min_part" : 1, "max_part" : 0,
-                            "min_slope" : 0, "max_slope" : 0}
-
-    def __init__(self, **kwargs):
-        d = PartitionConstraints.__defaultConstraints
-        self.constraints = dict([(key, kwargs.get(key) or d[key]) for key in d.iterkeys()])
-
-    def isEmpty(self):
-        d = PartitionConstraints.__defaultConstraints
-        return all(self.constraints.get(key) == d.get(key) for key in d.iterkeys())
-
-    def isValid(self, partition):
-        length = self.constraints.get("length")
-        if length and len(partition) != length: return False
-
-        if len(partition) < self.constraints.get("min_length"): return False
-
-        max_length  = self.constraints.get("max_length")
-        if max_length and len(partition) > max_length: return False
-
-        min_part = self.constraints.get("min_part")
-        if min_part > 1 and any(x < min_part for x in partition): return False
-
-        max_part = self.constraints.get("max_part")
-        if max_part and any(x > max_part for x in partition): return False
-
-        slopes = map(lambda x,y: x-y, partition, partition[1:] + [0])
-
-        min_slope = self.constraints.get("min_slope")
-        if min_slope and any(x < min_slope for x in slopes): return False
-
-        max_slope = self.constraints.get("max_slope")
-        if max_slope and any(x > max_slope for x in slopes): return False
-
-        return True
-
-    def get(self, key):
-        return self.constraints.get(key)
-
-
 class Partitions:
     # TODO: doc
-    r"""
-    Class providing iterator on partitions
+    r"""Class providing iterator on partitions
     """
-    def __init__(self, number, **kwargs):
-        self.number = number
-        self.constraints = PartitionConstraints(**kwargs)
 
-
-
-    def __iter__(self):
-        length = self.constraints.get("length")
-        if length:
-            current = FixedLengthPartition(self.number, length=length)
-        else:
-            current = Partition(self.number)
-        if self.constraints.isEmpty():
-            while current is not None:
-                yield current
-                current = current.next()
-        else:
-            while current is not None:
-                if self.constraints.isValid(current):
-                    yield current
-                current = current.next()
-
-
-    def size(self):
-        r"""
-        Returns number of partitions
-        """
-        # TODO
-        pass
-
-
-
-class Partition(list):
-    r"""
-    This class provides methods to generate partitions of natural numbers.
-    """
-    def __init__(self, *arg):
-        if isinstance(arg[0], list):
-            super(Partition, self).__init__(arg[0])
-        else:
-            super(Partition, self).__init__(arg)
-        self._h = arg[0]._h if isinstance(arg[0], Partition) else len(filter(lambda x: x>1, self))
-
-
-    def transpose(self):
-        r"""
-        Transposes the partition, e. g. its Ferrers diagram.
+    @staticmethod
+    def transpose(partition):
+        """Transposes the partition, e. g. its Ferrers diagram.
         partition must be in descending order
         """
         transposed = []
         i = 0
         while True:
-            counter = len(filter(lambda x: x-i>0, self))
+            counter = len(filter(lambda x: x-i>0, partition))
             if counter:
                 transposed.append(counter)
                 i += 1
             else:
                 break
-        return Partition(*transposed)
+        return transposed
+
+    @staticmethod
+    def _slope(seq):
+        return map(lambda x,y: x-y, seq, seq[1:] + [0])
+
+    def _isValid(self, seq):
+        return all(func(seq) for func in self._validators)
+
+    def __init__(self, number, length=None, min_length=None, max_length=None,
+                 min_part=None, max_part=None, min_slope=None, max_slope=None):
+        self._number, self._length = number, length
+        validators = [(min_length, lambda seq: len(seq)>=min_length),
+            (max_length, lambda seq: len(seq)<=max_length),
+            (min_part, lambda seq: all(x>=min_part for x in seq)),
+            (max_part, lambda seq: all(x<=max_part for x in seq)),
+            (min_slope, lambda seq: all(x>=min_slope for x in Partitions._slope(seq))),
+            (max_slope, lambda seq: all(x<=max_slope for x in Partitions._slope(seq)))]
+        self._validators = [func for (c, func) in validators if c is not None]
 
 
-    def next(self):
+    _h = 0
+    @staticmethod
+    def _next(partition):
         r"""
         Based on ZS1 algorithm from http://www.site.uottawa.ca/~ivan/F49-int-part.pdf
         """
-        if self[0] == 1:
+        if partition[0] <= 1:
             return None
 
-        x = Partition(self)  # make a copy of this partition
-        h = x._h
+        h = Partitions._h # not a really good idea; needed to simplify iterator definition
+        x = list(partition)  # make a copy of this partition
         if x[h-1] == 2:
             x[h-1]=1
             x.append(1)
@@ -135,37 +66,28 @@ class Partition(list):
             if not t:
                 del x[h:]  # remove redundant ones
             else:
-                if h+1 <= len(x):
+                m = h+1-len(x)
+                if m <= 0:
                     del x[h+1:]
                 else:
-                    x[len(x):h+1] = [1]*(h+1-len(x))
+                    x[len(x):] = [1] * m
                 if t > 1:
                     h += 1
                     x[h-1] = t
-        x._h = h
+        Partitions._h = h
         return x
 
-class FixedLengthPartition(list):
-    def __init__(self, *args, **kwargs):
-        length = kwargs.get("length")
-        if 0 < len(args) <= length <= args[0]:
-            # first partition:
-            super(FixedLengthPartition, self).__init__([args[0]-length+1]+[1]*(length-1))
-            self._length = length
-        else:
-            super(FixedLengthPartition, self).__init__(args)
-            self._length = len(args)
-
-    def next(self):
-        smallest = self[-1]
+    @staticmethod
+    def _nextFixedLength(partition):
+        smallest = partition[-1]
         i = 1
         try:
-            while self[-i-1] - smallest < 2:
+            while partition[-i-1] - smallest < 2:
                 i += 1
         except IndexError:
             return None
 
-        x = list(self)
+        x = list(partition)
         x[-i-1] -= 1
         s = sum(x[-i:]) + 1
         while i > 0:
@@ -173,4 +95,24 @@ class FixedLengthPartition(list):
             s -= x[-i]
             i -= 1
 
-        return FixedLengthPartition(*x)
+        return x
+
+    def __iter__(self):
+        l = self._length
+        n = self._number
+        if self._length is None:
+            Partitions._h = 1 # we use class variable to generalize call next() function
+            nextPartition = Partitions._next
+            current = [n]
+        else:
+            nextPartition = Partitions._nextFixedLength
+            current = [n - l + 1] + [1]*(l - 1) if l<=n else None
+
+        if not len(self._validators):
+            while current is not None:
+                yield current
+                current = nextPartition(current)
+        else:
+            while current is not None:
+                if self._isValid(current): yield current
+                current = nextPartition(current)
