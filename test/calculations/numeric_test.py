@@ -1,3 +1,4 @@
+from collections import Counter
 import unittest
 from calculations.numeric import *
 
@@ -25,3 +26,27 @@ class NumericTest(unittest.TestCase):
         a = filterDivisors([10, 9, 7, 6, 5, 4, 3])
         expected = [10, 9, 7, 6, 4]
         self.assertSequenceEqual(expected, a)
+
+    def test_filterDivisors_reversed(self):
+        a = filterDivisors([10, 9, 7, 6, 5, 4, 3], reverse=True)
+        expected = [4, 6, 7, 9, 10]
+        self.assertSequenceEqual(expected, a)
+
+    def test_first_divisor(self):
+        self.assertEqual(3, firstDivisor(9))
+        self.assertEqual(41, firstDivisor(41))
+
+    def test_next_odd_divisor(self):
+        self.assertEqual(13, nextOddDivisor(13, 1))
+        self.assertEqual(5, nextOddDivisor(35, 3))
+        self.assertEqual(7, nextOddDivisor(49, 3))
+
+    def test_factors(self):
+        expected = Counter({2:10, 3:7, 5:3, 7:1, 11:1, 23:1})
+        factors = Integer(495766656000).factors()
+        self.assertEqual(expected, factors)
+
+    def test_product(self):
+        expected = 495766656000
+        product = int(Integer((2, 10), (3, 7), (5, 3), 7, 11, 23))
+        self.assertEqual(expected, product)
