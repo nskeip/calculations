@@ -17,7 +17,10 @@ def evaluate(q, ni, ei = -1):
 
 
 class SemisimpleElements:
-    # TODO: doc
+    """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for all partitions n_1 + ... + n_k = n.
+    If optional parameter 'minus' is set to True, generates only elements with all minuses
+
+    """
     def __init__(self, q, n, minus=False):
         self._q = q
         self._n = n
@@ -30,16 +33,16 @@ class SemisimpleElements:
             for ni in BoundedSets(n, maximal=True):
                 yield evaluate(q, ni)
         else:
-            for left in range((n+2)//2):
+            for left in xrange((n+2)//2):
                 right = n - left
                 leftPartitions = BoundedSets(left, maximal=True)
                 leftLcms = ((evaluate(q, ni), evaluate(q, ni, ei=1)) for ni in leftPartitions) if left else [(1,1)]
-                for m in leftLcms:
+                for l in leftLcms:
                     rigthPartitions = BoundedSets(right, maximal=True)
                     rightLcms = ((evaluate(q, ni, ei=1), evaluate(q, ni)) for ni in rigthPartitions) if right else [(1,1)]
-                    for p in rightLcms:
-                        yield lcm(m[0], p[0])
-                        yield lcm(m[1], p[1])
+                    for r in rightLcms:
+                        yield lcm(l[0], r[0])
+                        yield lcm(l[1], r[1])
 
 
 class Signs:
