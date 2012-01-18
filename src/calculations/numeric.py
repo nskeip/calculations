@@ -80,6 +80,11 @@ class Integer:
     def __int__(self):
         return self._int
 
+    def __cmp__(self, other):
+        if isinstance(other, Integer):
+            return cmp(self._int, other._int)
+        return cmp(self._int, other)
+
     @staticmethod
     def _removeFactor(number, factor):
         power = 0
