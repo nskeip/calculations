@@ -101,6 +101,7 @@ class AlternatingGroup(Group):
     def __init__(self, degree):
         self._degree = degree
         self._spectrum = None
+        self._order = None
 
     def spectrum(self):
         if self._spectrum is None:
@@ -111,10 +112,15 @@ class AlternatingGroup(Group):
             self._spectrum = filterDivisors(self._spectrum, reverse=True)
         return self._spectrum
 
+    def order(self):
+        if self._order is None:
+            self._order = reduce(lambda x, y: x*y, xrange(3, self._degree+1))
+        return self._order
+
     def __str__(self):
         return "Alt({})".format(self._degree)
 
 class ClassicalGroup(Group):
-    def __init__(self, name, dimension, field):
+    def __init__(self, name, dimension, *field):
         pass
 

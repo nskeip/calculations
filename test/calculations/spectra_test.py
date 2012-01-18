@@ -55,6 +55,11 @@ class SpectraTest(unittest.TestCase):
         g = AlternatingGroup(21)
         self.assertSequenceEqual(expected, g.spectrum())
 
+    def test_alternating_order(self):
+        expected = 653837184000
+        g = AlternatingGroup(15)
+        self.assertEqual(expected, g.order())
+
     def test_alternating_str(self):
         g = AlternatingGroup(51)
         self.assertEqual("Alt(51)", str(g))
@@ -62,3 +67,8 @@ class SpectraTest(unittest.TestCase):
     def test_classical_str(self):
         g = ClassicalGroup("PSp", 4, Field(2, 3))
         self.assertEqual("PSp(4, 8)", str(g))
+
+    def test_symplectic(self):
+        expected = [ 4, 14, 18, 63, 65 ]
+        g = ClassicalGroup("Sp", 4, 8)
+        self.assertSetEqual(set(expected), set(g.spectrum()))
