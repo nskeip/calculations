@@ -21,10 +21,11 @@ class SemisimpleElements:
     If optional parameter 'minus' is set to True, generates only elements with all minuses
 
     """
-    def __init__(self, q, n, minus=False):
+    def __init__(self, q, n, minus=False, min_length=1):
         self._q = q
         self._n = n
         self._onlyMinus = minus
+        self._min_length = min_length
 
     def __iter__(self):
         q = self._q
@@ -36,13 +37,17 @@ class SemisimpleElements:
             for left in xrange((n+2)//2):
                 right = n - left
                 leftPartitions = BoundedSets(left, maximal=True)
-                leftLcms = ((evaluate(q, ni), evaluate(q, ni, ei=1)) for ni in leftPartitions) if left else [(1,1)]
-                for l in leftLcms:
-                    rigthPartitions = BoundedSets(right, maximal=True)
-                    rightLcms = ((evaluate(q, ni, ei=1), evaluate(q, ni)) for ni in rigthPartitions) if right else [(1,1)]
-                    for r in rightLcms:
-                        yield lcm(l[0], r[0])
-                        yield lcm(l[1], r[1])
+                # leftLcms = ((evaluate(q, ni), evaluate(q, ni, ei=1)) for ni in leftPartitions) if left else [(1,1)]
+                for lPart in leftPartitions:
+                    lLcms = (evaluate(q, lPart), evaluate(q, lPart, ei=1)) if left else (1, 1)
+                    rightPartitions = BoundedSets(right, maximal=True)
+                    # rightLcms = ((evaluate(q, ni, ei=1), evaluate(q, ni)) for ni in rigthPartitions) if right else [(1,1)]
+                    for rPart in rightPartitions:
+                        if len(lPart)+len(rPart) < self._min_length:
+                            continue
+                        rLcms = (evaluate(q, rPart, ei=1), evaluate(q, rPart)) if right else (1, 1)
+                        yield lcm(lLcms[0], rLcms[0])
+                        yield lcm(lLcms[1], rLcms[1])
 
 
 class Signs:
