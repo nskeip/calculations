@@ -50,3 +50,14 @@ class NumericTest(unittest.TestCase):
         expected = 495766656000
         product = int(Integer((2, 10), (3, 7), (5, 3), 7, 11, 23))
         self.assertEqual(expected, product)
+
+    def test_getExponent(self):
+        values = {(36, 6) : 2,
+                  (128, 2) : 7,
+                  (12, 2) : None,
+                  (42, 1) : None,
+                  (13, 13) : 1,
+                  (1, 42) : 0
+                  }
+        for key, value in values.iteritems():
+            self.assertTrue(getExponent(*key) == value)

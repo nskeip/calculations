@@ -17,6 +17,7 @@ def lcm(a, b):
     """
     return a/gcd(a, b) * b
 
+
 def filterDivisors(iterable, reverse=False):
     """
     removes all elements that divide any other.
@@ -25,13 +26,13 @@ def filterDivisors(iterable, reverse=False):
     """
     ret = []
     if reverse:
-        for element in iterable:
-                if not any(x % element == 0 for x in ret):
-                    ret.insert(0,element)
+        def appendLeft(element): ret.insert(0, element)
+        addElement = appendLeft
     else:
-        for element in iterable:
-            if not any(x % element == 0 for x in ret):
-                ret.append(element)
+        addElement = ret.append
+    for element in iterable:
+        if not any(x % element == 0 for x in ret):
+            addElement(element)
 
     return ret
 
@@ -54,6 +55,17 @@ def nextOddDivisor(number, previous):
         if number % i == 0:
             return i
     return number
+
+def getExponent(number, base):
+    """If number = base**k, returns k. Else returns None
+    """
+    k = 0
+    if base > 1:
+        while number % base == 0:
+            number /= base
+            k += 1
+    return k if number == 1 else None
+
 
 class Integer:
     """Represents integer with methods to factorize.
