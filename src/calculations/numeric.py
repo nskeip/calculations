@@ -25,7 +25,7 @@ def filterDivisors(iterable, reverse=False):
     If 'reverse' is True, returns list in increasing order
     """
     ret = []
-    if reverse:
+    if not reverse:
         def appendLeft(element): ret.insert(0, element)
         addElement = appendLeft
     else:
@@ -35,6 +35,11 @@ def filterDivisors(iterable, reverse=False):
             addElement(element)
 
     return ret
+
+def sortAndFilter(sequence, reverse=False):
+    ret = list(sequence)
+    ret.sort(reverse=True)
+    return filterDivisors(ret, reverse=reverse)
 
 def firstDivisor(number):
     """Returns lowest divisor of 'number' greater than 1

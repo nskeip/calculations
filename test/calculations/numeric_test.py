@@ -1,4 +1,3 @@
-from collections import Counter
 import unittest
 from calculations.numeric import *
 
@@ -22,15 +21,20 @@ class NumericTest(unittest.TestCase):
         self.assertTrue(c % b == 0)
         self.assertTrue(all(t % a > 0 or t % b > 0 for t in range(max(a, b), c)))
 
-    def test_filterDivisors(self):
-        a = filterDivisors([10, 9, 7, 6, 5, 4, 3])
+    def test_filterDivisors_reversed(self):
+        a = filterDivisors([10, 9, 7, 6, 5, 4, 3], reverse=True)
         expected = [10, 9, 7, 6, 4]
         self.assertSequenceEqual(expected, a)
 
-    def test_filterDivisors_reversed(self):
-        a = filterDivisors([10, 9, 7, 6, 5, 4, 3], reverse=True)
+    def test_filterDivisors(self):
+        a = filterDivisors([10, 9, 7, 6, 5, 4, 3])
         expected = [4, 6, 7, 9, 10]
         self.assertSequenceEqual(expected, a)
+
+    def test_sortAndFilter(self):
+        a = [9, 8, 21, 7, 12, 6, 5, 15, 10, 5, 4, 12, 4, 4, 3, 6, 3, 6, 3, 2, 2, 1]
+        expected = [21, 15, 12, 10, 9, 8]
+        self.assertSequenceEqual(expected, sortAndFilter(a, reverse=True))
 
     def test_first_divisor(self):
         self.assertEqual(3, firstDivisor(9))
