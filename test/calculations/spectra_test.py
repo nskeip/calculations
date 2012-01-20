@@ -26,14 +26,14 @@ class SpectraTest(unittest.TestCase):
 
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
-            Group().spectrum()
+            Group().apex()
 
     def test_sporadic(self):
         expected = [ 32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
                      57, 59, 60, 62, 66, 68, 69, 70, 71, 78, 84,
                      87, 88, 92, 93, 94, 95, 104, 105, 110, 119 ]
         g = SporadicGroup("M")
-        self.assertSequenceEqual(expected, g.spectrum())
+        self.assertSequenceEqual(expected, g.apex())
 
     def test_sporadic_order(self):
         expected = 495766656000
@@ -53,7 +53,7 @@ class SpectraTest(unittest.TestCase):
         expected = [19, 34, 48, 51, 52, 72, 78, 88, 91, 99, 110,
                     120, 126, 132, 165, 168, 180, 195, 231, 315, 420]
         g = AlternatingGroup(21)
-        self.assertSequenceEqual(expected, g.spectrum())
+        self.assertSequenceEqual(expected, g.apex())
 
     def test_alternating_order(self):
         expected = 653837184000
@@ -68,7 +68,16 @@ class SpectraTest(unittest.TestCase):
         g = ClassicalGroup("PSp", 4, Field(2, 3))
         self.assertEqual("PSp(4, 8)", str(g))
 
+    def test_classical_field(self):
+        for g in (ClassicalGroup("PSp", 4, Field(2, 3)),
+                  ClassicalGroup("PSp", 4, 2, 3),
+                  ClassicalGroup("PSp", 4, 8)):
+            self.assertEqual(2, g.field().char())
+            self.assertEqual(3, g.field().pow())
+
+
     def test_symplectic(self):
         expected = [ 4, 14, 18, 63, 65 ]
         g = ClassicalGroup("Sp", 4, 8)
-        self.assertSetEqual(set(expected), set(g.spectrum()))
+        self.assertSetEqual(set(expected), set(g.apex()))
+

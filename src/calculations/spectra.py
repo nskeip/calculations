@@ -35,7 +35,7 @@ class Field:
 class Group:
     """Interface for finite groups with method to calculate their spectra
     """
-    def spectrum(self):
+    def apex(self):
         raise NotImplementedError()
 
     def order(self):
@@ -84,7 +84,7 @@ class SporadicGroup(Group):
     def __init__(self, name):
         self._name = name
 
-    def spectrum(self):
+    def apex(self):
         return SporadicGroup._groups.get(self._name)[0]
 
     def order(self):
@@ -98,12 +98,17 @@ class SporadicGroup(Group):
         return SporadicGroup._groups.keys()
 
 class AlternatingGroup(Group):
+    """AlternatingGroup(n) represents alternating group of degree n
+    """
     def __init__(self, degree):
         self._degree = degree
         self._spectrum = None
         self._order = None
 
-    def spectrum(self):
+    def degree(self):
+        return self._degree
+
+    def apex(self):
         if self._spectrum is None:
             n = self._degree
             partitions = filter(lambda x: (len(x)+n) % 2 == 0, Partitions(n))
@@ -121,6 +126,20 @@ class AlternatingGroup(Group):
         return "Alt({})".format(self._degree)
 
 class ClassicalGroup(Group):
+    """Usage:
+    ClassicalGroup("PSp", 14, Field(2, 5))
+    ClassicalGroup("PSp", 14, 32)
+    ClassicalGroup("PSp", 14, 2, 5)
+    """
     def __init__(self, name, dimension, *field):
-        pass
+        self._name = name
+        self._dim = dimension
+        self._field = field[0] if isinstance(field[0], Field) else Field(*field)
 
+
+    def field(self):
+        return self._field
+
+    @staticmethod
+    def _symplectic(n, f):
+        pass
