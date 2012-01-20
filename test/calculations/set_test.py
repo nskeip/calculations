@@ -52,3 +52,7 @@ class SetTest(unittest.TestCase):
         self.assertTrue(all(
             any(set(partition)<=set(mPartition) for mPartition in minusPartitions)
             for partition in allPartitions))
+
+    def test_zero_bound(self):
+        sets = list(BoundedSets(0))
+        self.assertSequenceEqual([[]], sets)

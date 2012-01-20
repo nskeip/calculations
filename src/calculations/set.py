@@ -68,11 +68,14 @@ class BoundedSets:
         self._maximal = maximal
 
     def __iter__(self):
-        current = [self._bound]
-        sum = self._bound
-        nextSet = BoundedSets._nextMaximal if self._maximal else BoundedSets._next
-        while current is not None:
-            yield current
-            current, sum = nextSet(current, self._bound, sum)
+        if self._bound:
+            current = [self._bound]
+            sum = self._bound
+            nextSet = BoundedSets._nextMaximal if self._maximal else BoundedSets._next
+            while current is not None:
+                yield current
+                current, sum = nextSet(current, self._bound, sum)
+        else:
+            yield []
 
 
