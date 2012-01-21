@@ -87,8 +87,9 @@ class SemisimpleTest(unittest.TestCase):
         n = 3
         q = 9
         p = 3
-        f = lambda p, k: (p**(k-1)+1)//2
+        f = lambda k: (p**(k-1)+1)//2
+        g = lambda k: p**k
 
-        mixed = list(MixedElements(q, n, p, f))
+        mixed = list(MixedElements(q, n, f, g))
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))

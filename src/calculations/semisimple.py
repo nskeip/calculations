@@ -50,14 +50,14 @@ class SemisimpleElements:
                         yield lcm(lLcms[1], rLcms[1])
 
 class MixedElements:
-    """Generates elements of form p^k * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
+    """Generates elements of form g(k) * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
     for all partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """
-    def __init__(self, q, n, p, f):
+    def __init__(self, q, n, f, g):
         self._q = q
         self._n = n
-        self._p = p
-        self._f = lambda k: f(self._p, k)
+        self._f = f
+        self._g = g
 
     def __iter__(self):
         k = 1
@@ -65,7 +65,7 @@ class MixedElements:
             toPart = self._n - self._f(k)
             if toPart <= 0: break
             for elem in SemisimpleElements(self._q, toPart):
-                yield elem*(self._p**k)
+                yield elem*self._g(k)
             k += 1
 
 class Signs:
