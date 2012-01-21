@@ -1,7 +1,7 @@
 import unittest
 from calculations import semisimple
 from calculations.partition import Partitions
-from calculations.semisimple import SemisimpleElements, Signs
+from calculations.semisimple import SemisimpleElements, Signs, MixedElements
 
 __author__ = 'Daniel Lytkin'
 
@@ -82,3 +82,13 @@ class SemisimpleTest(unittest.TestCase):
 
     def test_min_length(self):
         self.all_semisimple(11, 5, min_length=2)
+
+    def test_mixed(self):
+        n = 3
+        q = 9
+        p = 3
+        f = lambda p, k: (p**(k-1)+1)//2
+
+        mixed = list(MixedElements(q, n, p, f))
+        expected = [246, 240, 30, 24, 120, 120, 90, 72]
+        self.assertSetEqual(set(mixed), set(expected))
