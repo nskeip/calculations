@@ -1,5 +1,7 @@
-from calculations.numeric import lcm, filterDivisors, firstDivisor, Integer
+from itertools import chain
+from calculations.numeric import lcm, filterDivisors, firstDivisor, Integer, getExponent, sortAndFilter
 from calculations.partition import Partitions
+from calculations.semisimple import SemisimpleElements, MixedElements
 
 __author__ = 'Daniel Lytkin'
 
@@ -102,20 +104,18 @@ class AlternatingGroup(Group):
     """
     def __init__(self, degree):
         self._degree = degree
-        self._spectrum = None
+        self._apex = None
         self._order = None
 
     def degree(self):
         return self._degree
 
     def apex(self):
-        if self._spectrum is None:
+        if self._apex is None:
             n = self._degree
             partitions = filter(lambda x: (len(x)+n) % 2 == 0, Partitions(n))
-            self._spectrum = [reduce(lcm, partition) for partition in partitions]
-            self._spectrum.sort(reverse=True)
-            self._spectrum = filterDivisors(self._spectrum, reverse=True)
-        return self._spectrum
+            self._apex = sortAndFilter([reduce(lcm, partition) for partition in partitions])
+        return self._apex
 
     def order(self):
         if self._order is None:
@@ -125,21 +125,88 @@ class AlternatingGroup(Group):
     def __str__(self):
         return "Alt({})".format(self._degree)
 
+
+
+# spectrum methods
+def _symplectic_order(n, field):
+    n //= 2
+    q = field.order()
+    o = (q**(n**2)) * reduce(lambda x, y: x*y, (q**(2*i)-1 for i in xrange(1, n+1)))
+    return o
+
+def _symplectic_odd_c(n, field):
+    """Spectra of symplectic groups in odd characteristic
+    """
+    n //= 2
+    # (1)
+    a1 = SemisimpleElements(field.order(), n)
+    # (2)
+    p = field.char()
+    a2 = MixedElements(field.order(), n, lambda k: (p**(k-1)+1)//2, lambda k: p**k)
+    # (3)
+    k = getExponent(2*n-1, field.char())
+    a3 = () if k is None else (field.char()*(2*n-1))
+    return chain(a1, a2, a3)
+
+def _symplectic_even_c(n, field):
+    """Spectra of symplectic groups in characteristic 2
+    """
+    n //= 2
+    # (1)
+    a1 = SemisimpleElements(field.order(), n)
+    # (2)
+    a2 = (2*elem for elem in SemisimpleElements(field.order(), n-1))
+    # (3)
+    a3 = MixedElements(field.order(), n, lambda k: 2**(k-1)+1, lambda k: 2**(k+1))
+    # (4)
+    k = getExponent(n-1, 2)
+    a4 = () if k is None else ((n-1)*4,)
+    return chain(a1, a2, a3, a4)
+
+
+def _symplectic(n, field):
+    """Spectra of symplectic groups
+    """
+    if field.char() == 2:
+        return _symplectic_even_c(n, field)
+    else:
+        return _symplectic_odd_c(n, field)
+
+
 class ClassicalGroup(Group):
     """Usage:
     ClassicalGroup("PSp", 14, Field(2, 5))
     ClassicalGroup("PSp", 14, 32)
     ClassicalGroup("PSp", 14, 2, 5)
     """
+    _groups = {"Sp" : (_symplectic, _symplectic_order)}
+
     def __init__(self, name, dimension, *field):
         self._name = name
         self._dim = dimension
         self._field = field[0] if isinstance(field[0], Field) else Field(*field)
+        self._apex = None
+        self._order = None
 
+    def __str__(self):
+        return "{}({}, {})".format(self._name, self._dim, self._field.order())
 
     def field(self):
+        """Returns field of this group
+        """
         return self._field
 
-    @staticmethod
-    def _symplectic(n, f):
-        pass
+    def apex(self):
+        if self._apex is None:
+            func = ClassicalGroup._groups.get(self._name)[0]
+            self._apex = sortAndFilter(func(self._dim, self._field))
+        return self._apex
+
+    def order(self):
+        if self._order is None:
+            func = ClassicalGroup._groups.get(self._name)[1]
+            self._order = func(self._dim, self._field)
+        return self._order
+
+
+

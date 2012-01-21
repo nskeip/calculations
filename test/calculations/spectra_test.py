@@ -76,8 +76,17 @@ class SpectraTest(unittest.TestCase):
             self.assertEqual(3, g.field().pow())
 
 
-    def test_symplectic(self):
+    def test_symplectic_even(self):
         expected = [ 4, 14, 18, 63, 65 ]
         g = ClassicalGroup("Sp", 4, 8)
         self.assertSetEqual(set(expected), set(g.apex()))
 
+    def test_symplectic_odd(self):
+        expected = [ 72, 90, 240, 246, 328, 410, 728, 730 ]
+        g = ClassicalGroup("Sp", 6, 9)
+        self.assertSetEqual(set(expected), set(g.apex()))
+
+    def test_symplectic_order(self):
+        expected = 108051462804999168000
+        g = ClassicalGroup("Sp", 6, 9)
+        self.assertEqual(expected, g.order())
