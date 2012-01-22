@@ -17,6 +17,15 @@ def lcm(a, b):
     """
     return a/gcd(a, b) * b
 
+def primePart(n, b):
+    """Returns b'-part of number n, which is the greatest divisor of n coprime to d
+    """
+    while True:
+        d = gcd(n, b)
+        if d <= 1: break
+        n //= d
+    return n
+
 
 def filterDivisors(iterable, reverse=False):
     """
@@ -37,6 +46,8 @@ def filterDivisors(iterable, reverse=False):
     return ret
 
 def sortAndFilter(sequence, reverse=False):
+    """Converts raw sequence of numbers to sorted sequence without divisors
+    """
     ret = list(sequence)
     ret.sort(reverse=True)
     return filterDivisors(ret, reverse=reverse)

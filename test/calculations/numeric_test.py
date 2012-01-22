@@ -21,6 +21,11 @@ class NumericTest(unittest.TestCase):
         self.assertTrue(c % b == 0)
         self.assertTrue(all(t % a > 0 or t % b > 0 for t in range(max(a, b), c)))
 
+    def test_primePart(self):
+        self.assertEqual(13, primePart(26, 6))
+        self.assertEqual(12, primePart(60, 25))
+        self.assertEqual(1, primePart(125, 5))
+
     def test_filterDivisors_reversed(self):
         a = filterDivisors([10, 9, 7, 6, 5, 4, 3], reverse=True)
         expected = [10, 9, 7, 6, 4]
