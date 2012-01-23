@@ -1,10 +1,15 @@
 __author__ = 'Daniel Lytkin'
 
 class Partitions:
-    # TODO: doc
-    r"""Class providing iterator on partitions
+    """Class providing iterator on partitions
+    Required parameter:
+        number - the number to partition
+    Optional parameters:
+        length - if specified, generates only partitions of fixed length
+        min_length, max_length - minimal and maximal length of partitions
+        min_part, max_part - minimum and maximum for partition elements
+        min_slope, max_slope - minimum and maximum for numbers a[i]-a[i+1] for i=0..n-1 and a[i] for i=n
     """
-
     @staticmethod
     def transpose(partition):
         """Transposes the partition, e. g. its Ferrers diagram.
