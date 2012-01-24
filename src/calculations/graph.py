@@ -104,6 +104,36 @@ class Graph:
         vertices.sort()
         return vertices, self.edges()
 
+    def _maxCocliquesInIndices(self, indices):
+        """Searches for largest cocliques among vertices with specified indices
+        """
+        if len(indices) == 1: return [list(indices)]
+
+        max = 0
+        cocliques = []
+
+        for j in xrange(len(indices)-max-1):
+            i = indices[j]
+            # candidates for the next vertex in coclique:
+            t = filter(lambda x: (x > i and self._adjacency[x][i]==False), indices)
+            if len(t) < max: continue
+            nextCocliques = self._maxCocliquesInIndices(t)
+            for coclique in nextCocliques:
+                if len(coclique) < max: continue
+                if len(coclique) > max:
+                    # found larger coclique, delete old ones
+                    cocliques = []
+                    max = len(coclique)
+                coclique.insert(0, i)
+                cocliques.append(coclique)
+
+        return cocliques
+
+
+    def maxCocliques(self):
+        cocliquesIndices = self._maxCocliquesInIndices(range(len(self._adjacency)))
+        return [map(lambda i: self._vertices[i], coclique) for coclique in cocliquesIndices]
+
 
 class PrimeGraph(Graph):
     def __init__(self, spectrum):

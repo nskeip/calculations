@@ -1,4 +1,3 @@
-from itertools import permutations
 import unittest
 from calculations.graph import Graph, PrimeGraph, FastGraph
 
@@ -27,6 +26,13 @@ class GraphTest(unittest.TestCase):
             (2, 73), (3, 5), (3, 41), (5, 41), (5, 73), (7, 13)]
         self.assertSparseGraphEqual((expectedVertices, expectedEdges), g.asSparseGraph())
 
+    def test_add_vertices(self):
+        vertices = [1, 2, 3, 4, 5]
+        g = Graph(vertices)
+        h = Graph()
+        h.addVertices(vertices)
+        self.assertSparseGraphEqual(g.asSparseGraph(), h.asSparseGraph())
+
     def test_vertices(self):
         g = Graph([1,2,3])
         self.assertSequenceEqual([1, 2, 3], list(g.vertices()))
@@ -53,3 +59,13 @@ class GraphTest(unittest.TestCase):
         g.addEdges(edges)
         g.cloneVertex(2, 3)
         self.assertSparseGraphEqual((vertices, edges + [(2, 3), (3, 4), (3, 5)]), g.asSparseGraph())
+
+    def test_max_cocliques(self):
+        vertices = range(6)
+        edges = [(0, 1), (0, 5), (1, 2), (1, 3), (1, 4), (1, 5), (2, 3), (2, 5)]
+        g = Graph(vertices)
+        g.addEdges(edges)
+
+        cocliques = g.maxCocliques()
+        expected = [[0, 2, 4], [0, 3, 4], [3, 4, 5]]
+        self.assertSequenceEqual(expected, cocliques)
