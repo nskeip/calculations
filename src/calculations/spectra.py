@@ -1,5 +1,5 @@
 from itertools import chain
-from calculations.numeric import lcm, filterDivisors, firstDivisor, Integer, getExponent, sortAndFilter
+from calculations.numeric import lcm, firstDivisor, Integer, getExponent, sortAndFilter
 from calculations.partition import Partitions
 from calculations.semisimple import SemisimpleElements, MixedElements
 
@@ -119,6 +119,7 @@ class AlternatingGroup(Group):
 
     def order(self):
         if self._order is None:
+            # n!/2
             self._order = reduce(lambda x, y: x*y, xrange(3, self._degree+1))
         return self._order
 
@@ -131,7 +132,7 @@ class AlternatingGroup(Group):
 def _symplectic_order(n, field):
     n //= 2
     q = field.order()
-    o = (q**(n**2)) * reduce(lambda x, y: x*y, (q**(2*i)-1 for i in xrange(1, n+1)))
+    o = (q**(n*n)) * reduce(lambda x, y: x*y, (q**(2*i)-1 for i in xrange(1, n+1)))
     return o
 
 def _symplectic_odd_c(n, field):
