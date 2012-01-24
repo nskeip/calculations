@@ -45,8 +45,8 @@ class Graph:
         edges.sort()
         return edges
 
-    def addVertex(self, vertex):
-        """Add new vertex to graph
+    def _addVertex(self, vertex):
+        """Add new vertex to graph and return its index
         """
         vIndex = self._index(vertex)
         if vIndex is None:
@@ -54,6 +54,11 @@ class Graph:
             return len(self._vertices) - 1
         else:
             return vIndex
+
+    def addVertex(self, vertex):
+        """Adds new vertex to graph
+        """
+        self._addVertex(vertex)
 
     def addVertices(self, vertices):
         for vertex in vertices:
@@ -174,7 +179,7 @@ class FastGraph(Graph):
             a = primePart(a, d)
             if a == 1: break
         if a > 1:
-            index = self.addVertex(a)
+            index = self._addVertex(a)
             for neighbor in neighbors:
                 self._set_adjacency(index, neighbor, True)
 
