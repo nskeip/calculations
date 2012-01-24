@@ -1,6 +1,4 @@
 import unittest
-import sys
-sys.path.append("../../src")
 
 __author__ = 'Daniel Lytkin'
 
