@@ -51,7 +51,7 @@ class SemisimpleElements:
 
 class MixedElements:
     """Generates elements of form g(k) * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
-    for all partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
+    for all k and partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """
     def __init__(self, q, n, f, g):
         self._q = q
