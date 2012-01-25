@@ -70,25 +70,3 @@ class MixedElements:
                 yield elem*self._g(k)
             k += 1
 
-class Signs:
-    """
-    Generates all n-tuples with elements {-1, 1}
-    """
-    def __init__(self, n):
-        self._number = n
-
-    def __iter__(self):
-        current = [-1]*self._number
-        yield current
-        try:
-            while True:
-                current = list(current)
-                i = 0
-                while current[i]==1:
-                    current[i]=-1
-                    i += 1
-                current[i]=1
-                yield current
-
-        except IndexError:
-            pass

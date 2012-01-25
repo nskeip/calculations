@@ -1,9 +1,37 @@
+from exceptions import IndexError
 import unittest
 from calculations import semisimple
 from calculations.partition import Partitions
-from calculations.semisimple import SemisimpleElements, Signs, MixedElements
+from calculations.semisimple import SemisimpleElements, MixedElements
 
 __author__ = 'Daniel Lytkin'
+
+class Signs:
+    """
+    Generates all n-tuples with elements {-1, 1}
+    """
+    def __init__(self, n):
+        self._number = n
+
+    @staticmethod
+    def _next(signs):
+        current = list(signs)
+        i = 0
+        while current[i]==1:
+            current[i]=-1
+            i += 1
+        current[i]=1
+        return current
+
+    def __iter__(self):
+        current = [-1]*self._number
+        yield current
+        try:
+            while True:
+                current = Signs._next(current)
+                yield current
+        except IndexError:
+            pass
 
 class SemisimpleTest(unittest.TestCase):
     def test_evaluate(self):
