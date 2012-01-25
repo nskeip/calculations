@@ -207,6 +207,43 @@ def _p_symplectic(n, field):
     else:
         return _p_symplectic_odd_c(n, field)
 
+def _omega_order(n, field):
+    # TODO
+    pass
+
+def _omega_odd_c(n, field):
+    n = (n-1)//2
+    q = field.order()
+    p = field.char()
+    # (1)
+    t = (q**n-1)//2
+    a1 = [t, t+1]
+    # (2)
+    a2 = SemisimpleElements(q, n, min_length=2)
+    # (3)
+    k = 1
+    a3 = []
+    while True:
+        n1 = n - (p**(k-1) + 1)//2
+        if n1 < 1: break
+        t = (q**n1-1)//2
+        a3.extend([t*p**k, (t+1)*p**k])
+        k += 1
+    # (4)
+    a4 = MixedElements(q, n, lambda k: (p**(k-1)+1)//2, lambda k: p**k, min_length=2)
+    # (5)
+    k = getExponent(2*n-1, p)
+    a5 = [] if k is None else [p*(2*n-1)]
+    return chain(a1, a2, a3, a4, a5)
+
+def _omega(n, field):
+    if field.char() == 2:
+        return _symplectic_even_c(n-1, field)
+    else:
+        if n == 5:
+            return _p_symplectic_odd_c(4, field)
+        return _omega_odd_c(n, field)
+
 class ClassicalGroup(Group):
     """Usage:
     ClassicalGroup("PSp", 14, Field(2, 5))
@@ -214,7 +251,8 @@ class ClassicalGroup(Group):
     ClassicalGroup("PSp", 14, 2, 5)
     """
     _groups = {"Sp" : (_symplectic, _symplectic_order),
-               "PSp" : (_p_symplectic, _p_symplectic_order)}
+               "PSp" : (_p_symplectic, _p_symplectic_order),
+               "Omega" : (_omega, _omega_order)}
 
     def __init__(self, name, dimension, *field):
         self._name = name

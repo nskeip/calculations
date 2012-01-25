@@ -93,9 +93,10 @@ class SpectraTest(unittest.TestCase):
         self.assertEqual(expected, g.order())
 
     def test_spectra(self):
+        self.longMessage = True
         for params, apex in spectra.iteritems():
-            if params[0] not in ["Sp", "PSp"]: continue
+            if params[0] not in ["Sp", "PSp", "Omega"]: continue
             g = ClassicalGroup(*params)
-            self.assertSetEqual(set(apex), set(g.apex()))
+            self.assertSetEqual(set(apex), set(g.apex()), msg = str(params))
 
     # todo: order tests
