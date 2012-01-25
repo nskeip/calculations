@@ -139,29 +139,31 @@ def _symplectic_odd_c(n, field):
     """Spectra of symplectic groups in odd characteristic
     """
     n //= 2
-    # (1)
-    a1 = SemisimpleElements(field.order(), n)
-    # (2)
+    q = field.order()
     p = field.char()
-    a2 = MixedElements(field.order(), n, lambda k: (p**(k-1)+1)//2, lambda k: p**k)
+    # (1)
+    a1 = SemisimpleElements(q, n)
+    # (2)
+    a2 = MixedElements(q, n, lambda k: (p**(k-1)+1)//2, lambda k: p**k)
     # (3)
-    k = getExponent(2*n-1, field.char())
-    a3 = () if k is None else (field.char()*(2*n-1))
+    k = getExponent(2*n-1, p)
+    a3 = [] if k is None else [2*p*(2*n-1)]
     return chain(a1, a2, a3)
 
 def _symplectic_even_c(n, field):
     """Spectra of symplectic groups in characteristic 2
     """
     n //= 2
+    q = field.order()
     # (1)
-    a1 = SemisimpleElements(field.order(), n)
+    a1 = SemisimpleElements(q, n)
     # (2)
-    a2 = (2*elem for elem in SemisimpleElements(field.order(), n-1))
+    a2 = (2*elem for elem in SemisimpleElements(q, n-1))
     # (3)
-    a3 = MixedElements(field.order(), n, lambda k: 2**(k-1)+1, lambda k: 2**(k+1))
+    a3 = MixedElements(q, n, lambda k: 2**(k-1)+1, lambda k: 2**(k+1))
     # (4)
     k = getExponent(n-1, 2)
-    a4 = () if k is None else ((n-1)*4,)
+    a4 = [] if k is None else [(n-1)*4]
     return chain(a1, a2, a3, a4)
 
 
@@ -173,6 +175,37 @@ def _symplectic(n, field):
     else:
         return _symplectic_odd_c(n, field)
 
+def _p_symplectic_order(n, field):
+    # equals to Sp(n, q) if q even
+    d = 1 + (field.char() % 2) # 1 if char == 2, otherwise 2
+    return _symplectic_order(n, field)//d
+
+def _p_symplectic_odd_c(n, field):
+    """Spectra of projective symplectic groups in characteristic 2
+    """
+    n //= 2
+    q = field.order()
+    p = field.char()
+    # (1)
+    t = (q**n-1)//2
+    a1 = [t, t+1]
+    # (2)
+    a2 = SemisimpleElements(q, n, min_length=2)
+    # (3)
+    a3 = MixedElements(q, n, lambda k: (p**(k-1)+1)//2, lambda k: p**k)
+    # (4)
+    k = getExponent(2*n-1, p)
+    a4 = [] if k is None else [p*(2*n-1)]
+    return chain(a1, a2, a3, a4)
+
+
+def _p_symplectic(n, field):
+    """Spectra of projective symplectic group. Note that PSp(n, 2^k) = Sp(n, 2^k)
+    """
+    if field.char() == 2:
+        return _symplectic_even_c(n, field)
+    else:
+        return _p_symplectic_odd_c(n, field)
 
 class ClassicalGroup(Group):
     """Usage:
@@ -180,7 +213,8 @@ class ClassicalGroup(Group):
     ClassicalGroup("PSp", 14, 32)
     ClassicalGroup("PSp", 14, 2, 5)
     """
-    _groups = {"Sp" : (_symplectic, _symplectic_order)}
+    _groups = {"Sp" : (_symplectic, _symplectic_order),
+               "PSp" : (_p_symplectic, _p_symplectic_order)}
 
     def __init__(self, name, dimension, *field):
         self._name = name

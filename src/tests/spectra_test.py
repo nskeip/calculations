@@ -94,5 +94,8 @@ class SpectraTest(unittest.TestCase):
 
     def test_spectra(self):
         for params, apex in spectra.iteritems():
+            if params[0] not in ["Sp", "PSp"]: continue
             g = ClassicalGroup(*params)
             self.assertSetEqual(set(apex), set(g.apex()))
+
+    # todo: order tests
