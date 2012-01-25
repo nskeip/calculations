@@ -5,6 +5,9 @@ from tests.spectra_data import spectra
 __author__ = 'Daniel Lytkin'
 
 class SpectraTest(unittest.TestCase):
+    def setUp(self):
+        self.longMessage = True
+
     def test_field_error(self):
         with self.assertRaises(ValueError):
             Field(1)
@@ -93,7 +96,6 @@ class SpectraTest(unittest.TestCase):
         self.assertEqual(expected, g.order())
 
     def test_spectra(self):
-        self.longMessage = True
         for params, apex in spectra.iteritems():
             if params[0] not in ["Sp", "PSp", "Omega"]: continue
             g = ClassicalGroup(*params)
