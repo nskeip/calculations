@@ -1,7 +1,8 @@
 import unittest
 from calculations.spectra import Group, SporadicGroup, AlternatingGroup, Field, ClassicalGroup
+from orders_data import orders
 from parametric import parametrized, parameters
-from tests.spectra_data import spectra
+from spectra_data import spectra
 
 __author__ = 'Daniel Lytkin'
 
@@ -80,10 +81,11 @@ class SpectraTest(unittest.TestCase):
             self.assertEqual(2, g.field().char())
             self.assertEqual(3, g.field().pow())
 
-    def test_symplectic_order(self):
-        expected = 108051462804999168000
-        g = ClassicalGroup("Sp", 6, 9)
-        self.assertEqual(expected, g.order())
+    @parameters(orders.keys(), naming=lambda param: "test_orders_{}_{}_{}".format(*param))
+    def test_orders(self, params):
+        g = ClassicalGroup(*params)
+        order = orders[params]
+        self.assertEqual(order, g.order())
 
     @parameters(spectra.keys(), naming=lambda param: "test_spectra_{}_{}_{}".format(*param))
     def test_spectra(self, params):
@@ -91,5 +93,4 @@ class SpectraTest(unittest.TestCase):
         apex = spectra[params]
         self.assertSetEqual(set(apex), set(g.apex()))
 
-    # todo: order tests
 
