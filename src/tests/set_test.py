@@ -18,7 +18,7 @@ class SetTest(unittest.TestCase):
 
     def test_next_maximal_set(self):
         expected = [4, 3, 2, 1]
-        self.assertSequenceEqual(expected, BoundedSets.nextMaximal([5, 2, 1], 10))
+        self.assertSequenceEqual(expected, MaximalBoundedSets.next([5, 2, 1], 10))
 
     def test_sets(self):
         sets = list(BoundedSets(10))
@@ -35,7 +35,7 @@ class SetTest(unittest.TestCase):
         Maximal sets are exactly the sets that are not contained in any other
         """
         n = 20
-        sets = list(BoundedSets(n, maximal=True))
+        sets = list(MaximalBoundedSets(n))
         expected = self.filterContained(list(BoundedSets(n)))
         self.assertSequenceEqual(expected, sets)
 
@@ -45,7 +45,7 @@ class SetTest(unittest.TestCase):
         We only need sets that are maximal by containment
         """
         n = 20
-        minusPartitions = list(BoundedSets(n, maximal=True))
+        minusPartitions = list(MaximalBoundedSets(n))
         allPartitions = list(Partitions(n))
 
         # every partition must have every its element contained in some minus-partition
@@ -56,3 +56,9 @@ class SetTest(unittest.TestCase):
     def test_zero_bound(self):
         sets = list(BoundedSets(0))
         self.assertSequenceEqual([[]], sets)
+
+    def test_full_sets(self):
+        n = 10
+        sets = list(FullBoundedSets(n))
+        expected = filter(lambda x: sum(x) == n, BoundedSets(n))
+        self.assertSequenceEqual(expected, sets)
