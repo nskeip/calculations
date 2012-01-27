@@ -55,6 +55,8 @@ class SemisimpleElements:
                         if len(plusPartition) % 2 != plusesMod: continue
                         plusLcm = evaluate(q, plusPartition, 1) if pluses else 1
                         for minusPartition in MaximalBoundedSets(n-pluses):
+                            if len(plusPartition)+len(minusPartition) < self._min_length:
+                                continue
                             minusLcm = evaluate(q, minusPartition) if (n-pluses) else 1
                             yield lcm(plusLcm, minusLcm)
 
