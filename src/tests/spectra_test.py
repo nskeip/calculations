@@ -81,13 +81,13 @@ class SpectraTest(unittest.TestCase):
             self.assertEqual(2, g.field().char())
             self.assertEqual(3, g.field().pow())
 
-    @parameters(orders.keys(), naming=lambda param: "test_orders_{}_{}_{}".format(*param))
+    @parameters(orders.keys())
     def test_orders(self, params):
         g = ClassicalGroup(*params)
         order = orders[params]
         self.assertEqual(order, g.order())
 
-    @parameters(spectra.keys(), naming=lambda param: "test_spectra_{}_{}_{}".format(*param))
+    @parameters(spectra.keys())
     def test_spectra(self, params):
         g = ClassicalGroup(*params)
         apex = spectra[params]

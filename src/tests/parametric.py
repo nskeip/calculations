@@ -3,10 +3,16 @@ from types import FunctionType
 
 __author__ = 'Daniel Lytkin'
 
-def parameters(paramsList, naming = None):
+def default_naming(name, param):
+    for p in param:
+        name += '_'+str(p)
+    return name
+
+def parameters(paramsList, naming = default_naming):
     """Generates test method for every param in paramsList.
-    If 'naming' argument provided, new methods are named as naming(param).
-    Wrapped method must have one argument param
+    If 'naming' argument provided, new methods are named as naming(name, param), where name is initial method name.
+    Default naming is 'name_str(param[0])_str(param[1])_...'
+    Wrapped method must have one argument 'param'.
 
     Usage:
     params = [1, 2, 3, 4]
@@ -49,10 +55,8 @@ def parametrized(testCase):
         if not isinstance(attr, FunctionType) or not hasattr(attr, "_params"):
             continue
 
-        noNaming = attr._naming is None
-
         for i, param in enumerate(attr._params):
-            name = attr.__name__ + str(i) if noNaming else attr._naming(param)
+            name = attr._naming(attr.__name__, param)
             def createMethod():
                 testMethod = attr
                 @wraps(testMethod)
