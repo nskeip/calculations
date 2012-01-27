@@ -58,10 +58,11 @@ def parametrized(testCase):
         for i, param in enumerate(attr._params):
             name = attr._naming(attr.__name__, param)
             def createMethod():
+                testParams = param
                 testMethod = attr
                 @wraps(testMethod)
                 def newMethod(self):
-                    return testMethod(self, param)
+                    return testMethod(self, testParams)
                 # newMethod.__doc__ = testMethod.__doc__
                 return newMethod
 
