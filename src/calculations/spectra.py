@@ -2,14 +2,14 @@ from itertools import chain
 from calculations.numeric import lcm, firstDivisor, Integer, getExponent, sortAndFilter
 from calculations.partition import Partitions
 from calculations.semisimple import SemisimpleElements, MixedElements
+from calculations.tools import doc_inherit
 
 __author__ = 'Daniel Lytkin'
 
 class Field:
     """Finite field.
-    Can be called as Field(order) or Field(base, pow) where base^pow is the order of the field.
+    Can be created as Field(order) or Field(base, pow) where base**pow is the order of the field.
     'order' must be a prime power, otherwise the wrong field will be created.
-
     """
     def __init__(self, *arg):
         if len(arg)==1:
@@ -28,19 +28,26 @@ class Field:
             self._order = self._base ** self._pow
 
     def order(self):
+        """Returns field order."""
         return self._order
     def char(self):
+        """Returns field characteristic."""
         return self._base
     def pow(self):
+        """Returns k, such that q = p^k, where q is field order and p is field characteristic."""
         return self._pow
 
-class Group:
+class Group(object):
     """Interface for finite groups with method to calculate their spectra
     """
     def apex(self):
+        """Returns apex of the group, which is the set of its element orders with all divisors filtered out.
+        """
         raise NotImplementedError()
 
     def order(self):
+        """Returns group order.
+        """
         raise NotImplementedError()
 
 class SporadicGroup(Group):
@@ -86,9 +93,11 @@ class SporadicGroup(Group):
     def __init__(self, name):
         self._name = name
 
+    @doc_inherit
     def apex(self):
         return SporadicGroup._groups.get(self._name)[0]
 
+    @doc_inherit
     def order(self):
         return SporadicGroup._groups.get(self._name)[1]
 
@@ -97,6 +106,7 @@ class SporadicGroup(Group):
 
     @staticmethod
     def getAllGroups():
+        """Returns all sporadic group names."""
         return SporadicGroup._groups.keys()
 
 class AlternatingGroup(Group):
@@ -108,8 +118,10 @@ class AlternatingGroup(Group):
         self._order = None
 
     def degree(self):
+        """Returns alternating group degree."""
         return self._degree
 
+    @doc_inherit
     def apex(self):
         if self._apex is None:
             n = self._degree
@@ -117,6 +129,7 @@ class AlternatingGroup(Group):
             self._apex = sortAndFilter([reduce(lcm, partition) for partition in partitions])
         return self._apex
 
+    @doc_inherit
     def order(self):
         if self._order is None:
             # n!/2
@@ -127,8 +140,10 @@ class AlternatingGroup(Group):
         return "Alt({})".format(self._degree)
 
 
+#####################
+# SPECTRA CALCULATION
+#####################
 
-# spectrum methods
 def _symplectic_order(n, field):
     n //= 2
     q = field.order()
