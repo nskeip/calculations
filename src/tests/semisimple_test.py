@@ -82,13 +82,16 @@ class SemisimpleTest(unittest.TestCase):
             [-1, 1, 1, 1], [1, 1, 1, 1]]
         self.assertSequenceEqual(expected, signs)
 
-    def all_semisimple(self, n, q, min_length=1):
+    def all_semisimple(self, n, q, min_length=1, sign=0):
         # very slow! For every partition of size n it calculates 2^n sign tuples.
-        ss = list(SemisimpleElements(q, n, min_length=min_length))
+        ss = list(SemisimpleElements(q, n, min_length=min_length, sign=sign))
+        signsMod = 0 if sign == 1 else 1
 
         divisible = set()
         for ni in Partitions(n, min_length=min_length):
             for ei in Signs(len(ni)):
+                # skip needless signs
+                if sign and ei.count(1) % 2 != signsMod: continue
                 elem = semisimple.evaluate(q, ni, ei)
                 # every element must divide at least one of items in ss
                 # also every item in ss must be equal to at least one element
@@ -121,3 +124,9 @@ class SemisimpleTest(unittest.TestCase):
         mixed = list(MixedElements(q, n, f, g))
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
+
+    def test_semisimple_with_signs(self):
+        n = 11
+        q = 5
+        self.all_semisimple(n, q, sign=1)
+        self.all_semisimple(n, q, sign=-1)
