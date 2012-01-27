@@ -1,3 +1,4 @@
+from functools import wraps
 from types import FunctionType
 
 __author__ = 'Daniel Lytkin'
@@ -54,10 +55,10 @@ def parametrized(testCase):
             name = attr.__name__ + str(i) if noNaming else attr._naming(param)
             def createMethod():
                 testMethod = attr
-                testParam = param
+                @wraps(testMethod)
                 def newMethod(self):
-                    return testMethod(self, testParam)
-                newMethod.__doc__ = testMethod.__doc__
+                    return testMethod(self, param)
+                # newMethod.__doc__ = testMethod.__doc__
                 return newMethod
 
             setattr(testCase, name, createMethod())
