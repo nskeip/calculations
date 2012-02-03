@@ -4,9 +4,10 @@ from set import  BoundedSets
 __author__ = 'Daniel Lytkin'
 
 def evaluate(q, ni, ei=-1):
-    """Calculates sesmisimple element with base q, partition ni and signs ei, which is precisely
-    lcm(q^ni[1] + ei[1], ..., q^ni[k] + ei[k]) where k is the length of partition.
-    ei may be a single integer - in this it is considered as same sign for each element.
+    """Calculates sesmisimple element with base q, partition ni and signs ei,
+    which is precisely lcm(q^ni[1] + ei[1], ..., q^ni[k] + ei[k]) where k is
+    the length of partition. ei may be a single integer - in this it is
+    considered as same sign for each element.
     """
     try:
     # for integer ei
@@ -17,8 +18,9 @@ def evaluate(q, ni, ei=-1):
 
 
 class SemisimpleElements:
-    """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for all partitions n_1 + ... + n_k = n.
-    If optional parameter 'minus' is set to True, generates only elements with all minuses
+    """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for
+    all partitions n_1 + ... + n_k = n. If optional parameter 'minus' is set to
+    True, generates only elements with all minuses
 
     """
 
@@ -38,12 +40,10 @@ class SemisimpleElements:
             for left in xrange((n + 2) // 2):
                 right = n - left
                 leftPartitions = BoundedSets(left, maximal=True)
-                # leftLcms = ((evaluate(q, ni), evaluate(q, ni, ei=1)) for ni in leftPartitions) if left else [(1,1)]
                 for lPart in leftPartitions:
                     lLcms = (evaluate(q, lPart),
                              evaluate(q, lPart, ei=1)) if left else (1, 1)
                     rightPartitions = BoundedSets(right, maximal=True)
-                    # rightLcms = ((evaluate(q, ni, ei=1), evaluate(q, ni)) for ni in rigthPartitions) if right else [(1,1)]
                     for rPart in rightPartitions:
                         if len(lPart) + len(rPart) < self._min_length:
                             continue

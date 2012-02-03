@@ -19,7 +19,7 @@ def lcm(a, b):
     return a / gcd(a, b) * b
 
 
-def primePart(n, b):
+def prime_part(n, b):
     """Returns b'-part of number n, which is the greatest divisor of n coprime to d
     """
     while True:
@@ -29,7 +29,7 @@ def primePart(n, b):
     return n
 
 
-def filterDivisors(iterable, reverse=False):
+def filter_divisors(iterable, reverse=False):
     """
     removes all elements that divide any other.
     input argument must be in decreasing order
@@ -37,27 +37,27 @@ def filterDivisors(iterable, reverse=False):
     """
     ret = []
     if not reverse:
-        def appendLeft(element): ret.insert(0, element)
+        def append_left(element): ret.insert(0, element)
 
-        addElement = appendLeft
+        add_element = append_left
     else:
-        addElement = ret.append
+        add_element = ret.append
     for element in iterable:
         if not any(x % element == 0 for x in ret):
-            addElement(element)
+            add_element(element)
 
     return ret
 
 
-def sortAndFilter(sequence, reverse=False):
+def sort_and_filter(sequence, reverse=False):
     """Converts raw sequence of numbers to sorted sequence without divisors
     """
     ret = list(sequence)
     ret.sort(reverse=True)
-    return filterDivisors(ret, reverse=reverse)
+    return filter_divisors(ret, reverse=reverse)
 
 
-def firstDivisor(number):
+def first_divisor(number):
     """Returns lowest divisor of 'number' greater than 1
     """
     if not number % 2: return 2
@@ -68,7 +68,7 @@ def firstDivisor(number):
     return number
 
 
-def nextOddDivisor(number, previous):
+def next_odd_divisor(number, previous):
     """Returns next divisor greater than 'previous'.
     Number must not be divisible by any number <= previous.
     """
@@ -79,7 +79,7 @@ def nextOddDivisor(number, previous):
     return number
 
 
-def getExponent(number, base):
+def get_exponent(number, base):
     """If number = base**k, returns k. Else returns None
     """
     k = 0
@@ -129,7 +129,7 @@ class Integer:
             power += 1
         return power, number
 
-
+    @property
     def factors(self):
         if self._factors is None:
             self._factors = Counter()
@@ -141,7 +141,7 @@ class Integer:
             currentDivisor = 1
             while remainder > 1:
                 # search for the next divisor
-                currentDivisor = nextOddDivisor(remainder, currentDivisor)
+                currentDivisor = next_odd_divisor(remainder, currentDivisor)
                 # and remove it
                 power, remainder = Integer._removeFactor(remainder,
                     currentDivisor)

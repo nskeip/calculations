@@ -1,14 +1,14 @@
 from itertools import chain
-from numeric import lcm, firstDivisor, Integer, getExponent, sortAndFilter
+from numeric import lcm, first_divisor, Integer, get_exponent, sort_and_filter
 from partition import Partitions
 from semisimple import SemisimpleElements, MixedElements
 
 __author__ = 'Daniel Lytkin'
 
 class Field:
-    """Finite field.
-    Can be called as Field(order) or Field(base, pow) where base^pow is the order of the field.
-    'order' must be a prime power, otherwise the wrong field will be created.
+    """Finite field. Can be called as Field(order) or Field(base, pow) where
+    base^pow is the order of the field. 'order' must be a prime power,
+    otherwise the wrong field will be created.
 
     """
 
@@ -16,7 +16,7 @@ class Field:
         if len(arg) == 1:
             if arg[0] <= 1:
                 raise ValueError("Field order must be at least 2")
-            self._base = firstDivisor(arg[0])
+            self._base = first_divisor(arg[0])
             self._pow = 1
             self._order = self._base
             while self._order < arg[0]:
@@ -28,25 +28,23 @@ class Field:
                 raise ValueError("Field order must be at least 2")
             self._order = self._base ** self._pow
 
-    def order(self):
-        return self._order
+    @property
+    def order(self): return self._order
 
-    def char(self):
-        return self._base
+    @property
+    def char(self): return self._base
 
-    def pow(self):
-        return self._pow
+    @property
+    def pow(self): return self._pow
 
 
 class Group:
     """Interface for finite groups with method to calculate their spectra
     """
 
-    def apex(self):
-        raise NotImplementedError()
+    def apex(self): raise NotImplementedError()
 
-    def order(self):
-        raise NotImplementedError()
+    def order(self): raise NotImplementedError()
 
 
 class SporadicGroup(Group):
@@ -55,13 +53,13 @@ class SporadicGroup(Group):
         "M12": (( 6, 8, 10, 11 ), Integer((2, 6), (3, 3), 5, 11)),
         "M22": (( 5, 6, 7, 8, 11 ), Integer((2, 7), (3, 2), 5, 7, 11)),
         "M23": (
-        ( 6, 8, 11, 14, 15, 23 ), Integer((2, 7), (3, 2), 5, 7, 11, 23)),
+            ( 6, 8, 11, 14, 15, 23 ), Integer((2, 7), (3, 2), 5, 7, 11, 23)),
         "M24": (( 8, 10, 11, 12, 14, 15, 21, 23 ),
                 Integer((2, 10), (3, 3), 5, 7, 11, 23)),
         "J1": (( 6, 7, 10, 11, 15, 19 ), Integer((2, 3), 3, 5, 7, 11, 19)),
         "J2": (( 7, 8, 10, 12, 15 ), Integer((2, 7), (3, 3), (5, 2), 7)),
         "J3": (
-        ( 8, 9, 10, 12, 15, 17, 19 ), Integer((2, 7), (3, 5), 5, 17, 19)),
+            ( 8, 9, 10, 12, 15, 17, 19 ), Integer((2, 7), (3, 5), 5, 17, 19)),
         "J4": (( 16, 23, 24, 28, 29, 30, 31, 35, 37, 40, 42, 43, 44, 66 ),
                Integer((2, 21), (3, 3), 5, 7, (11, 3), 23, 29, 31, 37, 43)),
         "Co1": (( 16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60 ),
@@ -75,12 +73,12 @@ class SporadicGroup(Group):
         "Fi23": (( 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60 ),
                  Integer((2, 18), (3, 13), (5, 2), 7, 11, 13, 17, 23)),
         "Fi24'": (
-        ( 16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60 ),
-        Integer((2, 21), (3, 16), (5, 2), (7, 3), 11, 13, 17, 23, 29)),
+            ( 16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60 ),
+            Integer((2, 21), (3, 16), (5, 2), (7, 3), 11, 13, 17, 23, 29)),
         "HS": (
-        ( 7, 8, 11, 12, 15, 20 ), Integer((2, 9), (3, 2), (5, 3), 7, 11)),
+            ( 7, 8, 11, 12, 15, 20 ), Integer((2, 9), (3, 2), (5, 3), 7, 11)),
         "McL": (
-        ( 8, 9, 11, 12, 14, 30 ), Integer((2, 7), (3, 6), (5, 3), 7, 11)),
+            ( 8, 9, 11, 12, 14, 30 ), Integer((2, 7), (3, 6), (5, 3), 7, 11)),
         "He": (( 8, 10, 12, 15, 17, 21, 28 ),
                Integer((2, 10), (3, 3), (5, 2), (7, 3), 17)),
         "Ru": (( 14, 15, 16, 20, 24, 26, 29 ),
@@ -120,7 +118,7 @@ class SporadicGroup(Group):
         return self._name
 
     @staticmethod
-    def getAllGroups():
+    def all_groups():
         return SporadicGroup._groups.keys()
 
 
@@ -133,14 +131,12 @@ class AlternatingGroup(Group):
         self._apex = None
         self._order = None
 
-    def degree(self):
-        return self._degree
 
     def apex(self):
         if self._apex is None:
             n = self._degree
             partitions = filter(lambda x: (len(x) + n) % 2 == 0, Partitions(n))
-            self._apex = sortAndFilter(
+            self._apex = sort_and_filter(
                 [reduce(lcm, partition) for partition in partitions])
         return self._apex
 
@@ -158,7 +154,7 @@ class AlternatingGroup(Group):
 # spectrum methods
 def _symplectic_order(n, field):
     n //= 2
-    q = field.order()
+    q = field.order
     o = (q ** (n * n)) * reduce(lambda x, y: x * y,
         (q ** (2 * i) - 1 for i in xrange(1, n + 1)))
     return o
@@ -168,15 +164,15 @@ def _symplectic_odd_c(n, field):
     """Spectra of symplectic groups in odd characteristic
     """
     n //= 2
-    q = field.order()
-    p = field.char()
+    q = field.order
+    p = field.char
     # (1)
     a1 = SemisimpleElements(q, n)
     # (2)
     a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k)
     # (3)
-    k = getExponent(2 * n - 1, p)
+    k = get_exponent(2 * n - 1, p)
     a3 = [] if k is None else [2 * p * (2 * n - 1)]
     return chain(a1, a2, a3)
 
@@ -185,7 +181,7 @@ def _symplectic_even_c(n, field):
     """Spectra of symplectic groups in characteristic 2
     """
     n //= 2
-    q = field.order()
+    q = field.order
     # (1)
     a1 = SemisimpleElements(q, n)
     # (2)
@@ -194,7 +190,7 @@ def _symplectic_even_c(n, field):
     a3 = MixedElements(q, n, lambda k: 2 ** (k - 1) + 1,
         lambda k: 2 ** (k + 1))
     # (4)
-    k = getExponent(n - 1, 2)
+    k = get_exponent(n - 1, 2)
     a4 = [] if k is None else [(n - 1) * 4]
     return chain(a1, a2, a3, a4)
 
@@ -202,7 +198,7 @@ def _symplectic_even_c(n, field):
 def _symplectic(n, field):
     """Spectra of symplectic groups
     """
-    if field.char() == 2:
+    if field.char == 2:
         return _symplectic_even_c(n, field)
     else:
         return _symplectic_odd_c(n, field)
@@ -210,7 +206,7 @@ def _symplectic(n, field):
 
 def _p_symplectic_order(n, field):
     # equals to Sp(n, q) if q even
-    d = 1 + (field.char() % 2) # 1 if char == 2, otherwise 2
+    d = 1 + (field.char % 2) # 1 if char == 2, otherwise 2
     return _symplectic_order(n, field) // d
 
 
@@ -218,8 +214,8 @@ def _p_symplectic_odd_c(n, field):
     """Spectra of projective symplectic groups in characteristic 2
     """
     n //= 2
-    q = field.order()
-    p = field.char()
+    q = field.order
+    p = field.char
     # (1)
     t = (q ** n - 1) // 2
     a1 = [t, t + 1]
@@ -229,15 +225,16 @@ def _p_symplectic_odd_c(n, field):
     a3 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k)
     # (4)
-    k = getExponent(2 * n - 1, p)
+    k = get_exponent(2 * n - 1, p)
     a4 = [] if k is None else [p * (2 * n - 1)]
     return chain(a1, a2, a3, a4)
 
 
 def _p_symplectic(n, field):
-    """Spectra of projective symplectic group. Note that PSp(n, 2^k) = Sp(n, 2^k)
+    """Spectra of projective symplectic group.
+    Note that PSp(n, 2^k) = Sp(n, 2^k)
     """
-    if field.char() == 2:
+    if field.char == 2:
         return _symplectic_even_c(n, field)
     else:
         return _p_symplectic_odd_c(n, field)
@@ -250,8 +247,8 @@ def _omega_order(n, field):
 
 def _omega_odd_c(n, field):
     n = (n - 1) // 2
-    q = field.order()
-    p = field.char()
+    q = field.order
+    p = field.char
     # (1)
     t = (q ** n - 1) // 2
     a1 = [t, t + 1]
@@ -270,13 +267,13 @@ def _omega_odd_c(n, field):
     a4 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k, min_length=2)
     # (5)
-    k = getExponent(2 * n - 1, p)
+    k = get_exponent(2 * n - 1, p)
     a5 = [] if k is None else [p * (2 * n - 1)]
     return chain(a1, a2, a3, a4, a5)
 
 
 def _omega(n, field):
-    if field.char() == 2:
+    if field.char == 2:
         return _symplectic_even_c(n - 1, field)
     else:
         if n == 5:
@@ -303,17 +300,17 @@ class ClassicalGroup(Group):
         self._order = None
 
     def __str__(self):
-        return "{}({}, {})".format(self._name, self._dim, self._field.order())
+        return "{}({}, {})".format(self._name, self._dim, self._field.order)
 
+    @property
     def field(self):
-        """Returns field of this group
-        """
+        """Returns field of this group."""
         return self._field
 
     def apex(self):
         if self._apex is None:
             func = ClassicalGroup._groups.get(self._name)[0]
-            self._apex = sortAndFilter(func(self._dim, self._field))
+            self._apex = sort_and_filter(func(self._dim, self._field))
         return self._apex
 
     def order(self):

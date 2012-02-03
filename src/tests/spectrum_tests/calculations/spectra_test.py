@@ -1,5 +1,5 @@
 import unittest
-from spectrum.calculations.spectra import Group, SporadicGroup, AlternatingGroup, Field, ClassicalGroup
+from spectrum.calculations.spectra import  SporadicGroup, AlternatingGroup, Field, ClassicalGroup
 from spectrum_tests.calculations.orders_data import orders
 from spectrum_tests.calculations.spectra_data import spectra
 from spectrum_tests.parametric import parametrized, parameters
@@ -20,19 +20,15 @@ class SpectraTest(unittest.TestCase):
 
     def test_field_by_order(self):
         f = Field(81)
-        self.assertEqual(81, f.order())
-        self.assertEqual(3, f.char())
-        self.assertEqual(4, f.pow())
+        self.assertEqual(81, f.order)
+        self.assertEqual(3, f.char)
+        self.assertEqual(4, f.pow)
 
     def test_field_by_characteristic(self):
         f = Field(2, 5)
-        self.assertEqual(32, f.order())
-        self.assertEqual(2, f.char())
-        self.assertEqual(5, f.pow())
-
-    def test_not_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            Group().apex()
+        self.assertEqual(32, f.order)
+        self.assertEqual(2, f.char)
+        self.assertEqual(5, f.pow)
 
     def test_sporadic(self):
         expected = [32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
@@ -51,7 +47,7 @@ class SpectraTest(unittest.TestCase):
                     "Co1", "Co2", "Co3", "Fi22", "Fi23",
                     "Fi24'", "HS", "McL", "He", "Ru", "Suz", "O'N", "HN", "Ly",
                     "Th", "B", "M", "2F4(2)'"}
-        self.assertSetEqual(expected, set(SporadicGroup.getAllGroups()))
+        self.assertSetEqual(expected, set(SporadicGroup.all_groups()))
 
     def test_sporadic_str(self):
         name = "2F4(2)'"
@@ -80,8 +76,8 @@ class SpectraTest(unittest.TestCase):
         for g in (ClassicalGroup("PSp", 4, Field(2, 3)),
                   ClassicalGroup("PSp", 4, 2, 3),
                   ClassicalGroup("PSp", 4, 8)):
-            self.assertEqual(2, g.field().char())
-            self.assertEqual(3, g.field().pow())
+            self.assertEqual(2, g.field.char)
+            self.assertEqual(3, g.field.pow)
 
     @parameters(orders.keys())
     def test_orders(self, params):

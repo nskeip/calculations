@@ -19,7 +19,7 @@ class SetTest(unittest.TestCase):
     def test_next_maximal_set(self):
         expected = [4, 3, 2, 1]
         self.assertSequenceEqual(expected,
-            BoundedSets.nextMaximal([5, 2, 1], 10))
+            BoundedSets.next_maximal([5, 2, 1], 10))
 
     def test_sets(self):
         sets = list(BoundedSets(10))
