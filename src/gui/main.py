@@ -11,8 +11,8 @@ frame = Frame(master=root)
 frame.pack()
 
 graph = Graph()
-graph.addVertices(range(10))
-graph.addEdge(0, 1)
+graph.add_vertices(range(10))
+graph.add_edge(0, 1)
 
 canvas = GraphViewer(RandomLayout(graph))
 canvas.pack()

@@ -28,7 +28,7 @@ class Layout(object):
         """Remove deleted vertices
         """
         deleted_vertices = self._coordMap.viewkeys() - set(
-            self._graph.vertices())
+            self._graph.vertices)
         for vertex in deleted_vertices:
             del self._coordMap[vertex]
 

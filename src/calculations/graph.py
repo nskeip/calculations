@@ -10,6 +10,7 @@ def _pair(a, b):
         return b, a
     return a, b
 
+
 class Graph:
     def __init__(self, vertices=list()):
         self._vertices = []
@@ -18,7 +19,7 @@ class Graph:
             self._add_no_check(vertex)
 
     def _add_no_check(self, vertex):
-        self._adjacency.append([False]*len(self._adjacency))
+        self._adjacency.append([False] * len(self._adjacency))
         self._vertices.append(vertex)
 
     def _index(self, vertex):
@@ -31,11 +32,13 @@ class Graph:
         index1, index2 = _pair(index1, index2)
         self._adjacency[index2][index1] = value
 
+    @property
     def vertices(self):
         """Returns graph's vertices
         """
-        return iter(self._vertices)
+        return list(self._vertices)
 
+    @property
     def edges(self):
         edges = list()
         for i in xrange(len(self._adjacency)):
@@ -45,7 +48,7 @@ class Graph:
         edges.sort()
         return edges
 
-    def _addVertex(self, vertex):
+    def _add_vertex(self, vertex):
         """Add new vertex to graph and return its index
         """
         vIndex = self._index(vertex)
@@ -55,16 +58,16 @@ class Graph:
         else:
             return vIndex
 
-    def addVertex(self, vertex):
+    def add_vertex(self, vertex):
         """Adds new vertex to graph
         """
-        self._addVertex(vertex)
+        self._add_vertex(vertex)
 
-    def addVertices(self, vertices):
+    def add_vertices(self, vertices):
         for vertex in vertices:
-            self.addVertex(vertex)
+            self.add_vertex(vertex)
 
-    def addEdge(self, v1, v2):
+    def add_edge(self, v1, v2):
         """Add new edge to graph. Adds missing vertices if necessary
         """
         i1 = self._index(v1)
@@ -77,14 +80,16 @@ class Graph:
             i2 = len(self._vertices) - 1
         self._set_adjacency(i1, i2, True)
 
-    def addEdges(self, edges):
+    def add_edges(self, edges):
         for edge in edges:
-            self.addEdge(*edge)
+            self.add_edge(*edge)
 
-    def _cloneVertex(self, index, value):
+    def _clone_vertex(self, index, value):
         # adjacency of new vertex with all other vertices:
-        newRow = list(self._adjacency[index]) + [True] +\
-                 [self._adjacency[j][index] for j in xrange(index+1, len(self._adjacency))]
+        newRow = (list(self._adjacency[index]) +
+                  [True] +
+                  [self._adjacency[j][index]
+                   for j in xrange(index + 1, len(self._adjacency))])
         vIndex = self._index(value)
         if vIndex is None:
             self._adjacency.append(newRow)
@@ -95,21 +100,21 @@ class Graph:
                 if i != vIndex and newRow[i]:
                     self._set_adjacency(vIndex, i, True)
 
-    def cloneVertex(self, vertex, value):
-        """Add new vertex 'value' with same neighbors as given, and connect to given.
-        Or connects given and all its neighbors to 'value' if is is already in the set of vertices.
-        Returns index of clone
+    def clone_vertex(self, vertex, value):
+        """Add new vertex 'value' with same neighbors as given, and connect to
+        given. Or connects given and all its neighbors to 'value' if is is
+        already in the set of vertices. Returns index of clone.
         """
-        return self._cloneVertex(self._vertices.index(vertex), value)
+        return self._clone_vertex(self._vertices.index(vertex), value)
 
-    def asSparseGraph(self):
+    def as_sparse_graph(self):
         """Returns pair <vertices>, <edges> for this graph
         """
         vertices = list(self._vertices)
         vertices.sort()
-        return vertices, self.edges()
+        return vertices, self.edges
 
-    def _maxCocliquesInIndices(self, indices):
+    def _max_cocliques_between_indices(self, indices):
         """Searches for largest cocliques among vertices with specified indices
         """
         if len(indices) == 1: return [list(indices)]
@@ -117,12 +122,13 @@ class Graph:
         max = 0
         cocliques = []
 
-        for j in xrange(len(indices)-max-1):
+        for j in xrange(len(indices) - max - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
-            t = filter(lambda x: (x > i and self._adjacency[x][i]==False), indices)
+            t = filter(lambda x: (x > i and self._adjacency[x][i] == False),
+                indices)
             if len(t) < max: continue
-            nextCocliques = self._maxCocliquesInIndices(t)
+            nextCocliques = self._max_cocliques_between_indices(t)
             for coclique in nextCocliques:
                 if len(coclique) < max: continue
                 if len(coclique) > max:
@@ -135,9 +141,11 @@ class Graph:
         return cocliques
 
 
-    def maxCocliques(self):
-        cocliquesIndices = self._maxCocliquesInIndices(range(len(self._adjacency)))
-        return [map(lambda i: self._vertices[i], coclique) for coclique in cocliquesIndices]
+    def max_cocliques(self):
+        cocliquesIndices = self._max_cocliques_between_indices(
+            range(len(self._adjacency)))
+        return [map(lambda i: self._vertices[i], coclique)
+                for coclique in cocliquesIndices]
 
 
 class PrimeGraph(Graph):
@@ -145,20 +153,24 @@ class PrimeGraph(Graph):
         Graph.__init__(self)
         for elem in spectrum:
             factors = Integer(elem).factors().keys()
-            self.addVertices(factors)
-            self.addEdges(combinations(factors, 2))
+            self.add_vertices(factors)
+            self.add_edges(combinations(factors, 2))
+
 
 class FastGraph(Graph):
     def __init__(self, spectrum):
         Graph.__init__(self)
         for elem in spectrum:
-            self._addElement(elem)
+            self._add_element(elem)
 
-    def _addElement(self, a):
+    def _add_element(self, a):
         """Add new spectrum element
         """
-        neighbors = [] # these are the indices of future neighbors of a
-        l = len(self._vertices) # memorize initial length so that we don't have to process newly added vertices
+        # these are the indices of future neighbors of a
+        neighbors = []
+        # memorize initial length so that we don't have to process newly added
+        # vertices
+        l = len(self._vertices)
         for i in range(l):
             b = self._vertices[i]
             d = gcd(a, b)
@@ -171,7 +183,7 @@ class FastGraph(Graph):
                 neighbors.append(i)
             else:
                 self._vertices[i] = bd
-                dIndex = self._cloneVertex(i, d)
+                dIndex = self._clone_vertex(i, d)
                 for neighbor in neighbors:
                     self._adjacency[dIndex][neighbor] = True
                 neighbors.append(dIndex)
@@ -179,7 +191,7 @@ class FastGraph(Graph):
             a = primePart(a, d)
             if a == 1: break
         if a > 1:
-            index = self._addVertex(a)
+            index = self._add_vertex(a)
             for neighbor in neighbors:
                 self._set_adjacency(index, neighbor, True)
 

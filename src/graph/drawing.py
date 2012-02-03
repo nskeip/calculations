@@ -112,7 +112,7 @@ class MousePlugin(object):
                 vdiff((event.x, event.y), self._click))
         else:
             pass
-        #        if self._mode == MousePlugin.PICKING:
+            #        if self._mode == MousePlugin.PICKING:
         #            if self._click == (event.x, event.y):
         #                event.id = self._pressed_id
         #                self._onClick(event)
@@ -176,7 +176,6 @@ class GraphViewer(Canvas):
         self._mouse_plugin = MousePlugin(self)
 
         def createListener():
-            vertices = self._vertices
             state = self._picked_vertex_state
 
             def listener(vertex):
@@ -231,7 +230,7 @@ class GraphViewer(Canvas):
         """Updates layout, removes deleted vertices, adds missing ones.
         """
         self.layout.update()
-        graph_vertices = set(self.graph.vertices())
+        graph_vertices = set(self.graph.vertices)
         local_vertices = self._vertices.viewkeys()
         # deleted vertices:
         for value in local_vertices - graph_vertices:
@@ -241,14 +240,14 @@ class GraphViewer(Canvas):
             self._add_vertex(value)
 
         self.delete("edge")
-        for start_value, end_value in self.graph.edges():
+        for start_value, end_value in self.graph.edges:
             self._add_edge(start_value, end_value)
 
     def reset(self):
         # TODO: temporary
         """Reset vertex positions."""
         self._translate = (0, 0)
-        for vertex in self.graph.vertices():
+        for vertex in self.graph.vertices:
             layout_location = self.layout.get_location(vertex.value)
             canvas_location = self._convert_layout_location(*layout_location)
             self.set_vertex_location(vertex, *canvas_location)

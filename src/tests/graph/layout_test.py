@@ -7,7 +7,7 @@ __author__ = 'Daniel Lytkin'
 class LayoutTest(unittest.TestCase):
     def setUp(self):
         self.graph = Graph(range(5))
-        self.graph.addEdges({(0, 1), (1, 2), (1, 3), (2, 3), (3, 4), (2, 4)})
+        self.graph.add_edges({(0, 1), (1, 2), (1, 3), (2, 3), (3, 4), (2, 4)})
         self.layout = Layout(self.graph, defaultLocation=(0.42, 0.42))
 
     def test_setLocation(self):
