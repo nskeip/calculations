@@ -4,8 +4,8 @@ from Tkinter import Canvas
 # rename methods
 # len(seq)==0 to not seq
 # properties
-from graph.shapes import create_default_shape, EdgeShape
-from tools.observers import Observable
+from shapes import create_default_shape, EdgeShape
+from spectrum.tools.observers import Observable
 
 __author__ = 'Daniel Lytkin'
 

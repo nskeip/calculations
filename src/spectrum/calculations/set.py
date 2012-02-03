@@ -1,12 +1,12 @@
 __author__ = 'Daniel Lytkin'
 
 
-
 class BoundedSets:
     """Generates integer sets {n_1,...,n_k}, such that n_1+...+n_k <= n.
     If optional parameter 'maximal' is set to True, then generates only those sets that
     are maximal under containment relation.
     """
+
     @staticmethod
     def _next(sequence, bound, sum):
         if sequence[0] <= 1:
@@ -19,7 +19,7 @@ class BoundedSets:
         else:
             x[-1] -= 1
             while True:
-                t = min(x[-1]-1, bound - sum)
+                t = min(x[-1] - 1, bound - sum)
                 if not t: break
                 sum += t
                 x.append(t)
@@ -39,8 +39,9 @@ class BoundedSets:
         x = list(sequence)
         try:
             i = 1
-            while x[-1] == i: # if tail is [N, i, i-1, i-2, ..., 1], remove it ant set to [N-1]
-                i+=1
+            while x[
+                  -1] == i: # if tail is [N, i, i-1, i-2, ..., 1], remove it ant set to [N-1]
+                i += 1
                 sum -= x[-1]
                 del x[-1]
         except IndexError:
@@ -50,7 +51,7 @@ class BoundedSets:
         x[-1] -= 1
         sum -= 1
         while True:
-            t = min(x[-1]-1, bound - sum)
+            t = min(x[-1] - 1, bound - sum)
             if not t: break
             sum += t
             x.append(t)

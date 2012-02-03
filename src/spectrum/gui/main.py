@@ -1,6 +1,6 @@
-from calculations.graph import Graph
-from graph.drawing import GraphViewer
-from graph.layout import RandomLayout
+from spectrum.graph.drawing import GraphViewer
+from spectrum.graph.graph import Graph
+from spectrum.graph.layout import RandomLayout
 
 __author__ = 'Daniel Lytkin'
 
