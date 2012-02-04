@@ -8,7 +8,8 @@ class Partitions:
         length - if specified, generates only partitions of fixed length
         min_length, max_length - minimal and maximal length of partitions
         min_part, max_part - minimum and maximum for partition elements
-        min_slope, max_slope - minimum and maximum for numbers a[i]-a[i+1] for i=0..n-1 and a[i] for i=n
+        min_slope, max_slope - minimum and maximum for numbers a[i]-a[i+1] for
+        i=0..n-1 and a[i] for i=n
     """
 
     @staticmethod
@@ -58,7 +59,9 @@ class Partitions:
         if partition[0] <= 1:
             return None
 
-        h = Partitions._h # not a really good idea; needed to simplify iterator definition
+        # not a really good idea;
+        # needed to simplify iterator definition
+        h = Partitions._h
         x = list(partition)  # make a copy of this partition
         if x[h - 1] == 2:
             x[h - 1] = 1
@@ -111,14 +114,15 @@ class Partitions:
         l = self._length
         n = self._number
         if self._length is None:
-            Partitions._h = 1 # we use class variable to generalize call next() function
+            # we use class variable to generalize next() function
+            Partitions._h = 1
             nextPartition = Partitions._next
             current = [n]
         else:
             nextPartition = Partitions._nextFixedLength
             current = [n - l + 1] + [1] * (l - 1) if l <= n else None
 
-        if not len(self._validators):
+        if not self._validators:
             while current is not None:
                 yield current
                 current = nextPartition(current)
