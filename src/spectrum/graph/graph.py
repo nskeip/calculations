@@ -143,3 +143,11 @@ class Graph:
             range(len(self._adjacency)))
         return [map(lambda i: self._vertices[i], coclique)
                 for coclique in cocliquesIndices]
+
+
+class FullGraph(Graph):
+    def __init__(self, n):
+        Graph.__init__(self)
+        for i in xrange(n):
+            self._vertices.append(i)
+            self._adjacency.append([True] * len(self._adjacency))

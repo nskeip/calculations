@@ -1,5 +1,5 @@
 import unittest
-from spectrum.graph.graph import Graph
+from spectrum.graph.graph import Graph, FullGraph
 
 __author__ = 'Daniel Lytkin'
 
@@ -57,3 +57,11 @@ class GraphTest(unittest.TestCase):
         cocliques = g.max_cocliques()
         expected = [[0, 2, 4], [0, 3, 4], [3, 4, 5]]
         self.assertSequenceEqual(expected, cocliques)
+
+    def test_full_graph(self):
+        g = FullGraph(4)
+
+        expectedVertices = range(4)
+        expectedEdges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
+        self.assertSparseGraphEqual((expectedVertices, expectedEdges),
+            g.as_sparse_graph())
