@@ -1,6 +1,6 @@
 __author__ = 'Daniel Lytkin'
 
-def _pair(a, b):
+def ordered_pair(a, b):
     """Returns (a, b) if a < b and (b, a) otherwise
     """
     if a > b:
@@ -26,7 +26,7 @@ class Graph:
             return None
 
     def _set_adjacency(self, index1, index2, value):
-        index1, index2 = _pair(index1, index2)
+        index1, index2 = ordered_pair(index1, index2)
         self._adjacency[index2][index1] = value
 
     @property
@@ -41,7 +41,8 @@ class Graph:
         for i in xrange(len(self._adjacency)):
             for j in xrange(len(self._adjacency[i])):
                 if self._adjacency[i][j]:
-                    edges.append(_pair(self._vertices[i], self._vertices[j]))
+                    edges.append(
+                        ordered_pair(self._vertices[i], self._vertices[j]))
         edges.sort()
         return edges
 

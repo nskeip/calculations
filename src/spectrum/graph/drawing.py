@@ -1,10 +1,6 @@
 from Tkinter import Canvas
-
-# TODO:
-# rename methods
-# len(seq)==0 to not seq
-# properties
 from shapes import create_default_shape, EdgeShape
+from spectrum.graph.graph import ordered_pair
 from spectrum.tools.observers import Observable
 
 __author__ = 'Daniel Lytkin'
@@ -51,72 +47,65 @@ class PickedState(Observable):
 
 
 class MousePlugin(object):
+    class Click(object):
+        def __init__(self, x, y, id=None):
+            self.x = x
+            self.y = y
+            self.id = id
+
     def __init__(self, container):
         self._container = container
-        self.mode = PICKING
 
+        self._selection = None
         self._click = None
+        self._picked_state = container.picked_vertex_state
 
         container.bind("<Button-1>", self._on_press)
         container.bind("<ButtonRelease-1>", self._on_release)
         container.bind("<Motion>", self._on_drag)
-        container.bind("<Button-2>", self.switch) # TODO: temp
-
-        self._picked_state = container.picked_vertex_state
-
-    #todo: temp
-    def reset(self, event): self._container.reset()
-
-    # todo: temp
-    def switch(self, event):
-        if self.mode == TRANSLATING:
-            self.mode = PICKING
-        else:
-            self.mode = TRANSLATING
-
 
     def _on_drag(self, event):
         if self._click is not None:
-            if self.mode == TRANSLATING:
-                self._container.scan_dragto(event.x, event.y, 1)
+            if self._click.id is not None:
+                picked = self._picked_state.get_picked()
+                if picked:
+                    for vertex in picked:
+                        self._container.move_vertex(vertex,
+                            event.x - self._click.x, event.y - self._click.y)
+                    self._click.x = event.x
+                    self._click.y = event.y
             else:
-                for vertex in self._picked_state.get_picked():
-                    self._container.move_vertex(vertex,
-                        *vdiff((event.x, event.y), self._click))
-                self._click = (event.x, event.y)
-
+                x0, x1 = ordered_pair(self._selection.x, event.x)
+                y0, y1 = ordered_pair(self._selection.y, event.y)
+                self._container.coords(self._selection.id, x0, y0, x1, y1)
 
     def _on_press(self, event):
-        self._click = (event.x, event.y)
-        if self.mode == TRANSLATING:
-            self._container.scan_mark(event.x, event.y)
-        else:
-            id = self._container.get_object_id_by_location(*self._click)
-            self._pressed_id = id
-            if id is None:
+        self._click = self.Click(event.x, event.y)
+        id = self._container.get_object_id_by_location(event.x, event.y)
+        if self._container.is_vertex(id):
+            self._click.id = id
+            vertex = self._container._get_vertex_by_shape_id(id)
+            if (not self._picked_state.is_picked(vertex) and
+                not event.state & 1):
                 self._picked_state.clear()
-
-            if id is not None and self._container.is_vertex(id):
-                vertex = self._container._get_vertex_by_shape_id(id)
-                if (not self._picked_state.is_picked(vertex) and
-                    not event.state & 1):
-                    self._picked_state.clear()
-                above = self._container.find_above(id)
-                if above:
-                    self._container.tag_raise(id, above) # move to front
-                self._picked_state.pick(vertex)
+            self._picked_state.pick(vertex)
+        else:
+            if not event.state & 1:
+                self._picked_state.clear()
+            self._selection = self.Click(event.x, event.y,
+                self._container.create_rectangle(
+                    event.x, event.y, event.x, event.y))
 
     def _on_release(self, event):
-        if self.mode == TRANSLATING:
-            self._container._translate = vsum(self._container._translate,
-                vdiff((event.x, event.y), self._click))
-        else:
-            pass
-            #        if self._mode == MousePlugin.PICKING:
-        #            if self._click == (event.x, event.y):
-        #                event.id = self._pressed_id
-        #                self._onClick(event)
         self._click = None
+        if self._selection is not None:
+            selection = self._container.coords(self._selection.id)
+            for id in self._container.find_overlapping(*selection):
+                if self._container.is_vertex(id):
+                    vertex = self._container._get_vertex_by_shape_id(id)
+                    self._picked_state.pick(vertex)
+            self._container.delete(self._selection.id)
+            self._selection = None
 
 
 class Vertex(object):
@@ -171,7 +160,7 @@ class GraphViewer(Canvas):
                                      create_default_shape(self, vertex))
         self.update()
 
-        self._translate = (0, 0)
+        # self._translate = (0, 0)
 
         self._mouse_plugin = MousePlugin(self)
 
@@ -187,6 +176,10 @@ class GraphViewer(Canvas):
         self._picked_vertex_state.add_listener(createListener())
 
     @property
+    def vertices(self):
+        return self._vertices.viewvalues()
+
+    @property
     def picked_vertex_state(self):
         return self._picked_vertex_state
 
@@ -195,7 +188,6 @@ class GraphViewer(Canvas):
         no object. If multiple objects match, returns highest one.
         """
         try:
-            x, y = vdiff((x, y), self._translate)
             return self.find_overlapping(x, y, x, y)[-1]
         except IndexError:
             return None
@@ -246,7 +238,6 @@ class GraphViewer(Canvas):
     def reset(self):
         # TODO: temporary
         """Reset vertex positions."""
-        self._translate = (0, 0)
         for vertex in self.graph.vertices:
             layout_location = self.layout.get_location(vertex.value)
             canvas_location = self._convert_layout_location(*layout_location)
@@ -254,7 +245,7 @@ class GraphViewer(Canvas):
 
     def is_vertex(self, id):
         """Checks whether given shape id represents a vertex."""
-        return "vertex" in self.gettags(id)
+        return id is not None and "vertex" in self.gettags(id)
 
     def move_vertex(self, vertex, x, y):
         id = vertex.shape.id
