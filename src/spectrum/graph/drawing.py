@@ -8,6 +8,7 @@ __author__ = 'Daniel Lytkin'
 PICKING = 0
 TRANSLATING = 1
 
+SELECTION_KW = {"outline": "#aaaaff"}
 
 def vsum(v1, v2):
     """2D vector sum"""
@@ -94,7 +95,7 @@ class MousePlugin(object):
                 self._picked_state.clear()
             self._selection = self.Click(event.x, event.y,
                 self._container.create_rectangle(
-                    event.x, event.y, event.x, event.y))
+                    event.x, event.y, event.x, event.y, **SELECTION_KW))
 
     def _on_release(self, event):
         self._click = None

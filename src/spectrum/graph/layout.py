@@ -1,4 +1,5 @@
 from random import random
+import math
 
 __author__ = 'Daniel Lytkin'
 
@@ -47,15 +48,60 @@ class RandomLayout(Layout):
         return self._coordMap[vertex]
 
 
-class IterativeLayout(Layout):
-    def __init__(self, graph):
-        super(IterativeLayout, self).__init__(graph)
+class CircleLayout(Layout):
+    def __init__(self, graph, x, y, r):
+        super(CircleLayout, self).__init__(graph)
+        self._center = (x, y)
+        self._radius = r
+        self.reset()
 
-    def step(self):
-        raise NotImplementedError()
+    def reset(self):
+        self._coordMap.clear()
+        step = 2 * math.pi / len(self.graph.vertices)
+        x, y = self._center
+        r = self._radius
+        for i, vertex in enumerate(self._graph.vertices):
+            self._coordMap[vertex] = (x + r * math.sin(step * i),
+                                      y + r * math.cos(step * i))
 
-    def done(self):
-        return True
+
+class SpringLayout(Layout):
+    """Provides force-based layout. Edges are springs, vertices are charged
+    particles.
+    `rate' is repulsion divided by attraction; default 1.0.
+    `damping' how fast vertices slow down; default 0.5
+    `mass' function vertex -> mass. Default mass is 1.0.
+    """
+
+    def __init__(self, graph, spring_rate=1.0, spring_length=0.2,
+                 electric_rate=1.0, damping=0.5, mass=lambda: 1.0):
+        super(SpringLayout, self).__init__(graph)
+        self._spring_rate = spring_rate
+        self._spring_length = spring_length
+        self._electric_rate = electric_rate
+        self._damping = damping
+        self._mass = mass
+
+        # set random initial positions
+        for vertex in graph.vertices:
+            self._coordMap[vertex] = (random(), random())
+        self._velocities = dict.fromkeys(graph.vertices, (0.0, 0.0))
+
+    def _distance_sq(self, v1, v2):
+        x1, y1 = self._coordMap[v1]
+        x2, y2 = self._coordMap[v2]
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+
+    def _repulsion(self, vertex, other):
+        return self._electric_rate / self._distance_sq(vertex, other)
+
+    def _attraction(self, vertex, other):
+        r = self._distance_sq(vertex, other) ** 0.5
+        return self._spring_rate * (self._spring_length - r)
+
+    def step(self, time_step):
+        for vertex in self._graph.vertices:
+            pass
 
 
 

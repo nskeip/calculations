@@ -65,3 +65,17 @@ class GraphTest(unittest.TestCase):
         expectedEdges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
         self.assertSparseGraphEqual((expectedVertices, expectedEdges),
             g.as_sparse_graph())
+
+    def test_adjacent(self):
+        g = Graph(range(3))
+        g.add_edge(0, 1)
+        self.assertTrue(g.adjacent(0, 1))
+        self.assertFalse(g.adjacent(1, 2))
+
+    def test_neighbors(self):
+        g = Graph(range(5))
+        edges = [(0, 1), (0, 3), (0, 4), (1, 2), (2, 3), (2, 4)]
+        g.add_edges(edges)
+
+        self.assertEqual([1, 3, 4], g.neighbors(0))
+        self.assertEqual([1, 3, 4], g.neighbors(2))

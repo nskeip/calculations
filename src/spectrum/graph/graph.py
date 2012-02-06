@@ -19,7 +19,7 @@ class Graph:
         self._adjacency.append([False] * len(self._adjacency))
         self._vertices.append(vertex)
 
-    def _index(self, vertex):
+    def index(self, vertex):
         try:
             return self._vertices.index(vertex)
         except ValueError:
@@ -49,7 +49,7 @@ class Graph:
     def _add_vertex(self, vertex):
         """Add new vertex to graph and return its index
         """
-        vIndex = self._index(vertex)
+        vIndex = self.index(vertex)
         if vIndex is None:
             self._add_no_check(vertex)
             return len(self._vertices) - 1
@@ -68,8 +68,8 @@ class Graph:
     def add_edge(self, v1, v2):
         """Add new edge to graph. Adds missing vertices if necessary
         """
-        i1 = self._index(v1)
-        i2 = self._index(v2)
+        i1 = self.index(v1)
+        i2 = self.index(v2)
         if i1 is None:
             self._add_no_check(v1)
             i1 = len(self._vertices) - 1
@@ -82,13 +82,23 @@ class Graph:
         for edge in edges:
             self.add_edge(*edge)
 
+    def neighbors(self, index):
+        neighbors = []
+        for i in xrange(index):
+            if self._adjacency[index][i]:
+                neighbors.append(i)
+        for j in xrange(index + 1, len(self._adjacency)):
+            if self._adjacency[j][index]:
+                neighbors.append(j)
+        return neighbors
+
     def _clone_vertex(self, index, value):
         # adjacency of new vertex with all other vertices:
         newRow = (list(self._adjacency[index]) +
                   [True] +
                   [self._adjacency[j][index]
                    for j in xrange(index + 1, len(self._adjacency))])
-        vIndex = self._index(value)
+        vIndex = self.index(value)
         if vIndex is None:
             self._adjacency.append(newRow)
             self._vertices.append(value)
@@ -104,6 +114,13 @@ class Graph:
         already in the set of vertices. Returns index of clone.
         """
         return self._clone_vertex(self._vertices.index(vertex), value)
+
+    def adjacent(self, index1, index2):
+        """Returns true iff vertices with indices index1 and index2 are
+        adjacent
+        """
+        index1, index2 = ordered_pair(index1, index2)
+        return self._adjacency[index2][index1]
 
     def as_sparse_graph(self):
         """Returns pair <vertices>, <edges> for this graph
