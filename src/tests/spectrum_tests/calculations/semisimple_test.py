@@ -1,8 +1,7 @@
-from exceptions import IndexError
 import unittest
-from calculations import semisimple
-from calculations.partition import Partitions
-from calculations.semisimple import SemisimpleElements, MixedElements
+from spectrum.calculations import semisimple
+from spectrum.calculations.partition import Partitions
+from spectrum.calculations.semisimple import SemisimpleElements, MixedElements
 
 __author__ = 'Daniel Lytkin'
 
@@ -10,6 +9,7 @@ class Signs:
     """
     Generates all n-tuples with elements {-1, 1}
     """
+
     def __init__(self, n):
         self._number = n
 
@@ -17,14 +17,14 @@ class Signs:
     def _next(signs):
         current = list(signs)
         i = 0
-        while current[i]==1:
-            current[i]=-1
+        while current[i] == 1:
+            current[i] = -1
             i += 1
-        current[i]=1
+        current[i] = 1
         return current
 
     def __iter__(self):
-        current = [-1]*self._number
+        current = [-1] * self._number
         yield current
         try:
             while True:
@@ -32,6 +32,7 @@ class Signs:
                 yield current
         except IndexError:
             pass
+
 
 class SemisimpleTest(unittest.TestCase):
     def test_evaluate(self):
@@ -42,10 +43,10 @@ class SemisimpleTest(unittest.TestCase):
         self.assertEqual(75331760, r)
 
     def test_evaluate_minuses(self):
-        ni = [8,7,4,3,1]
+        ni = [8, 7, 4, 3, 1]
         q = 4
         r = semisimple.evaluate(q, ni)
-        rp = semisimple.evaluate(q, ni, [-1]*len(ni))
+        rp = semisimple.evaluate(q, ni, [-1] * len(ni))
         self.assertEqual(rp, r)
 
     def test_minus(self):
@@ -62,12 +63,13 @@ class SemisimpleTest(unittest.TestCase):
             found = False
             for x in ss:
                 if x % elem == 0:
-                    if x==elem:
+                    if x == elem:
                         divisible.add(x)
                     found = True
             self.assertTrue(found,
-                    msg="element with base {}, partition {} = {} " \
-                        "doesn't divide any of {}".format(str(q), str(ni), str(elem), str(ss)))
+                msg="element with base {}, partition {} = {} "\
+                    "doesn't divide any of {}".format(str(q), str(ni),
+                    str(elem), str(ss)))
         self.assertSetEqual(divisible, set(ss))
 
     def test_signs(self):
@@ -98,13 +100,14 @@ class SemisimpleTest(unittest.TestCase):
                 found = False
                 for x in ss:
                     if x % elem == 0:
-                        if x==elem:
+                        if x == elem:
                             divisible.add(x)
                         found = True
-                #self.assertTrue(any(x % elem == 0 for x in ss),
+                        #self.assertTrue(any(x % elem == 0 for x in ss),
                 self.assertTrue(found,
-                    msg="element with base {}, partition {} and signs {} = {} " \
-                        "doesn't divide any of {}".format(str(q), str(ni), str(ei), str(elem), str(ss)))
+                    msg="element with base {}, partition {} and signs {} = {} "\
+                        "doesn't divide any of {}".format(str(q), str(ni),
+                        str(ei), str(elem), str(ss)))
 
         self.assertSetEqual(divisible, set(ss))
 
@@ -118,8 +121,8 @@ class SemisimpleTest(unittest.TestCase):
         n = 3
         q = 9
         p = 3
-        f = lambda k: (p**(k-1)+1)//2
-        g = lambda k: p**k
+        f = lambda k: (p ** (k - 1) + 1) // 2
+        g = lambda k: p ** k
 
         mixed = list(MixedElements(q, n, f, g))
         expected = [246, 240, 30, 24, 120, 120, 90, 72]

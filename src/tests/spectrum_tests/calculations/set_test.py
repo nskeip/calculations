@@ -1,6 +1,6 @@
 import unittest
-from calculations.partition import Partitions
-from calculations.set import *
+from spectrum.calculations.partition import Partitions
+from spectrum.calculations.set import BoundedSets, MaximalBoundedSets, FullBoundedSets
 
 __author__ = 'Daniel Lytkin'
 
@@ -10,7 +10,7 @@ class SetTest(unittest.TestCase):
         """
         Returns only those sets, that are not contained in any other set
         """
-        return filter(lambda x: not any(set(x)<set(y) for y in sets), sets)
+        return filter(lambda x: not any(set(x) < set(y) for y in sets), sets)
 
     def test_next_bounded_set(self):
         expected = [4, 3, 2, 1]
@@ -18,7 +18,8 @@ class SetTest(unittest.TestCase):
 
     def test_next_maximal_set(self):
         expected = [4, 3, 2, 1]
-        self.assertSequenceEqual(expected, MaximalBoundedSets.next([5, 2, 1], 10))
+        self.assertSequenceEqual(expected,
+            MaximalBoundedSets.next([5, 2, 1], 10))
 
     def test_sets(self):
         sets = list(BoundedSets(10))
@@ -50,7 +51,8 @@ class SetTest(unittest.TestCase):
 
         # every partition must have every its element contained in some minus-partition
         self.assertTrue(all(
-            any(set(partition)<=set(mPartition) for mPartition in minusPartitions)
+            any(set(partition) <= set(
+                mPartition) for mPartition in minusPartitions)
             for partition in allPartitions))
 
     def test_zero_bound(self):

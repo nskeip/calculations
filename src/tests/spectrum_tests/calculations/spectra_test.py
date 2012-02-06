@@ -1,8 +1,8 @@
 import unittest
-from calculations.spectra import Group, SporadicGroup, AlternatingGroup, Field, ClassicalGroup
-from orders_data import orders
-from parametric import parametrized, parameters
 from spectra_data import spectra
+from spectrum.calculations.spectra import Field, Group, SporadicGroup, AlternatingGroup, ClassicalGroup
+from spectrum_tests.calculations.orders_data import orders
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
@@ -20,24 +20,24 @@ class SpectraTest(unittest.TestCase):
 
     def test_field_by_order(self):
         f = Field(81)
-        self.assertEqual(81, f.order())
-        self.assertEqual(3, f.char())
-        self.assertEqual(4, f.pow())
+        self.assertEqual(81, f.order)
+        self.assertEqual(3, f.char)
+        self.assertEqual(4, f.pow)
 
     def test_field_by_characteristic(self):
         f = Field(2, 5)
-        self.assertEqual(32, f.order())
-        self.assertEqual(2, f.char())
-        self.assertEqual(5, f.pow())
+        self.assertEqual(32, f.order)
+        self.assertEqual(2, f.char)
+        self.assertEqual(5, f.pow)
 
     def test_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             Group().apex()
 
     def test_sporadic(self):
-        expected = [ 32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
-                     57, 59, 60, 62, 66, 68, 69, 70, 71, 78, 84,
-                     87, 88, 92, 93, 94, 95, 104, 105, 110, 119 ]
+        expected = [32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
+                    57, 59, 60, 62, 66, 68, 69, 70, 71, 78, 84,
+                    87, 88, 92, 93, 94, 95, 104, 105, 110, 119]
         g = SporadicGroup("M")
         self.assertSequenceEqual(expected, g.apex())
 
@@ -47,9 +47,11 @@ class SpectraTest(unittest.TestCase):
         self.assertEqual(expected, g.order())
 
     def test_sporadic_names(self):
-        expected = {"M11", "M12", "M22", "M23", "M24", "J1", "J2", "J3", "J4", "Co1", "Co2", "Co3", "Fi22", "Fi23",
-                    "Fi24'", "HS", "McL", "He", "Ru", "Suz", "O'N", "HN", "Ly", "Th", "B", "M", "2F4(2)'"}
-        self.assertSetEqual(expected, set(SporadicGroup.getAllGroups()))
+        expected = {"M11", "M12", "M22", "M23", "M24", "J1", "J2", "J3", "J4",
+                    "Co1", "Co2", "Co3", "Fi22", "Fi23",
+                    "Fi24'", "HS", "McL", "He", "Ru", "Suz", "O'N", "HN", "Ly",
+                    "Th", "B", "M", "2F4(2)'"}
+        self.assertSetEqual(expected, set(SporadicGroup.all_groups()))
 
     def test_sporadic_str(self):
         name = "2F4(2)'"
@@ -78,8 +80,8 @@ class SpectraTest(unittest.TestCase):
         for g in (ClassicalGroup("PSp", 4, Field(2, 3)),
                   ClassicalGroup("PSp", 4, 2, 3),
                   ClassicalGroup("PSp", 4, 8)):
-            self.assertEqual(2, g.field().char())
-            self.assertEqual(3, g.field().pow())
+            self.assertEqual(2, g.field.char)
+            self.assertEqual(3, g.field.pow)
 
     @parameters(orders.keys())
     def test_orders(self, params):

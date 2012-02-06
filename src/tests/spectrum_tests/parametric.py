@@ -5,10 +5,11 @@ __author__ = 'Daniel Lytkin'
 
 def default_naming(name, param):
     for p in param:
-        name += '_'+str(p)
+        name += '_' + str(p)
     return name
 
-def parameters(paramsList, naming = default_naming):
+
+def parameters(paramsList, naming=default_naming):
     """Generates test method for every param in paramsList.
     If 'naming' argument provided, new methods are named as naming(name, param), where name is initial method name.
     Default naming is 'name_str(param[0])_str(param[1])_...'
@@ -42,11 +43,15 @@ def parameters(paramsList, naming = default_naming):
 
     # etc
     """
-    def decorator(func): # decorator returns same function with additional attribute
+
+    def decorator(
+            func): # decorator returns same function with additional attribute
         func._params = paramsList
         func._naming = naming
         return func
+
     return decorator
+
 
 def parametrized(testCase):
     """Test case class must be decorated with @parametrized for @parameters to work for its methods
@@ -57,13 +62,16 @@ def parametrized(testCase):
 
         for i, param in enumerate(attr._params):
             name = attr._naming(attr.__name__, param)
+
             def createMethod():
                 testParams = param
                 testMethod = attr
+
                 @wraps(testMethod)
                 def newMethod(self):
                     return testMethod(self, testParams)
-                # newMethod.__doc__ = testMethod.__doc__
+
+                    # newMethod.__doc__ = testMethod.__doc__
                 return newMethod
 
             setattr(testCase, name, createMethod())
