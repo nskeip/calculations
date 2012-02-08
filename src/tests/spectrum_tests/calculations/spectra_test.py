@@ -1,5 +1,5 @@
 import unittest
-from spectra_data import spectra
+from spectrum_tests.calculations.spectra_data import spectra
 from spectrum.calculations.spectra import Field, Group, SporadicGroup, AlternatingGroup, ClassicalGroup
 from spectrum_tests.calculations.orders_data import orders
 from spectrum_tests.parametric import parametrized, parameters
