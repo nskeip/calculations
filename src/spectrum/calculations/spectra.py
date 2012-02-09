@@ -31,19 +31,13 @@ class Field:
             self._order = self._base ** self._pow
 
     @property
-    def order(self):
-        """Returns field order."""
-        return self._order
+    def order(self): return self._order
 
     @property
-    def char(self):
-        """Returns field characteristic."""
-        return self._base
+    def char(self): return self._base
 
     @property
-    def pow(self):
-        """Returns k, such that q = p^k, where q is field order and p is field characteristic."""
-        return self._pow
+    def pow(self): return self._pow
 
 
 class Group(object):
@@ -67,13 +61,13 @@ class SporadicGroup(Group):
         "M12": (( 6, 8, 10, 11 ), Integer((2, 6), (3, 3), 5, 11)),
         "M22": (( 5, 6, 7, 8, 11 ), Integer((2, 7), (3, 2), 5, 7, 11)),
         "M23": (
-        ( 6, 8, 11, 14, 15, 23 ), Integer((2, 7), (3, 2), 5, 7, 11, 23)),
+            ( 6, 8, 11, 14, 15, 23 ), Integer((2, 7), (3, 2), 5, 7, 11, 23)),
         "M24": (( 8, 10, 11, 12, 14, 15, 21, 23 ),
                 Integer((2, 10), (3, 3), 5, 7, 11, 23)),
         "J1": (( 6, 7, 10, 11, 15, 19 ), Integer((2, 3), 3, 5, 7, 11, 19)),
         "J2": (( 7, 8, 10, 12, 15 ), Integer((2, 7), (3, 3), (5, 2), 7)),
         "J3": (
-        ( 8, 9, 10, 12, 15, 17, 19 ), Integer((2, 7), (3, 5), 5, 17, 19)),
+            ( 8, 9, 10, 12, 15, 17, 19 ), Integer((2, 7), (3, 5), 5, 17, 19)),
         "J4": (( 16, 23, 24, 28, 29, 30, 31, 35, 37, 40, 42, 43, 44, 66 ),
                Integer((2, 21), (3, 3), 5, 7, (11, 3), 23, 29, 31, 37, 43)),
         "Co1": (( 16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60 ),
@@ -87,12 +81,12 @@ class SporadicGroup(Group):
         "Fi23": (( 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60 ),
                  Integer((2, 18), (3, 13), (5, 2), 7, 11, 13, 17, 23)),
         "Fi24'": (
-        ( 16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60 ),
-        Integer((2, 21), (3, 16), (5, 2), (7, 3), 11, 13, 17, 23, 29)),
+            ( 16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60 ),
+            Integer((2, 21), (3, 16), (5, 2), (7, 3), 11, 13, 17, 23, 29)),
         "HS": (
-        ( 7, 8, 11, 12, 15, 20 ), Integer((2, 9), (3, 2), (5, 3), 7, 11)),
+            ( 7, 8, 11, 12, 15, 20 ), Integer((2, 9), (3, 2), (5, 3), 7, 11)),
         "McL": (
-        ( 8, 9, 11, 12, 14, 30 ), Integer((2, 7), (3, 6), (5, 3), 7, 11)),
+            ( 8, 9, 11, 12, 14, 30 ), Integer((2, 7), (3, 6), (5, 3), 7, 11)),
         "He": (( 8, 10, 12, 15, 17, 21, 28 ),
                Integer((2, 10), (3, 3), (5, 2), (7, 3), 17)),
         "Ru": (( 14, 15, 16, 20, 24, 26, 29 ),
@@ -318,8 +312,8 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
         n_k = nk(k)
         if n_k >= n: break
         dk = gcd(4, q ** n_k - sign) // 2
-        a3.append(p ** k * lcm(dk, q ** (n - n_k) + 1) // dk)
-        a3.append(p ** k * lcm(dk, q ** (n - n_k) - 1) // dk)
+        a3.append(p ** k * lcm(dk, (q ** (n - n_k) + 1) // dk))
+        a3.append(p ** k * lcm(dk, (q ** (n - n_k) - 1) // dk))
         k += 1
         # (4)
     a4 = MixedElements(q, n, nk, lambda k: p ** k, min_length=2)
@@ -454,7 +448,7 @@ class ClassicalGroup(Group):
                "SO+": (_special_orthogonal_pm(1), _special_orthogonal_order(1))
         ,
                "SO-": (
-               _special_orthogonal_pm(-1), _special_orthogonal_order(-1))}
+                   _special_orthogonal_pm(-1), _special_orthogonal_order(-1))}
 
     def __init__(self, name, dimension, *field):
         self._name = name
