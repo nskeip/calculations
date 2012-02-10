@@ -42,14 +42,16 @@ class SetTest(unittest.TestCase):
 
     def test_containing_partitions(self):
         """
-        Every partition must have the set of its parts contained in some bounded set for the same n.
-        We only need sets that are maximal by containment
+        Every partition must have the set of its parts contained in some
+        bounded set for the same n. We only need sets that are maximal by
+        containment
         """
         n = 20
         minusPartitions = list(MaximalBoundedSets(n))
         allPartitions = list(Partitions(n))
 
-        # every partition must have every its element contained in some minus-partition
+        # every partition must have every its element contained in some
+        # minus-partition
         self.assertTrue(all(
             any(set(partition) <= set(
                 mPartition) for mPartition in minusPartitions)

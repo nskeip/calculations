@@ -1,8 +1,8 @@
 from itertools import chain
-from spectrum.calculations.numeric import Integer, first_divisor, sort_and_filter, get_exponent, lcm, gcd
-from spectrum.calculations.partition import Partitions
-from spectrum.calculations.semisimple import SemisimpleElements, MixedElements, evaluate
-from spectrum.calculations.set import FullBoundedSets
+from numeric import *
+from partition import Partitions
+from semisimple import SemisimpleElements, MixedElements, evaluate
+from set import FullBoundedSets
 from spectrum.tools.tools import doc_inherit
 
 
@@ -10,8 +10,10 @@ __author__ = 'Daniel Lytkin'
 
 class Field:
     """Finite field.
-    Can be created as Field(order) or Field(base, pow) where base**pow is the order of the field.
-    'order' must be a prime power, otherwise the wrong field will be created.
+    Can be created as Field(order) or Field(base, pow) where base**pow is the
+    order of the field. `order' must be a prime power, otherwise the wrong
+    field will be created.
+
     """
 
     def __init__(self, *arg):
@@ -45,13 +47,14 @@ class Group(object):
     """
 
     def apex(self):
-        """Returns apex of the group, which is the set of its element orders with all divisors filtered out.
+        """Returns apex of the group, which is the set of its element orders
+        with all divisors filtered out.
+
         """
         raise NotImplementedError()
 
     def order(self):
-        """Returns group order.
-        """
+        """Returns group order."""
         raise NotImplementedError()
 
 
@@ -60,14 +63,14 @@ class SporadicGroup(Group):
         "M11": (( 5, 6, 8, 11 ), Integer((2, 4), (3, 2), 5, 11)),
         "M12": (( 6, 8, 10, 11 ), Integer((2, 6), (3, 3), 5, 11)),
         "M22": (( 5, 6, 7, 8, 11 ), Integer((2, 7), (3, 2), 5, 7, 11)),
-        "M23": (
-            ( 6, 8, 11, 14, 15, 23 ), Integer((2, 7), (3, 2), 5, 7, 11, 23)),
+        "M23": (( 6, 8, 11, 14, 15, 23 ),
+                Integer((2, 7), (3, 2), 5, 7, 11, 23)),
         "M24": (( 8, 10, 11, 12, 14, 15, 21, 23 ),
                 Integer((2, 10), (3, 3), 5, 7, 11, 23)),
         "J1": (( 6, 7, 10, 11, 15, 19 ), Integer((2, 3), 3, 5, 7, 11, 19)),
         "J2": (( 7, 8, 10, 12, 15 ), Integer((2, 7), (3, 3), (5, 2), 7)),
-        "J3": (
-            ( 8, 9, 10, 12, 15, 17, 19 ), Integer((2, 7), (3, 5), 5, 17, 19)),
+        "J3": (( 8, 9, 10, 12, 15, 17, 19 ),
+               Integer((2, 7), (3, 5), 5, 17, 19)),
         "J4": (( 16, 23, 24, 28, 29, 30, 31, 35, 37, 40, 42, 43, 44, 66 ),
                Integer((2, 21), (3, 3), 5, 7, (11, 3), 23, 29, 31, 37, 43)),
         "Co1": (( 16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60 ),
@@ -83,10 +86,10 @@ class SporadicGroup(Group):
         "Fi24'": (
             ( 16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60 ),
             Integer((2, 21), (3, 16), (5, 2), (7, 3), 11, 13, 17, 23, 29)),
-        "HS": (
-            ( 7, 8, 11, 12, 15, 20 ), Integer((2, 9), (3, 2), (5, 3), 7, 11)),
-        "McL": (
-            ( 8, 9, 11, 12, 14, 30 ), Integer((2, 7), (3, 6), (5, 3), 7, 11)),
+        "HS": (( 7, 8, 11, 12, 15, 20 ),
+               Integer((2, 9), (3, 2), (5, 3), 7, 11)),
+        "McL": (( 8, 9, 11, 12, 14, 30 ),
+                Integer((2, 7), (3, 6), (5, 3), 7, 11)),
         "He": (( 8, 10, 12, 15, 17, 21, 28 ),
                Integer((2, 10), (3, 3), (5, 2), (7, 3), 17)),
         "Ru": (( 14, 15, 16, 20, 24, 26, 29 ),
@@ -167,9 +170,9 @@ class AlternatingGroup(Group):
         return "Alt({})".format(self._degree)
 
 
-#####################
-# SPECTRA CALCULATION
-#####################
+#############################
+# SPECTRA OF CLASSICAL GROUPS
+#############################
 
 def _symplectic_order(n, field):
     n //= 2
@@ -250,7 +253,8 @@ def _p_symplectic_spectrum_odd_c(n, field):
 
 
 def _p_symplectic_spectrum(n, field):
-    """Spectra of projective symplectic group. Note that PSp(n, 2^k) = Sp(n, 2^k)
+    """Spectra of projective symplectic group. Note that
+    PSp(n, 2^k) = Sp(n, 2^k)
     """
     if field.char == 2:
         return _symplectic_spectrum_even_c(n, field)
