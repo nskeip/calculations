@@ -10,7 +10,7 @@ class Layout(object):
 
     def __init__(self, graph, defaultLocation=(0.0, 0.0)):
         self._graph = graph
-        self._coordMap = dict()
+        self._locations = dict()
         self._defaultLocation = defaultLocation
 
     @property
@@ -18,23 +18,25 @@ class Layout(object):
         return self._graph
 
     def set_location(self, vertex, x, y):
-        self._coordMap[vertex] = (x, y)
+        self._locations[vertex] = (x, y)
 
     def get_location(self, vertex):
-        if not self._coordMap.has_key(vertex):
-            self._coordMap[vertex] = self._defaultLocation
-        return self._coordMap[vertex]
+        if not self._locations.has_key(vertex):
+            self._locations[vertex] = self._defaultLocation
+        return self._locations[vertex]
+
+    # TODO: def setLock(vertex, locked)
 
     def update(self):
         """Remove deleted vertices
         """
-        deleted_vertices = self._coordMap.viewkeys() - set(
+        deleted_vertices = self._locations.viewkeys() - set(
             self._graph.vertices)
         for vertex in deleted_vertices:
-            del self._coordMap[vertex]
+            del self._locations[vertex]
 
     def reset(self):
-        self._coordMap.clear()
+        self._locations.clear()
 
 
 class RandomLayout(Layout):
@@ -43,9 +45,9 @@ class RandomLayout(Layout):
         self.reset()
 
     def get_location(self, vertex):
-        if not self._coordMap.has_key(vertex):
-            self._coordMap[vertex] = (random(), random())
-        return self._coordMap[vertex]
+        if not self._locations.has_key(vertex):
+            self._locations[vertex] = (random(), random())
+        return self._locations[vertex]
 
 
 class CircleLayout(Layout):
@@ -56,13 +58,13 @@ class CircleLayout(Layout):
         self.reset()
 
     def reset(self):
-        self._coordMap.clear()
+        self._locations.clear()
         step = 2 * math.pi / len(self.graph.vertices)
         x, y = self._center
         r = self._radius
         for i, vertex in enumerate(self._graph.vertices):
-            self._coordMap[vertex] = (x + r * math.sin(step * i),
-                                      y + r * math.cos(step * i))
+            self._locations[vertex] = (x + r * math.sin(step * i),
+                                       y + r * math.cos(step * i))
 
 
 class SpringLayout(Layout):
@@ -73,8 +75,8 @@ class SpringLayout(Layout):
     `mass' function vertex -> mass. Default mass is 1.0.
     """
 
-    def __init__(self, graph, spring_rate=1.0, spring_length=0.2,
-                 electric_rate=1.0, damping=0.5, mass=lambda: 1.0):
+    def __init__(self, graph, spring_rate=10.0, spring_length=0.5,
+                 electric_rate=0.01, damping=0.5, mass=lambda: 1.0):
         super(SpringLayout, self).__init__(graph)
         self._spring_rate = spring_rate
         self._spring_length = spring_length
@@ -84,24 +86,57 @@ class SpringLayout(Layout):
 
         # set random initial positions
         for vertex in graph.vertices:
-            self._coordMap[vertex] = (random(), random())
+            self._locations[vertex] = (random(), random())
         self._velocities = dict.fromkeys(graph.vertices, (0.0, 0.0))
 
     def _distance_sq(self, v1, v2):
-        x1, y1 = self._coordMap[v1]
-        x2, y2 = self._coordMap[v2]
+        x1, y1 = self._locations[v1]
+        x2, y2 = self._locations[v2]
         return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
-    def _repulsion(self, vertex, other):
-        return self._electric_rate / self._distance_sq(vertex, other)
+    def _repulsion_force(self, vertex, other):
+        r = self._distance_sq(vertex, other)
+        if r == 0.0: return random(), random()
+        c = self._electric_rate / (r ** 1.5)
+        x1, y1 = self._locations[vertex]
+        x2, y2 = self._locations[other]
+        return (x1 - x2) * c, (y1 - y2) * c
 
-    def _attraction(self, vertex, other):
+    def _attraction_force(self, vertex, other):
         r = self._distance_sq(vertex, other) ** 0.5
-        return self._spring_rate * (self._spring_length - r)
+        if r == 0.0: return random(), random()
+        c = self._spring_rate * (self._spring_length - r) / r
+        x1, y1 = self._locations[vertex]
+        x2, y2 = self._locations[other]
+        return (x1 - x2) * c, (y1 - y2) * c
 
     def step(self, time_step):
-        for vertex in self._graph.vertices:
-            pass
+        for vertex in xrange(len(self._graph.vertices)):
+            force_x, force_y = 0, 0
+
+            for other in xrange(len(self._graph.vertices)):
+                if other == vertex: continue
+                repulsion = self._repulsion_force(vertex, other)
+                force_x += repulsion[0]
+                force_y += repulsion[1]
+
+                if self._graph.adjacent(vertex, other):
+                    attraction = self._attraction_force(vertex, other)
+                    force_x += attraction[0]
+                    force_y += attraction[1]
+
+            vel_x, vel_y = self._velocities[vertex]
+            vel_x = self._damping * (vel_x + time_step * force_x)
+            vel_y = self._damping * (vel_y + time_step * force_y)
+            self._velocities[vertex] = vel_x, vel_y
+
+            # this is to prevent going behind borders:
+            f = lambda a: min(max(0, a), 1)
+            x, y = self._locations[vertex]
+            x += time_step * vel_x
+            y += time_step * vel_y
+            self._locations[vertex] = f(x), f(y)
+
 
 
 

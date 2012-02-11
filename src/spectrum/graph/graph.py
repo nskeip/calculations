@@ -83,6 +83,8 @@ class Graph:
             self.add_edge(*edge)
 
     def neighbors(self, index):
+        """Returns indices of neighbors of vertex with specified index.
+        """
         neighbors = []
         for i in xrange(index):
             if self._adjacency[index][i]:
@@ -92,7 +94,12 @@ class Graph:
                 neighbors.append(j)
         return neighbors
 
-    def _clone_vertex(self, index, value):
+    def clone_vertex(self, index, value):
+        """Add new vertex 'value' with same neighbors as given, and connect to
+        given. Or connects given and all its neighbors to 'value' if is is
+        already in the set of vertices. Returns index of clone.
+
+        """
         # adjacency of new vertex with all other vertices:
         newRow = (list(self._adjacency[index]) +
                   [True] +
@@ -108,12 +115,6 @@ class Graph:
                 if i != vIndex and newRow[i]:
                     self._set_adjacency(vIndex, i, True)
 
-    def clone_vertex(self, vertex, value):
-        """Add new vertex 'value' with same neighbors as given, and connect to
-        given. Or connects given and all its neighbors to 'value' if is is
-        already in the set of vertices. Returns index of clone.
-        """
-        return self._clone_vertex(self._vertices.index(vertex), value)
 
     def adjacent(self, index1, index2):
         """Returns true iff vertices with indices index1 and index2 are

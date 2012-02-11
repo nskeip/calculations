@@ -36,13 +36,13 @@ class GraphTest(unittest.TestCase):
         g = Graph(vertices)
         edges = [(1, 2), (1, 3), (2, 4), (2, 5), (4, 5)]
         g.add_edges(edges)
-        g.clone_vertex(2, 6)
+        g.clone_vertex(g.index(2), 6)
         self.assertSparseGraphEqual((vertices + [6], edges + [(1, 6), (2, 6),
             (4, 6), (5, 6)]), g.as_sparse_graph())
 
         g = Graph(vertices)
         g.add_edges(edges)
-        g.clone_vertex(2, 3)
+        g.clone_vertex(g.index(2), 3)
         self.assertSparseGraphEqual((vertices,
                                      edges + [(2, 3), (3, 4), (3, 5)]),
             g.as_sparse_graph())

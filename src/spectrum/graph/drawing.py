@@ -202,7 +202,7 @@ class GraphViewer(Canvas):
     def _add_vertex(self, value):
         new_vertex = Vertex(value, self._create_vertex_shape(value))
 
-        layout_location = self._layout.get_location(value)
+        layout_location = self._layout.get_location(self.graph.index(value))
         canvas_location = self._convert_layout_location(*layout_location)
         self.set_vertex_location(new_vertex, *canvas_location)
         self._vertices[value] = new_vertex
@@ -239,10 +239,10 @@ class GraphViewer(Canvas):
     def reset(self):
         # TODO: temporary
         """Reset vertex positions."""
-        for vertex in self.graph.vertices:
-            layout_location = self.layout.get_location(vertex.value)
+        for value in self.graph.vertices:
+            layout_location = self.layout.get_location(self.graph.index(value))
             canvas_location = self._convert_layout_location(*layout_location)
-            self.set_vertex_location(vertex, *canvas_location)
+            self.set_vertex_location(self._vertices[value], *canvas_location)
 
     def is_vertex(self, id):
         """Checks whether given shape id represents a vertex."""
@@ -253,7 +253,7 @@ class GraphViewer(Canvas):
         self.move(id, x, y)
         canvas_location = self._get_shape_center(id)
         layout_location = self._convert_canvas_location(*canvas_location)
-        self._layout.set_location(vertex, *layout_location)
+        self._layout.set_location(self.graph.index(vertex), *layout_location)
         # move edges ends
         for edge in vertex.incident:
             if vertex is edge.start:

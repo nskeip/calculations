@@ -39,7 +39,7 @@ class FastGraph(Graph):
                 neighbors.append(i)
             else:
                 self._vertices[i] = bd
-                dIndex = self._clone_vertex(i, d)
+                dIndex = self.clone_vertex(i, d)
                 for neighbor in neighbors:
                     self._adjacency[dIndex][neighbor] = True
                 neighbors.append(dIndex)
