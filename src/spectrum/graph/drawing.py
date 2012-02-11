@@ -253,7 +253,8 @@ class GraphViewer(Canvas):
         self.move(id, x, y)
         canvas_location = self._get_shape_center(id)
         layout_location = self._convert_canvas_location(*canvas_location)
-        self._layout.set_location(self.graph.index(vertex), *layout_location)
+        self._layout.set_location(self.graph.index(vertex.value),
+            *layout_location)
         # move edges ends
         for edge in vertex.incident:
             if vertex is edge.start:

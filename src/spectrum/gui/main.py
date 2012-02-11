@@ -10,7 +10,7 @@ root = Tk()
 frame = Frame(master=root)
 frame.pack()
 
-graph = FullGraph(16)
+graph = FullGraph(15)
 #graph.add_edge(0, 1)
 #graph.add_edge(1, 2)
 
