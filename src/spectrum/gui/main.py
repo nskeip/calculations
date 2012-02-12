@@ -17,11 +17,20 @@ graph = FullGraph(15)
 
 canvas = GraphViewer(SpringLayout(graph))
 
-def e(event):
+id = None
+
+def e():
+    global id
     canvas.layout.step(0.1)
     canvas.reset()
+    id = frame.after(50, e)
 
-canvas.bind_all("<space>", e)
+e()
+
+def stop(event):
+    frame.after_cancel(id)
+
+canvas.bind_all("<space>", stop)
 
 canvas.pack()
 frame.mainloop()

@@ -165,12 +165,17 @@ class GraphViewer(Canvas):
 
         self._mouse_plugin = MousePlugin(self)
 
+        # makes vertex shape change appearing if it was picked
+        # also sets layout lock for picked vertices
         def createListener():
             state = self._picked_vertex_state
+            layout = self.layout
 
             def listener(vertex):
                 picked = state.is_picked(vertex)
                 vertex.shape.set_selection(picked)
+                layout.set_lock(layout.graph.index(vertex.value), picked)
+
 
             return listener
 
