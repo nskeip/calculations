@@ -4,9 +4,12 @@ from types import FunctionType
 __author__ = 'Daniel Lytkin'
 
 def default_naming(name, param):
-    for p in param:
-        name += '_' + str(p)
-    return name
+    try:
+        for p in param:
+            name += '_' + str(p)
+        return name
+    except TypeError:
+        return name + '_' + str(param)
 
 
 def parameters(paramsList, naming=default_naming):
@@ -72,6 +75,7 @@ def parametrized(testCase):
                     return testMethod(self, testParams)
 
                     # newMethod.__doc__ = testMethod.__doc__
+
                 return newMethod
 
             setattr(testCase, name, createMethod())

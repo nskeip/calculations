@@ -1,11 +1,15 @@
 import unittest
+import itertools
 from spectrum.calculations.numeric import *
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
+@parametrized
 class NumericTest(unittest.TestCase):
-    def test_gcd(self):
-        a, b = 30, 12
+    @parameters(itertools.combinations(range(1, 30), 2))
+    def test_gcd(self, params):
+        a, b = params
         c = gcd(a, b)
         # c must divide both a and b
         self.assertTrue(a % c == 0)
@@ -14,8 +18,9 @@ class NumericTest(unittest.TestCase):
         self.assertTrue(
             all(a % t > 0 or b % t > 0 for t in range(c + 1, min(a, b) + 1)))
 
-    def test_lcm(self):
-        a, b = 30, 12
+    @parameters(itertools.combinations(range(1, 30), 2))
+    def test_lcm(self, params):
+        a, b = params
         c = lcm(a, b)
         # c must me divisible by both a and b
         self.assertTrue(c % a == 0)

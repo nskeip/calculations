@@ -1,9 +1,11 @@
 import unittest
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.set import BoundedSets, MaximalBoundedSets, FullBoundedSets
+from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
 
+@parametrized
 class SetTest(unittest.TestCase):
     @staticmethod
     def filterContained(sets):
@@ -31,22 +33,22 @@ class SetTest(unittest.TestCase):
             [3], [2, 1], [2], [1]]
         self.assertSequenceEqual(expected, sets)
 
-    def test_maximal_sets(self):
+    @parameters(range(2, 20))
+    def test_maximal_sets(self, n):
         """
         Maximal sets are exactly the sets that are not contained in any other
         """
-        n = 20
         sets = list(MaximalBoundedSets(n))
         expected = self.filterContained(list(BoundedSets(n)))
         self.assertSequenceEqual(expected, sets)
 
-    def test_containing_partitions(self):
+    @parameters(range(2, 20))
+    def test_containing_partitions(self, n):
         """
         Every partition must have the set of its parts contained in some
         bounded set for the same n. We only need sets that are maximal by
         containment
         """
-        n = 20
         minusPartitions = list(MaximalBoundedSets(n))
         allPartitions = list(Partitions(n))
 
@@ -61,8 +63,8 @@ class SetTest(unittest.TestCase):
         sets = list(BoundedSets(0))
         self.assertSequenceEqual([[]], sets)
 
-    def test_full_sets(self):
-        n = 10
+    @parameters(range(2, 20))
+    def test_full_sets(self, n):
         sets = list(FullBoundedSets(n))
         expected = filter(lambda x: sum(x) == n, BoundedSets(n))
         self.assertSequenceEqual(expected, sets)

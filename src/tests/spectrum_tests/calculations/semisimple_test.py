@@ -1,9 +1,12 @@
+from itertools import combinations
 import unittest
 from spectrum.calculations import semisimple
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.semisimple import SemisimpleElements, MixedElements
+from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
+
 
 class Signs:
     """
@@ -34,6 +37,7 @@ class Signs:
             pass
 
 
+@parametrized
 class SemisimpleTest(unittest.TestCase):
     def test_evaluate(self):
         ni = [8, 4, 4, 3, 2, 1]
@@ -49,12 +53,12 @@ class SemisimpleTest(unittest.TestCase):
         rp = semisimple.evaluate(q, ni, [-1] * len(ni))
         self.assertEqual(rp, r)
 
-    def test_minus(self):
+    @parameters(combinations(range(2, 20), 2))
+    def test_minus(self, params):
         """
         Test elements [q^{n_1}-1, ..., q^{n_k}-1] for all n_1+...+n_k=n
         """
-        n = 20
-        q = 5
+        n, q = params
         ss = SemisimpleElements(q, n, minus=True)
 
         divisible = set()
@@ -111,10 +115,13 @@ class SemisimpleTest(unittest.TestCase):
 
         self.assertSetEqual(divisible, set(ss))
 
-    def test_all_semisimple(self):
-        self.all_semisimple(11, 5)
+    @parameters(combinations(range(2, 15), 2))
+    def test_all_semisimple(self, params):
+        self.all_semisimple(*params)
 
-    def test_min_length(self):
+    @parameters(
+        [(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
+    def test_min_length(self, params):
         self.all_semisimple(11, 5, min_length=2)
 
     def test_mixed(self):
@@ -128,8 +135,8 @@ class SemisimpleTest(unittest.TestCase):
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
 
-    def test_semisimple_with_signs(self):
-        n = 11
-        q = 5
+    @parameters(combinations(range(2, 15), 2))
+    def test_semisimple_with_signs(self, params):
+        n, q = params
         self.all_semisimple(n, q, sign=1)
         self.all_semisimple(n, q, sign=-1)

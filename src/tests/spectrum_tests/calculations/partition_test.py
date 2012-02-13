@@ -1,9 +1,11 @@
 import unittest
 from spectrum.calculations.partition import *
+from spectrum_tests.parametric import parametrized, parameters
 
 
 __author__ = 'Daniel Lytkin'
 
+@parametrized
 class PartitionTest(unittest.TestCase):
     def test_transpose(self):
         partition = [8, 8, 6, 5, 3, 3, 3, 1]
@@ -32,9 +34,9 @@ class PartitionTest(unittest.TestCase):
 
         self.assertSequenceEqual(expected, allPartitions)
 
-    def test_first_fixed_length_partition(self):
-        n = 10
-        k = 5
+    @parameters([(n, k) for n in range(1, 10) for k in range(1, 10) if n > k])
+    def test_first_fixed_length_partition(self, params):
+        n, k = params
         p = Partitions(n, length=k).__iter__().next()
         expected = [n - k + 1] + [1] * (k - 1)
         self.assertSequenceEqual(p, expected)
@@ -45,10 +47,10 @@ class PartitionTest(unittest.TestCase):
         expected = [[9, 1], [8, 2], [7, 3], [6, 4], [5, 5]]
         self.assertSequenceEqual(expected, p)
 
-    def test_length(self):
+    @parameters([(n, k) for n in range(1, 10) for k in range(1, 10) if n > k])
+    def test_length(self, params):
         # self.maxDiff = None
-        n = 30
-        k = 11
+        n, k = params
         p = list(Partitions(n, length=k))
         expected = filter(lambda x: len(x) == k, Partitions(n))
         self.assertSequenceEqual(expected, p)
