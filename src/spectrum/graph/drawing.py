@@ -1,5 +1,6 @@
 from Tkinter import Canvas
 from shapes import create_default_shape, EdgeShape
+from spectrum.graph.geometry import Point
 from spectrum.graph.graph import ordered_pair
 from spectrum.tools.observers import Observable
 
@@ -8,16 +9,8 @@ __author__ = 'Daniel Lytkin'
 PICKING = 0
 TRANSLATING = 1
 
+# params of selection rectangle
 SELECTION_KW = {"outline": "#aaaaff"}
-
-def vsum(v1, v2):
-    """2D vector sum"""
-    return v1[0] + v2[0], v1[1] + v2[1]
-
-
-def vdiff(v1, v2):
-    """2D vector difference"""
-    return v1[0] - v2[0], v1[1] - v2[1]
 
 
 class PickedState(Observable):
@@ -48,17 +41,13 @@ class PickedState(Observable):
 
 
 class MousePlugin(object):
-    class Click(object):
-        def __init__(self, x, y, id=None):
-            self.x = x
-            self.y = y
-            self.id = id
-
     def __init__(self, container):
         self._container = container
 
         self._selection = None
+        self._selection_rect = None
         self._click = None
+        self._click_id = None
         self._picked_state = container.picked_vertex_state
 
         container.bind("<Button-1>", self._on_press)
@@ -67,24 +56,24 @@ class MousePlugin(object):
 
     def _on_drag(self, event):
         if self._click is not None:
-            if self._click.id is not None:
+            if self._click_id is not None:
                 picked = self._picked_state.get_picked()
                 if picked:
                     for vertex in picked:
                         self._container.move_vertex(vertex,
-                            event.x - self._click.x, event.y - self._click.y)
-                    self._click.x = event.x
-                    self._click.y = event.y
+                            Point(event.x, event.y) - self._click)
+                    self._click = Point(event.x, event.y)
             else:
                 x0, x1 = ordered_pair(self._selection.x, event.x)
                 y0, y1 = ordered_pair(self._selection.y, event.y)
-                self._container.coords(self._selection.id, x0, y0, x1, y1)
+                self._container.coords(self._selection_rect, x0, y0, x1, y1)
 
     def _on_press(self, event):
-        self._click = self.Click(event.x, event.y)
-        id = self._container.get_object_id_by_location(event.x, event.y)
+        self._click = Point(event.x, event.y)
+        self._click_id = None
+        id = self._container.get_object_id_by_location(self._click)
         if self._container.is_vertex(id):
-            self._click.id = id
+            self._click_id = id
             vertex = self._container._get_vertex_by_shape_id(id)
             if (not self._picked_state.is_picked(vertex) and
                 not event.state & 1):
@@ -93,19 +82,19 @@ class MousePlugin(object):
         else:
             if not event.state & 1:
                 self._picked_state.clear()
-            self._selection = self.Click(event.x, event.y,
-                self._container.create_rectangle(
-                    event.x, event.y, event.x, event.y, **SELECTION_KW))
+            self._selection = Point(event.x, event.y)
+            self._selection_rect = self._container.create_rectangle(
+                event.x, event.y, event.x, event.y, **SELECTION_KW)
 
     def _on_release(self, event):
         self._click = None
         if self._selection is not None:
-            selection = self._container.coords(self._selection.id)
+            selection = self._container.coords(self._selection_rect)
             for id in self._container.find_overlapping(*selection):
                 if self._container.is_vertex(id):
                     vertex = self._container._get_vertex_by_shape_id(id)
                     self._picked_state.pick(vertex)
-            self._container.delete(self._selection.id)
+            self._container.delete(self._selection_rect)
             self._selection = None
 
 
@@ -189,12 +178,13 @@ class GraphViewer(Canvas):
     def picked_vertex_state(self):
         return self._picked_vertex_state
 
-    def get_object_id_by_location(self, x, y):
+    def get_object_id_by_location(self, point):
         """Returns id of object in specified coordinates, or None if there is
         no object. If multiple objects match, returns highest one.
         """
         try:
-            return self.find_overlapping(x, y, x, y)[-1]
+            return self.find_overlapping(point.x, point.y, point.x, point.y)[
+                   -1]
         except IndexError:
             return None
 
@@ -207,19 +197,19 @@ class GraphViewer(Canvas):
     def _add_vertex(self, value):
         new_vertex = Vertex(value, self._create_vertex_shape(value))
 
-        layout_location = self._layout.get_location(self.graph.index(value))
-        canvas_location = self._convert_layout_location(*layout_location)
-        self.set_vertex_location(new_vertex, *canvas_location)
+        layout_location = self._layout[self.graph.index(value)]
+        canvas_location = self._convert_layout_location(layout_location)
+        self.set_vertex_location(new_vertex, canvas_location)
         self._vertices[value] = new_vertex
 
         self.__margin = max(self.__margin, new_vertex.shape.radius)
 
-    def _add_edge(self, start_value, end_value):
-        start = self._vertices[start_value]
-        end = self._vertices[end_value]
-        coords = (self.get_vertex_location(start) +
-                  self.get_vertex_location(end))
-        edge = Edge(start, end, EdgeShape(self, *coords))
+    def _add_edge(self, start_index, end_index):
+        start = self._vertices[start_index]
+        end = self._vertices[end_index]
+        edge = Edge(start, end, EdgeShape(self,
+            self.get_vertex_location(start),
+            self.get_vertex_location(end)))
         start.incident.add(edge)
         end.incident.add(edge)
         self.tag_raise("vertex", edge.shape.id)
@@ -245,58 +235,62 @@ class GraphViewer(Canvas):
         # TODO: temporary
         """Reset vertex positions."""
         for value in self.graph.vertices:
-            layout_location = self.layout.get_location(self.graph.index(value))
-            canvas_location = self._convert_layout_location(*layout_location)
-            self.set_vertex_location(self._vertices[value], *canvas_location)
+            layout_location = self.layout[self.graph.index(value)]
+            canvas_location = self._convert_layout_location(layout_location)
+            self.set_vertex_location(self._vertices[value], canvas_location)
 
     def is_vertex(self, id):
         """Checks whether given shape id represents a vertex."""
         return id is not None and "vertex" in self.gettags(id)
 
-    def move_vertex(self, vertex, x, y):
+    def move_vertex(self, vertex, v):
+        """Move `vertex' by vector `v'
+        """
         id = vertex.shape.id
-        self.move(id, x, y)
+        self.move(id, v.x, v.y)
         canvas_location = self._get_shape_center(id)
-        layout_location = self._convert_canvas_location(*canvas_location)
-        self._layout.set_location(self.graph.index(vertex.value),
-            *layout_location)
+        layout_location = self._convert_canvas_location(canvas_location)
+        self._layout[self.graph.index(vertex.value)] = layout_location
         # move edges ends
         for edge in vertex.incident:
             if vertex is edge.start:
-                self.move_edge(edge, x, y, 0, 0)
+                self._move_edge(edge, v, Point())
             else:
-                self.move_edge(edge, 0, 0, x, y)
+                self._move_edge(edge, Point(), v)
 
     def _get_shape_center(self, id):
         x, y, x1, y1 = self.coords(id)
-        return (x + x1) / 2, (y + y1) / 2
+        return (Point(x, y) + Point(x1, y1)) / 2
 
     def get_vertex_location(self, vertex):
         return self._get_shape_center(vertex.shape.id)
 
-    def set_vertex_location(self, vertex, x, y):
-        px, py = self.get_vertex_location(vertex)
-        self.move_vertex(vertex, x - px, y - py)
+    def set_vertex_location(self, vertex, location):
+        current = self.get_vertex_location(vertex)
+        self.move_vertex(vertex, location - current)
 
-    def move_edge(self, edge, *dcoords):
-        prev = self.coords(edge.shape.id)
-        self.coords(edge.shape.id, *map(lambda x, y: x + y, prev, dcoords))
+    def _move_edge(self, edge, start, end):
+        new = start.x, start.y, end.x, end.y
+        current = self.coords(edge.shape.id)
+        self.coords(edge.shape.id, *map(lambda x, y: x + y, current, new))
 
-    def _convert_layout_location(self, x, y):
+    def _convert_layout_location(self, location):
         """Converts layout coordinates to canvas coordinates
         """
         margin = self.__margin
         w = self.__w - 2 * margin
         h = self.__h - 2 * margin
-        return margin + w * x, margin + h * y
+        return margin + w * location.x, margin + h * location.y
 
-    def _convert_canvas_location(self, x, y):
+    def _convert_canvas_location(self, location):
         """Converts canvas coordinates to layout coordinates
         """
+        x, y = location
         margin = self.__margin
         w = self.__w
         h = self.__h
-        return (x - margin) / (w - 2 * margin), (y - margin) / (h - 2 * margin)
+        return Point((x - margin) / (w - 2 * margin),
+            (y - margin) / (h - 2 * margin))
 
     def _get_vertex_by_shape_id(self, id):
         for vertex in self._vertices.itervalues():

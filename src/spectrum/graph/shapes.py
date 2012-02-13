@@ -1,3 +1,5 @@
+from spectrum.graph.geometry import Point
+
 __author__ = 'Daniel Lytkin'
 
 class Shape(object):
@@ -26,9 +28,9 @@ class EdgeShape(Shape):
     """Shape for edges (line)
     """
 
-    def __init__(self, canvas, x0, y0, x1, y1):
+    def __init__(self, canvas, start, end):
         super(EdgeShape, self).__init__(canvas)
-        self._id = canvas.create_line(x0, y0, x1, y1)
+        self._id = canvas.create_line(start.x, start.y, end.x, end.y)
 
 
 class VertexShape(Shape):
@@ -57,9 +59,10 @@ class VertexShape(Shape):
 
 
 class CircleShape(VertexShape):
-    def __init__(self, canvas, radius, x=0, y=0, **kw):
+    def __init__(self, canvas, radius, location=Point(), **kw):
         super(CircleShape, self).__init__(canvas)
         r = radius
+        x, y = location.x, location.y
         self._id = canvas.create_oval(x - r, y - r, x + r, y + r, fill="white",
             **kw)
 
