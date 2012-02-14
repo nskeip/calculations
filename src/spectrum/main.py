@@ -1,6 +1,6 @@
 from spectrum.graph.drawing import GraphViewer
-from spectrum.graph.graph import  FullGraph
-from spectrum.graph.layout import   CircleLayout
+from spectrum.graph.graph import full_graph
+from spectrum.graph.layout import CircleLayout
 
 __author__ = 'Daniel Lytkin'
 
@@ -10,7 +10,7 @@ root = Tk()
 frame = Frame(master=root)
 frame.pack()
 
-graph = FullGraph(15)
+graph = full_graph(15)
 #graph.add_edge(0, 1)
 #graph.add_edge(1, 2)
 graph.add_vertex(20)

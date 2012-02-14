@@ -1,5 +1,5 @@
 import unittest
-from spectrum.graph.graph import Graph, FullGraph
+from spectrum.graph.graph import Graph, full_graph
 
 __author__ = 'Daniel Lytkin'
 
@@ -59,7 +59,7 @@ class GraphTest(unittest.TestCase):
         self.assertSequenceEqual(expected, cocliques)
 
     def test_full_graph(self):
-        g = FullGraph(4)
+        g = full_graph(4)
 
         expectedVertices = range(4)
         expectedEdges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
