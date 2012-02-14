@@ -47,8 +47,8 @@ class Layout(object):
     def update(self):
         """Remove deleted vertices
         """
-        deleted_vertices = self.__locations.viewkeys() - set(
-            self._graph.vertices)
+        deleted_vertices = (self.__locations.viewkeys() -
+                            set(range(len(self._graph.vertices))))
         for vertex in deleted_vertices:
             del self.__locations[vertex]
 
@@ -68,19 +68,19 @@ class RandomLayout(Layout):
 
 
 class CircleLayout(Layout):
-    def __init__(self, graph, x, y, r):
+    def __init__(self, graph, r, x=0.5, y=0.5):
         super(CircleLayout, self).__init__(graph)
         self._center = Point(x, y)
         self._radius = r
         self.reset()
 
     def reset(self):
-        self.__locations.clear()
+        super(CircleLayout, self).reset()
         step = 2 * math.pi / len(self.graph.vertices)
         r = self._radius
-        for i, vertex in enumerate(self._graph.vertices):
+        for i in range(len(self._graph.vertices)):
             v = Point(math.sin(step * i), math.cos(step * i))
-            self.set_unlocked_location(vertex, self._center + r * v)
+            self.set_unlocked_location(i, self._center + r * v)
 
 
 class SpringLayout(Layout):
@@ -89,7 +89,7 @@ class SpringLayout(Layout):
     """
 
     def __init__(self, graph, spring_rate=10.0, spring_length=0.5,
-                 electric_rate=0.01, damping=0.6):
+                 electric_rate=0.01, damping=0.5):
         super(SpringLayout, self).__init__(graph)
         self._spring_rate = spring_rate
         self._spring_length = spring_length
@@ -99,12 +99,12 @@ class SpringLayout(Layout):
         # set random initial positions
         for vertex in graph.vertices:
             self.set_unlocked_location(vertex, Point(random(), random()))
-        self._velocities = dict.fromkeys(graph.vertices, Point())
+        self._velocities = dict.fromkeys(range(len(graph.vertices)), Point())
 
     def _repulsion_force(self, vertex, other):
         r = (self[vertex] - self[other]).square()
         if r == 0.0:
-            return Point(random(), random()) * 0.000001
+            return Point()#random(), random())
         c = self._electric_rate / (r ** 1.5)
         return  (self[vertex] - self[other]) * c
 
@@ -122,27 +122,35 @@ class SpringLayout(Layout):
         for vertex in xrange(len(self._graph.vertices)):
             force = Point()
 
+            # repulsion between vertices
             for other in xrange(len(self._graph.vertices)):
                 if other == vertex: continue
                 force += self._repulsion_force(vertex, other)
 
+            # attraction between edges' ends
             for other in self._graph.neighbors(vertex):
                 force += self._attraction_force(vertex, other)
 
+            # border contact force
+            def transform_force(coord, f):
+                if coord == 0:
+                    return max(0, f)
+                if coord == 1:
+                    return min(0, f)
+                return f
+
+            force = Point(transform_force(self[vertex].x, force.x),
+                transform_force(self[vertex].y, force.y))
+
             vel = self._damping * (self._velocities[vertex] +
                                    time_step * force)
+            vel = Point(transform_force(self[vertex].x, vel.x),
+                transform_force(self[vertex].y, vel.y))
             self._velocities[vertex] = vel
 
             # this is to prevent going behind borders:
             f = lambda a: min(max(0, a), 1)
-            p = self[vertex] + time_step * vel
-            # todo: if vertex is on border, speed on axis=0
-            if p.x == 0 or p.x == 1:
-                self._velocities[vertex] = Point(0.0,
-                    self._velocities[vertex].y)
-            if p.y == 0 or p.y == 1:
-                self._velocities[vertex] = Point(self._velocities[vertex].x,
-                    0.0)
+            p = self[vertex] + time_step * vel  # next position of vertex
 
             self.set_unlocked_location(vertex, p.apply(f))
 
