@@ -133,11 +133,11 @@ class Edge(object):
 
 
 class GraphViewer(Canvas):
-    def __init__(self, layout, master=None, width=400, height=400, **kw):
-        Canvas.__init__(self, master, width=width, height=height, **kw)
-        self.__w = width
-        self.__h = height
-        self.__margin = 20 # todo: temp
+    def __init__(self, layout, master=None, margin=20, **kw):
+        Canvas.__init__(self, master, width=layout.size.x + 2 * margin,
+            height=layout.size.y + 2 * margin, **kw)
+
+        self.__margin = margin
 
         # map value -> Vertex object
         self._vertices = dict()
@@ -149,6 +149,7 @@ class GraphViewer(Canvas):
         self._create_vertex_shape = (lambda vertex:
                                      create_default_shape(self, vertex))
         self.update()
+
 
         # self._translate = (0, 0)
 
@@ -169,6 +170,14 @@ class GraphViewer(Canvas):
             return listener
 
         self._picked_vertex_state.add_listener(createListener())
+
+        # handle resize
+        self.bind("<Configure>", lambda event: self.update_layout_size())
+
+
+    def update_layout_size(self):
+        self._layout.size = Point(self.winfo_width() - 2 * self.__margin,
+            self.winfo_height() - 2 * self.__margin)
 
     @property
     def vertices(self):
@@ -278,19 +287,14 @@ class GraphViewer(Canvas):
         """Converts layout coordinates to canvas coordinates
         """
         margin = self.__margin
-        w = self.__w - 2 * margin
-        h = self.__h - 2 * margin
-        return margin + w * location.x, margin + h * location.y
+        return margin + location.x, margin + location.y
 
     def _convert_canvas_location(self, location):
         """Converts canvas coordinates to layout coordinates
         """
         x, y = location
         margin = self.__margin
-        w = self.__w
-        h = self.__h
-        return Point((x - margin) / (w - 2 * margin),
-            (y - margin) / (h - 2 * margin))
+        return Point(x - margin, y - margin)
 
     def _get_vertex_by_shape_id(self, id):
         for vertex in self._vertices.itervalues():

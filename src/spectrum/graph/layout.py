@@ -6,10 +6,11 @@ __author__ = 'Daniel Lytkin'
 
 class Layout(object):
     """Basic abstract implementation of layout.
-    Layout provides map vertices -> coordinates, which is a tuple (x, y), each one in range 0.0 to 1.0.
+    Layout provides map vertices -> coordinates
     """
 
-    def __init__(self, graph, default_location=Point()):
+    def __init__(self, graph, default_location=Point(), width=400, height=400):
+        self.size = Point(width, height)
         self._locked = set()
         self._graph = graph
         self.__locations = dict()
@@ -53,6 +54,7 @@ class Layout(object):
             del self.__locations[vertex]
 
     def reset(self):
+        self._locked.clear()
         self.__locations.clear()
 
 
@@ -63,14 +65,15 @@ class RandomLayout(Layout):
 
     def __getitem__(self, vertex):
         if not self.__locations.has_key(vertex):
-            self.set_unlocked_location(vertex, Point(random(), random()))
+            self.set_unlocked_location(vertex, Point(self.size.x * random(),
+                self.size.y * random()))
         return self.__locations[vertex]
 
 
 class CircleLayout(Layout):
-    def __init__(self, graph, r, x=0.5, y=0.5):
-        super(CircleLayout, self).__init__(graph)
-        self._center = Point(x, y)
+    def __init__(self, graph, r, center=(50, 50), **kw):
+        super(CircleLayout, self).__init__(graph, **kw)
+        self._center = Point(*center)
         self._radius = r
         self.reset()
 
@@ -88,31 +91,39 @@ class SpringLayout(Layout):
     particles.
     """
 
-    def __init__(self, graph, spring_rate=10.0, spring_length=0.5,
-                 electric_rate=0.01, damping=0.5):
-        super(SpringLayout, self).__init__(graph)
+    def __init__(self, graph, spring_rate=1.0, spring_length=200,
+                 electric_rate=1.0, damping=0.5, **kw):
+        super(SpringLayout, self).__init__(graph, **kw)
         self._spring_rate = spring_rate
         self._spring_length = spring_length
         self._electric_rate = electric_rate
         self._damping = damping
 
+        self.reset()
+
+
+    def reset(self):
+        super(SpringLayout, self).reset()
         # set random initial positions
-        for vertex in graph.vertices:
-            self.set_unlocked_location(vertex, Point(random(), random()))
-        self._velocities = dict.fromkeys(range(len(graph.vertices)), Point())
+        for vertex in self._graph.vertices:
+            self.set_unlocked_location(vertex, Point(self.size.x * random(),
+                self.size.y * random()))
+        self._velocities = dict.fromkeys(
+            range(len(self._graph.vertices)), Point())
+
 
     def _repulsion_force(self, vertex, other):
         r = (self[vertex] - self[other]).square()
         if r == 0.0:
             return Point()#random(), random())
-        c = self._electric_rate / (r ** 1.5)
-        return  (self[vertex] - self[other]) * c
+        c = 10 ** 6 * self._electric_rate / (r ** 1.5)
+        return (self[vertex] - self[other]) * c
 
     def _attraction_force(self, vertex, other):
         r = (self[vertex] - self[other]).square() ** 0.5
         if r == 0.0:
             return Point()
-        c = self._spring_rate * (self._spring_length - r) / r
+        c = 10 * self._spring_rate * (self._spring_length - r) / r
         return (self[vertex] - self[other]) * c
 
     def step(self, time_step):
@@ -132,27 +143,30 @@ class SpringLayout(Layout):
                 force += self._attraction_force(vertex, other)
 
             # border contact force
-            def transform_force(coord, f):
+            def transform_force(coord, right_border, f):
                 if coord == 0:
                     return max(0, f)
-                if coord == 1:
+                if coord == right_border:
                     return min(0, f)
                 return f
 
-            force = Point(transform_force(self[vertex].x, force.x),
-                transform_force(self[vertex].y, force.y))
+            force = Point(
+                transform_force(self[vertex].x, self.size.x, force.x),
+                transform_force(self[vertex].y, self.size.y, force.y))
 
             vel = self._damping * (self._velocities[vertex] +
                                    time_step * force)
-            vel = Point(transform_force(self[vertex].x, vel.x),
-                transform_force(self[vertex].y, vel.y))
+            vel = Point(
+                transform_force(self[vertex].x, self.size.x, vel.x),
+                transform_force(self[vertex].y, self.size.y, vel.y))
             self._velocities[vertex] = vel
 
             # this is to prevent going behind borders:
-            f = lambda a: min(max(0, a), 1)
+            fx = lambda a: min(max(0, a), self.size.x)
+            fy = lambda b: min(max(0, b), self.size.y)
             p = self[vertex] + time_step * vel  # next position of vertex
 
-            self.set_unlocked_location(vertex, p.apply(f))
+            self.set_unlocked_location(vertex, Point(fx(p.x), fy(p.y)))
 
     def total_kinetic_energy(self):
         return sum((v.square() for v in self._velocities))
