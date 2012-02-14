@@ -4,11 +4,9 @@ from spectrum.graph.layout import CircleLayout
 
 __author__ = 'Daniel Lytkin'
 
-from Tkinter import *
-
-root = Tk()
-frame = Frame(master=root)
-frame.pack()
+#root = Tk()
+#frame = Frame(master=root)
+#frame.pack()
 
 graph = full_graph(15)
 #graph.add_edge(0, 1)
@@ -23,15 +21,16 @@ def e():
     global id
     canvas.layout.step(0.1)
     canvas.reset()
-    id = frame.after(50, e)
+    id = canvas.after(50, e)
 
 # e()
 
 def stop(event):
-    frame.after_cancel(id)
+    canvas.after_cancel(id)
 
 canvas.bind_all("<space>", stop)
-
-canvas.pack()
-frame.mainloop()
+canvas.grid()
+canvas.mainloop()
+#canvas.pack()
+#frame.mainloop()
 

@@ -133,8 +133,8 @@ class Edge(object):
 
 
 class GraphViewer(Canvas):
-    def __init__(self, layout, width=400, height=400):
-        Canvas.__init__(self, width=width, height=height)
+    def __init__(self, layout, master=None, width=400, height=400, **kw):
+        Canvas.__init__(self, master, width=width, height=height, **kw)
         self.__w = width
         self.__h = height
         self.__margin = 20 # todo: temp
