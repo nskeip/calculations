@@ -105,7 +105,7 @@ class SpringLayout(Layout):
     def reset(self):
         super(SpringLayout, self).reset()
         # set random initial positions
-        for vertex in self._graph.vertices:
+        for vertex in range(len(self._graph.vertices)):
             self.set_unlocked_location(vertex, Point(self.size.x * random(),
                 self.size.y * random()))
         self._velocities = dict.fromkeys(
