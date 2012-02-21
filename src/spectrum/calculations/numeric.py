@@ -82,6 +82,7 @@ def next_odd_divisor(number, previous):
 def get_exponent(number, base):
     """If number = base**k, returns k. Else returns None
     """
+    if number <= 1: return 0
     k = 0
     if base > 1:
         while number % base == 0:
