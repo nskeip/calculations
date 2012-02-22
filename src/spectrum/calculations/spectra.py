@@ -133,7 +133,8 @@ class SporadicGroup(Group):
     @staticmethod
     def all_groups():
         """Returns all sporadic group names."""
-        return SporadicGroup._groups.keys()
+        return [k for (k, v) in sorted(SporadicGroup._groups.iteritems(),
+            key=lambda x: int(x[1][1]))]
 
 
 class AlternatingGroup(Group):
@@ -464,6 +465,11 @@ class ClassicalGroup(Group):
 
     def __str__(self):
         return "{}({}, {})".format(self._name, self._dim, self._field.order)
+
+    @staticmethod
+    def types():
+        return sorted(ClassicalGroup._groups.keys(),
+            key=lambda key: key.strip("P"))
 
     @property
     def field(self):
