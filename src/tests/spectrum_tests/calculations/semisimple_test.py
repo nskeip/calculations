@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import combinations, product
 import unittest
 from spectrum.calculations import semisimple
 from spectrum.calculations.partition import Partitions
@@ -53,13 +53,13 @@ class SemisimpleTest(unittest.TestCase):
         rp = semisimple.evaluate(q, ni, [-1] * len(ni))
         self.assertEqual(rp, r)
 
-    @parameters(combinations(range(2, 20), 2))
+    @parameters(combinations(range(2, 15), 2))
     def test_minus(self, params):
         """
         Test elements [q^{n_1}-1, ..., q^{n_k}-1] for all n_1+...+n_k=n
         """
         n, q = params
-        ss = SemisimpleElements(q, n, minus=True)
+        ss = SemisimpleElements(q, n, sign=1)
 
         divisible = set()
         for ni in Partitions(n):
@@ -88,16 +88,22 @@ class SemisimpleTest(unittest.TestCase):
             [-1, 1, 1, 1], [1, 1, 1, 1]]
         self.assertSequenceEqual(expected, signs)
 
-    def all_semisimple(self, n, q, min_length=1, sign=0):
-        # very slow! For every partition of size n it calculates 2^n sign tuples.
-        ss = list(SemisimpleElements(q, n, min_length=min_length, sign=sign))
-        signsMod = 0 if sign == 1 else 1
+    def all_semisimple(self, n, q, min_length=1, parity=0, sign=0):
+        # very slow! For every partition of size n it calculates 2^n parity tuples.
+        ss = list(
+            SemisimpleElements(q, n, min_length=min_length, parity=parity,
+                sign=sign))
+        signsMod = 0 if parity == 1 else 1
 
         divisible = set()
         for ni in Partitions(n, min_length=min_length):
-            for ei in Signs(len(ni)):
+            if sign:
+                signs = [[-sign ** nk for nk in ni]]
+            else:
+                signs = Signs(len(ni))
+            for ei in signs:
                 # skip needless signs
-                if sign and ei.count(1) % 2 != signsMod: continue
+                if parity and ei.count(1) % 2 != signsMod: continue
                 elem = semisimple.evaluate(q, ni, ei)
                 # every element must divide at least one of items in ss
                 # also every item in ss must be equal to at least one element
@@ -122,7 +128,8 @@ class SemisimpleTest(unittest.TestCase):
     @parameters(
         [(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
     def test_min_length(self, params):
-        self.all_semisimple(11, 5, min_length=2)
+        n, q, l = params
+        self.all_semisimple(n, q, min_length=l)
 
     def test_mixed(self):
         n = 3
@@ -135,8 +142,14 @@ class SemisimpleTest(unittest.TestCase):
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
 
-    @parameters(combinations(range(2, 15), 2))
-    def test_semisimple_with_signs(self, params):
-        n, q = params
-        self.all_semisimple(n, q, sign=1)
-        self.all_semisimple(n, q, sign=-1)
+    @parameters(product(range(2, 10), range(2, 10), (-1, 1)))
+    def test_semisimple_parity(self, params):
+        n, q, p = params
+        self.all_semisimple(n, q, parity=p)
+        self.all_semisimple(n, q, parity=p, min_length=2)
+
+    @parameters(product(range(2, 15), range(2, 15), (-1, 1)))
+    def test_semisimple_sign(self, params):
+        n, q, p = params
+        self.all_semisimple(n, q, sign=p)
+        self.all_semisimple(n, q, sign=p, min_length=2)
