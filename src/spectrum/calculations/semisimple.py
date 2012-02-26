@@ -105,13 +105,14 @@ class MixedElements:
     for all k and partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """
 
-    def __init__(self, q, n, f, g, min_length=1, parity=0):
+    def __init__(self, q, n, f, g, min_length=1, parity=0, sign=0):
         self._q = q
         self._n = n
         self._f = f
         self._g = g
         self._min_length = min_length
         self._parity = parity
+        self._sign = sign
 
 
     def __iter__(self):
@@ -120,7 +121,8 @@ class MixedElements:
             toPart = self._n - self._f(k)
             if toPart <= 0: break
             for elem in SemisimpleElements(self._q, toPart,
-                min_length=self._min_length, parity=self._parity):
+                min_length=self._min_length, parity=self._parity,
+                sign=self._sign):
                 yield elem * self._g(k)
             k += 1
 
