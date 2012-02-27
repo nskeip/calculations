@@ -65,8 +65,8 @@ class SemisimpleElements:
                     plusPartition = plusPartition + [1]
                     minuses -= 1
                 plusLcm = evaluate(q, plusPartition, 1) if pluses else 1
-                for minusPartition in MaximalBoundedSets(minuses):
-                    rest = n - pluses - sum(minusPartition)
+                for minusPartition in BoundedSets(minuses):
+                    rest = n - sum(plusPartition) - sum(minusPartition)
                     if len(plusPartition) + len(
                         minusPartition) + rest < self._min_length:
                         continue

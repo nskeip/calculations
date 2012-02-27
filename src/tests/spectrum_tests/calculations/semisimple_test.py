@@ -142,14 +142,14 @@ class SemisimpleTest(unittest.TestCase):
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
 
-    @parameters(product(range(2, 10), range(2, 10), (-1, 1)))
+    @parameters(product(range(2, 15), range(2, 15), (-1, 1)))
     def test_semisimple_parity(self, params):
         n, q, p = params
         self.all_semisimple(n, q, parity=p)
-        self.all_semisimple(n, q, parity=p, min_length=2)
+        self.all_semisimple(n, q, parity=p, min_length=10)
 
     @parameters(product(range(2, 15), range(2, 15), (-1, 1)))
     def test_semisimple_sign(self, params):
         n, q, p = params
         self.all_semisimple(n, q, sign=p)
-        self.all_semisimple(n, q, sign=p, min_length=4)
+        self.all_semisimple(n, q, sign=p, min_length=10)
