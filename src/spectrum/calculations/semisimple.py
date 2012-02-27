@@ -1,5 +1,5 @@
 from numeric import lcm
-from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets
+from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
 
 __author__ = 'Daniel Lytkin'
 
@@ -46,7 +46,7 @@ class SemisimpleElements:
         # [q^n_1 - sign^n_1, ..., q^n_k - sign^n_k]
         f = ((lambda ni: -1) if self._sign == 1 else
              lambda ni: (-1 if nk % 2 == 0 else 1 for nk in ni))
-        for ni in MaximalBoundedSets(n):
+        for ni in BoundedSets(n):
             if len(ni) + n - sum(ni) < self._min_length:
                 continue
             yield evaluate(q, ni, ei=f(ni))

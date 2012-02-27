@@ -152,4 +152,4 @@ class SemisimpleTest(unittest.TestCase):
     def test_semisimple_sign(self, params):
         n, q, p = params
         self.all_semisimple(n, q, sign=p)
-        self.all_semisimple(n, q, sign=p, min_length=2)
+        self.all_semisimple(n, q, sign=p, min_length=4)
