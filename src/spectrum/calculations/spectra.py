@@ -309,7 +309,7 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     # (1)
     a1 = [(q ** n - sign) // 2]
     # (2)
-    a2 = SemisimpleElements(q, n, min_length=2, sign=sign)
+    a2 = SemisimpleElements(q, n, min_length=2, parity=sign)
     # (3)
     a3 = []
     k = 1
@@ -324,7 +324,7 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     a4 = MixedElements(q, n, nk, lambda k: p ** k, min_length=2)
     # (5)
     a5 = []
-    for elem in SemisimpleElements(q, n - 2, min_length=2, sign=sign):
+    for elem in SemisimpleElements(q, n - 2, min_length=2, parity=sign):
         a5.append(p * lcm(q - 1, elem))
         a5.append(p * lcm(q + 1, elem))
         # (6)
@@ -344,7 +344,7 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     n //= 2
     q = field.order
     # (1)
-    a1 = SemisimpleElements(q, n, sign=sign)
+    a1 = SemisimpleElements(q, n, parity=sign)
     # (2)
     a2 = MixedElements(q, n, lambda k: 2 ** (k - 1) + 2,
         lambda k: 2 ** (k + 1))
@@ -352,7 +352,7 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     a3 = (2 * elem for elem in SemisimpleElements(q, n - 2))
     # (4)
     a4 = []
-    for elem in SemisimpleElements(q, n - 2, sign=sign):
+    for elem in SemisimpleElements(q, n - 2, parity=sign):
         a4.append(2 * lcm(q - 1, elem))
         a4.append(2 * lcm(q + 1, elem))
         # (5)
@@ -363,7 +363,7 @@ def _omega_pm_spectrum_even_c(n, field, sign):
         a5.append(4 * lcm(q - 1, evaluate(q, ni, 1)))
         # (6)
     a6 = (4 * lcm(q + 1, elem) for elem in SemisimpleElements(q, n - 3,
-        sign=sign))
+        parity=sign))
     # (7)
     k = get_exponent(n - 2, 2)
     a7 = [] if k is None else [4 * (n - 2)]
@@ -421,13 +421,13 @@ def _special_orthogonal_pm(sign):
         q = field.order
         p = field.char
         # (1)
-        a1 = SemisimpleElements(q, n, sign=e)
+        a1 = SemisimpleElements(q, n, parity=e)
         # (2)
         a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 3) // 2,
             lambda k: p ** k)
         # (3)
         a3 = []
-        for elem in SemisimpleElements(q, n - 2, sign=e):
+        for elem in SemisimpleElements(q, n - 2, parity=e):
             a3.append(p * lcm(q - 1, elem))
             a3.append(p * lcm(q + 1, elem))
             # (4)
@@ -438,22 +438,151 @@ def _special_orthogonal_pm(sign):
     return spectrum
 
 
+# PGL and PGU
+def _projective_general_linear(sign):
+    e = sign
+
+    def spectrum(n, field):
+        q = field.order
+        p = field.char
+        # (1)
+        eps = 1 if n % 2 == 0 else e
+        a1 = [(q ** n - eps) // (q - e)]
+        # (2)
+        a2 = SemisimpleElements(q, n, min_length=2, sign=e)
+        # (3)
+        a3 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
+            lambda k: p ** k, sign=e)
+        # (4)
+        k = get_exponent(n - 1, p)
+        a4 = [] if k is None else [p * (n - 1)]
+        return chain(a1, a2, a3, a4)
+
+    return spectrum
+
+
+def _special_linear(sign):
+    e = sign
+
+    def spectrum(n, field):
+        q = field.order
+        p = field.char
+        # (1)
+        eps = 1 if n % 2 == 0 else e
+        a1 = [(q ** n - eps) // (q - e)]
+        # (2)
+        a2 = SemisimpleElements(q, n, min_length=2, sign=e)
+        # (3)
+        a3 = []
+        k = 1
+        d = gcd(n, q - e)
+        while True:
+            n1 = n - p ** (k - 1) - 1
+            if n1 < 1: break
+            eps = 1 if n1 % 2 == 0 else e
+            a3.append(p ** k * (q ** n1 - eps) / gcd(d, n1))
+            k += 1
+            # (4)
+        a4 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
+            lambda k: p ** k, min_length=2, sign=e)
+        # (5)
+        k = get_exponent(n - 1, p)
+        a5 = [] if k is None else [p * (n - 1) * d]
+        # (6)
+        a6 = [p * gcd(2, q - 1) * (q + e)] if n == 4 else []
+        return chain(a1, a2, a3, a4, a5, a6)
+
+    return spectrum
+
+
+def _projective_special_linear(sign):
+    e = sign
+
+    def spectrum(n, field):
+        q = field.order
+        p = field.char
+        d = gcd(n, q - e)
+        # (1)
+        eps = 1 if n % 2 == 0 else e
+        a1 = [(q ** n - eps) // ((q - e) * d)]
+        # (2)
+        a2 = []
+        eps = lambda s: 1 if s % 2 == 0 else e
+        for n1 in xrange(1, (n + 2) // 2):
+            pair = (n1, n - n1)
+            signs = (-eps(n1), -eps(n - n1))
+            a2.append(evaluate(q, pair, ei=signs) // gcd(n // gcd(n1, n - n1),
+                q - e))
+            # (3)
+        a3 = SemisimpleElements(q, n, min_length=3, sign=e)
+        # (4)
+        a4 = []
+        k = 1
+        while True:
+            n1 = n - p ** (k - 1) - 1
+            if n1 < 1: break
+            eps = 1 if n1 % 2 == 0 else e
+            a4.append(p ** k * (q ** n1 - eps) / d)
+            k += 1
+            # (5)
+        a5 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
+            lambda k: p ** k, min_length=2, sign=e)
+        # (6)
+        k = get_exponent(n - 1, p)
+        a6 = [] if k is None else [p * (n - 1)]
+        return chain(a1, a2, a3, a4, a5, a6)
+
+    return spectrum
+
+
+def _projective_general_linear_order(n, field):
+    q = field.order
+    return q ** (n * (n - 1) / 2) * reduce(lambda x, y: x * y,
+        (q ** i - 1 for i in xrange(2, n + 1)))
+
+
+def _projective_general_unitary_order(n, field):
+    q = field.order
+    return q ** (n * (n - 1) / 2) * reduce(lambda x, y: x * y,
+        ((q ** i - 1 if i % 2 == 0 else q ** i + 1) for i in xrange(2, n + 1)))
+
+
+def _projective_special_linear_order(n, field):
+    q = field.order
+    return _projective_general_linear_order(n, field) / gcd(n, q - 1)
+
+
+def _projective_special_unitary_order(n, field):
+    q = field.order
+    return _projective_general_unitary_order(n, field) / gcd(n, q + 1)
+
+
 class ClassicalGroup(Group):
     """Usage:
     ClassicalGroup("PSp", 14, Field(2, 5))
     ClassicalGroup("PSp", 14, 32)
     ClassicalGroup("PSp", 14, 2, 5)
     """
-    _groups = {"Sp": (_symplectic_spectrum, _symplectic_order),
-               "PSp": (_p_symplectic_spectrum, _p_symplectic_order),
-               "Omega": (_omega_spectrum, _p_symplectic_order),
-               "Omega+": (_omega_pm_spectrum(1), None),
-               "Omega-": (_omega_pm_spectrum(-1), None),
-               "SO": (_special_orthogonal_odd_c, _special_orthogonal_order(0)),
-               "SO+": (_special_orthogonal_pm(1), _special_orthogonal_order(1))
-        ,
-               "SO-": (
-                   _special_orthogonal_pm(-1), _special_orthogonal_order(-1))}
+    _groups = {
+        "Sp": (_symplectic_spectrum, _symplectic_order),
+        "PSp": (_p_symplectic_spectrum, _p_symplectic_order),
+        "Omega": (_omega_spectrum, _p_symplectic_order),
+        "Omega+": (_omega_pm_spectrum(1), None),
+        "Omega-": (_omega_pm_spectrum(-1), None),
+        "SO": (_special_orthogonal_odd_c, _special_orthogonal_order(0)),
+        "SO+": (_special_orthogonal_pm(1), _special_orthogonal_order(1)),
+        "SO-": (_special_orthogonal_pm(-1), _special_orthogonal_order(-1)),
+        "PGL": (
+        _projective_general_linear(1), _projective_general_linear_order),
+        "PGU": (
+        _projective_general_linear(-1), _projective_general_unitary_order),
+        "SL": (_special_linear(1), _projective_general_linear_order),
+        "SU": (_special_linear(-1), _projective_general_unitary_order),
+        "PSL": (
+        _projective_special_linear(1), _projective_special_linear_order),
+        "PSU": (
+        _projective_special_linear(-1), _projective_special_unitary_order)
+    }
 
     def __init__(self, name, dimension, *field):
         self._name = name
