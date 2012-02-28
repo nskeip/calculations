@@ -8,7 +8,7 @@ class PrimeGraph(Graph):
     def __init__(self, spectrum):
         Graph.__init__(self)
         for elem in spectrum:
-            factors = Integer(elem).factors.keys()
+            factors = Integer(elem).factorize().keys()
             self.add_vertices(factors)
             self.add_edges(combinations(factors, 2))
 

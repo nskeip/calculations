@@ -91,6 +91,37 @@ def get_exponent(number, base):
     return k if number == 1 else None
 
 
+def _removeFactor(number, factor):
+    """Returns maximal power of 'factor', dividing 'number' and number divided
+        by factor in that power
+    """
+    power = 0
+    while number % factor == 0:
+        number /= factor
+        power += 1
+    return power, number
+
+
+def _factorize_number(number):
+    factors = Counter()
+    # first handle the 2 for other primes are odd, so that we can then
+    # increment divisor by two
+    power, remainder = _removeFactor(number, 2)
+    if power:
+        factors[2] += power
+
+    currentDivisor = 1
+    while remainder > 1:
+        # search for the next divisor
+        currentDivisor = next_odd_divisor(remainder, currentDivisor)
+        # and remove it
+        power, remainder = _removeFactor(remainder,
+            currentDivisor)
+        if power:
+            factors[currentDivisor] += power
+    return factors
+
+
 class Integer:
     """Represents integer with methods to factorize.
     Usage: Integer(12345) for number 12345 or Integer((2,5), (3,2), 5, 7) for number 2^5 * 3^3 * 5 * 7
@@ -98,12 +129,15 @@ class Integer:
 
     def __init__(self, *args):
         if len(args) == 1:
-            if type(args[0]) in (int, long):
+            if isinstance(args[0], int) or isinstance(args[0], long):
                 self._int = args[0]
-                self._factors = None
-            if isinstance(args[0], Integer):
+                self._factors = Counter({args[0]: 1})
+            elif isinstance(args[0], Integer):
                 self._int = args[0]._int
-                self._factors = args[0]._factors
+                self._factors = args[0]._factors.copy()
+            elif isinstance(args[0], dict):
+                self._factors = Counter(args[0])
+                self._multiply()
         else:
             self._factors = Counter()
             for arg in args:
@@ -111,8 +145,11 @@ class Integer:
                     self._factors[arg] += 1
                 else:
                     if arg[1]: self._factors[arg[0]] += arg[1]
-            self._int = reduce(lambda x, y: x * y, self._factors.elements())
+            self._multiply()
 
+    def _multiply(self):
+        self._int = reduce(lambda x, y: x * y, self._factors.elements(),
+            initial=1)
 
     def __int__(self):
         return self._int
@@ -122,31 +159,44 @@ class Integer:
             return cmp(self._int, other._int)
         return cmp(self._int, other)
 
-    @staticmethod
-    def _removeFactor(number, factor):
-        power = 0
-        while number % factor == 0:
-            number /= factor
-            power += 1
-        return power, number
+    def copy(self):
+        copy = Integer(1)
+        copy._factors = self._factors.copy()
+        copy._int = self._int
+        return copy
+
+    def __imul__(self, other):
+        if isinstance(other, Integer):
+            self._factors += other._factors
+            self._int *= other._int
+        elif isinstance(other, int) or isinstance(other, long):
+            self._factors[other] += 1
+            self._int *= other
+        return self
+
+    def __mul__(self, other):
+        copy = self.copy()
+        copy *= other
+        return copy
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def factorize(self):
+        """Factorize all not factorized divisors
+        """
+        for x in self._factors.keys():
+            p = self._factors[x]
+            for key, value in _factorize_number(x).iteritems():
+                self._factors[key] += value * p
+            self._factors[x] = 0
+            # remove factors with zero powers
+        for x in self._factors.keys():
+            if not self._factors[x]:
+                del self._factors[x]
+        return self._factors
+
 
     @property
     def factors(self):
-        if self._factors is None:
-            self._factors = Counter()
-            # first handle the 2 for other primes are odd, thus we can then increment divisor by two
-            power, remainder = Integer._removeFactor(self._int, 2)
-            if power:
-                self._factors[2] += power
-
-            currentDivisor = 1
-            while remainder > 1:
-                # search for the next divisor
-                currentDivisor = next_odd_divisor(remainder, currentDivisor)
-                # and remove it
-                power, remainder = Integer._removeFactor(remainder,
-                    currentDivisor)
-                if power:
-                    self._factors[currentDivisor] += power
-
         return self._factors

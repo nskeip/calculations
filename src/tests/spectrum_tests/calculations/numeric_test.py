@@ -60,13 +60,22 @@ class NumericTest(unittest.TestCase):
 
     def test_factors(self):
         expected = Counter({2: 10, 3: 7, 5: 3, 7: 1, 11: 1, 23: 1})
-        factors = Integer(495766656000).factors
-        self.assertEqual(expected, factors)
+        i = Integer(495766656000)
+        i.factorize()
+        self.assertEqual(expected, i.factors)
 
     def test_product(self):
         expected = 495766656000
         product = int(Integer((2, 10), (3, 7), (5, 3), 7, 11, 23))
         self.assertEqual(expected, product)
+
+    def test_mult(self):
+        expected = 495766656000
+        a = Integer((2, 10), (3, 7), 11, 23)
+        b = Integer((5, 3), 7)
+        a *= b
+        self.assertEqual(expected, int(a))
+
 
     def test_getExponent(self):
         values = {(36, 6): 2,
