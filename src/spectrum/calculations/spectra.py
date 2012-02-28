@@ -227,13 +227,13 @@ def _symplectic_spectrum(n, field):
         return _symplectic_spectrum_odd_c(n, field)
 
 
-def _p_symplectic_order(n, field):
+def _projective_symplectic_order(n, field):
     # equals to Sp(n, q) if q even
     d = 1 + (field.char % 2) # 1 if char == 2, otherwise 2
     return _symplectic_order(n, field) // d
 
 
-def _p_symplectic_spectrum_odd_c(n, field):
+def _projective_symplectic_spectrum_odd_c(n, field):
     """Spectra of projective symplectic groups in characteristic 2
     """
     n //= 2
@@ -253,14 +253,14 @@ def _p_symplectic_spectrum_odd_c(n, field):
     return chain(a1, a2, a3, a4)
 
 
-def _p_symplectic_spectrum(n, field):
+def _projective_symplectic_spectrum(n, field):
     """Spectra of projective symplectic group. Note that
     PSp(n, 2^k) = Sp(n, 2^k)
     """
     if field.char == 2:
         return _symplectic_spectrum_even_c(n, field)
     else:
-        return _p_symplectic_spectrum_odd_c(n, field)
+        return _projective_symplectic_spectrum_odd_c(n, field)
 
 
 def _omega_spectrum_odd_c(n, field):
@@ -297,7 +297,7 @@ def _omega_spectrum(n, field):
         return _symplectic_spectrum_even_c(n - 1, field)
     else:
         if n == 5:
-            return _p_symplectic_spectrum_odd_c(4, field)
+            return _projective_symplectic_spectrum_odd_c(4, field)
         return _omega_spectrum_odd_c(n, field)
 
 
@@ -370,6 +370,66 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     return chain(a1, a2, a3, a4, a5, a6, a7)
 
 
+def _equal_two_part(a, b):
+    """Returns True iff a_{2} = b_{2}
+    """
+    while a % 2 == 0 and b % 2 == 0:
+        a, b = a // 2, b // 2
+    return a % 2 == 1 and b % 2 == 1
+
+
+def _projective_omega_pm_spectrum(sign):
+    e = sign
+
+    def spectrum(n, field):
+        n //= 2
+        q = field.order
+        p = field.char
+        # if gcd(4, q^n-e) != 4, then POmega = Omega
+        b = n % 2 == 1 and q % 4 == 3  # true iff gcd(4, q^n+1)=4
+        if not ((b and e == -1) or q % 2 == 1):
+            return _omega_pm_spectrum(e)(n * 2, field)
+
+        nk = lambda k: (p ** (k - 1) + 3) // 2
+        # (1)
+        a1 = [(q ** n - sign) // 4]
+        # (2)
+        a2 = []
+        for n1 in xrange(1, n):
+            for e1 in [-1, 1]:
+                a = q ** n1 - e1
+                b = q ** (n - n1) - e * e1
+                d = 2 if _equal_two_part(a, b) else 1
+                a2.append(lcm(a, b) // d)
+            # (3)
+        a3 = SemisimpleElements(q, n, min_length=3, parity=sign)
+        # (4)
+        a4 = []
+        k = 1
+        while True:
+            n_k = nk(k)
+            if n_k >= n: break
+            a4.append(p ** k * (q ** (n - n_k) + 1) // 2)
+            a4.append(p ** k * (q ** (n - n_k) - 1) // 2)
+            k += 1
+            # (5)
+        a5 = MixedElements(q, n, nk, lambda k: p ** k, min_length=2)
+        # (6)
+        a6 = []
+        for elem in SemisimpleElements(q, n - 2, min_length=2, parity=sign):
+            a6.append(p * lcm(q - 1, elem))
+            a6.append(p * lcm(q + 1, elem))
+            # (7)
+        t = (q ** (n - 2) - sign) // 2
+        a7 = [p * lcm(q - 1, t), p * lcm(q + 1, t)]
+        # (8)
+        k = get_exponent(2 * n - 3, p)
+        a8 = [] if k is None else [p * (2 * n - 3)]
+        return chain(a1, a2, a3, a4, a5, a6, a7, a8)
+
+    return spectrum
+
+
 def _omega_pm_spectrum(sign):
     e = sign
 
@@ -380,6 +440,35 @@ def _omega_pm_spectrum(sign):
             return _omega_pm_spectrum_odd_c(n, field, e)
 
     return spectrum
+
+
+def _omega_pm_order(sign):
+    e = sign
+
+    def order(n, field):
+        q = field.order
+        n //= 2
+        return q ** (n * (n - 1)) * (q ** n - e) * reduce(lambda x, y: x * y,
+            ((q ** (2 * i) - 1) for i in xrange(1, n))) // gcd(q - e, 2)
+
+    return order
+
+
+def _projective_omega_pm_order(sign):
+    e = sign
+
+    def order(n, field):
+        omega_order = _omega_pm_order(e)(n, field)
+        q = field.order
+        n //= 2
+        # gcd(4, q^n-e)
+        if e == 1:
+            divisor = 2 if (n % 2 == 1 and q % 4 == 3) else 4
+        else:
+            divisor = 4 if (n % 2 == 1 and q % 4 == 3) else 2
+        return omega_order * gcd(q - e, 2) // divisor
+
+    return order
 
 
 def _special_orthogonal_order(sign):
@@ -413,7 +502,7 @@ def _special_orthogonal_odd_c(n, field):
     return chain(a1, a2, a3)
 
 
-def _special_orthogonal_pm(sign):
+def _special_orthogonal_pm_spectrum(sign):
     e = sign
 
     def spectrum(n, field):
@@ -439,7 +528,7 @@ def _special_orthogonal_pm(sign):
 
 
 # PGL and PGU
-def _projective_general_linear(sign):
+def _projective_general_linear_spectrum(sign):
     e = sign
 
     def spectrum(n, field):
@@ -461,7 +550,7 @@ def _projective_general_linear(sign):
     return spectrum
 
 
-def _special_linear(sign):
+def _special_linear_spectrum(sign):
     e = sign
 
     def spectrum(n, field):
@@ -495,7 +584,7 @@ def _special_linear(sign):
     return spectrum
 
 
-def _projective_special_linear(sign):
+def _projective_special_linear_spectrum(sign):
     e = sign
 
     def spectrum(n, field):
@@ -565,23 +654,34 @@ class ClassicalGroup(Group):
     """
     _groups = {
         "Sp": (_symplectic_spectrum, _symplectic_order),
-        "PSp": (_p_symplectic_spectrum, _p_symplectic_order),
-        "Omega": (_omega_spectrum, _p_symplectic_order),
-        "Omega+": (_omega_pm_spectrum(1), None),
-        "Omega-": (_omega_pm_spectrum(-1), None),
+        "PSp": (_projective_symplectic_spectrum, _projective_symplectic_order),
+        "Omega": (_omega_spectrum, _projective_symplectic_order),
+        "Omega+": (_omega_pm_spectrum(1), _omega_pm_order(1)),
+        "Omega-": (_omega_pm_spectrum(-1), _omega_pm_order(-1)),
+        "POmega+": (
+        _projective_omega_pm_spectrum(1), _projective_omega_pm_order(1)),
+        "POmega-": (
+        _projective_omega_pm_spectrum(-1), _projective_omega_pm_order(-1)),
         "SO": (_special_orthogonal_odd_c, _special_orthogonal_order(0)),
-        "SO+": (_special_orthogonal_pm(1), _special_orthogonal_order(1)),
-        "SO-": (_special_orthogonal_pm(-1), _special_orthogonal_order(-1)),
+        "SO+": (
+        _special_orthogonal_pm_spectrum(1), _special_orthogonal_order(1)),
+        "SO-": (
+        _special_orthogonal_pm_spectrum(-1), _special_orthogonal_order(-1)),
         "PGL": (
-        _projective_general_linear(1), _projective_general_linear_order),
+            _projective_general_linear_spectrum(1),
+            _projective_general_linear_order),
         "PGU": (
-        _projective_general_linear(-1), _projective_general_unitary_order),
-        "SL": (_special_linear(1), _projective_general_linear_order),
-        "SU": (_special_linear(-1), _projective_general_unitary_order),
+            _projective_general_linear_spectrum(-1),
+            _projective_general_unitary_order),
+        "SL": (_special_linear_spectrum(1), _projective_general_linear_order),
+        "SU": (_special_linear_spectrum(-1), _projective_general_unitary_order)
+        ,
         "PSL": (
-        _projective_special_linear(1), _projective_special_linear_order),
+            _projective_special_linear_spectrum(1),
+            _projective_special_linear_order),
         "PSU": (
-        _projective_special_linear(-1), _projective_special_unitary_order)
+            _projective_special_linear_spectrum(-1),
+            _projective_special_unitary_order)
     }
 
     def __init__(self, name, dimension, *field):
