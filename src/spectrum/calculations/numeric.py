@@ -128,7 +128,10 @@ class Integer:
     """
 
     def __init__(self, *args):
-        if len(args) == 1:
+        if not args:
+            self._int = 1
+            self._factors = Counter()
+        elif len(args) == 1:
             if isinstance(args[0], int) or isinstance(args[0], long):
                 self._int = args[0]
                 self._factors = Counter({args[0]: 1})
@@ -148,8 +151,7 @@ class Integer:
             self._multiply()
 
     def _multiply(self):
-        self._int = reduce(lambda x, y: x * y, self._factors.elements(),
-            initial=1)
+        self._int = reduce(lambda x, y: x * y, self._factors.elements(), 1)
 
     def __int__(self):
         return self._int
@@ -160,7 +162,7 @@ class Integer:
         return cmp(self._int, other)
 
     def copy(self):
-        copy = Integer(1)
+        copy = Integer()
         copy._factors = self._factors.copy()
         copy._int = self._int
         return copy
@@ -175,25 +177,55 @@ class Integer:
         return self
 
     def __mul__(self, other):
-        copy = self.copy()
-        copy *= other
-        return copy
+        ret = Integer()
+        if isinstance(other, Integer):
+            ret._factors = other._factors + self._factors
+            ret._int = other._int * self._int
+        elif isinstance(other, int) or isinstance(other, long):
+            ret._factors[other] += 1
+            ret._int *= other
+        return ret
 
     def __rmul__(self, other):
         return self.__mul__(other)
+
+    def __div__(self, other):
+        other = Integer(other)
+        other.factorize()
+        ret = Integer()
+        for factor in self._factors.keys():
+            for prime_factor in other._factors:
+                if factor % prime_factor == 0:
+                    self._factorize_divisor(factor)
+                    break
+        for factor, value in self._factors.iteritems():
+            p = value - other._factors[factor]
+            if p > 0:
+                ret._factors[factor] += p
+        ret._multiply()
+        return ret
+
+    def __floordiv__(self, other):
+        return self.__div__(other)
+
+    def __repr__(self):
+        return "{} = {}".format(self._int, self._factors)
+
+
+    def _factorize_divisor(self, divisor):
+        """Factorizes one factor of this number
+        """
+        p = self._factors[divisor]
+        if not p: return
+        for key, value in _factorize_number(divisor).iteritems():
+            self._factors[key] += value * p
+        del self._factors[divisor]
 
     def factorize(self):
         """Factorize all not factorized divisors
         """
         for x in self._factors.keys():
-            p = self._factors[x]
-            for key, value in _factorize_number(x).iteritems():
-                self._factors[key] += value * p
-            self._factors[x] = 0
-            # remove factors with zero powers
-        for x in self._factors.keys():
-            if not self._factors[x]:
-                del self._factors[x]
+            self._factorize_divisor(x)
         return self._factors
 
 
