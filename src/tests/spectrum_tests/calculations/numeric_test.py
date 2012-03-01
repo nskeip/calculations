@@ -76,12 +76,20 @@ class NumericTest(unittest.TestCase):
         a *= b
         self.assertEqual(expected, int(a))
 
-    def test_div(self):
-        expected = 9504
-        a = Integer(495766656000)
-        b = Integer(52164000)
-        c = a / b
-        self.assertEqual(expected, c)
+    #    def test_div(self):
+    #        expected = 9504
+    #        a = Integer(495766656000)
+    #        b = Integer(52164000)
+    #        c = a / b
+    #        self.assertEqual(expected, c)
+
+    def test_div_by_prime(self):
+        a = Integer((525, 2), 244, 2, 32)
+        expected1 = Integer((525, 2), 244, 32)
+        expected2 = Integer((525, 2), 122, 2, 32)
+        a.div_by_prime(2)
+        self.assertEqual(expected1, a)
+        self.assertEqual(expected2, a)
 
     def test_getExponent(self):
         values = {(36, 6): 2,
