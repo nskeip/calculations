@@ -1,7 +1,7 @@
 import unittest
-from spectrum_tests.calculations.spectra_data import spectra
+from spectrum_tests.calculations.spectra_data import spectra, exceptional_spectra
 from spectrum.calculations.spectra import *
-from spectrum_tests.calculations.orders_data import orders
+from spectrum_tests.calculations.orders_data import orders, exceptional_orders
 from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
@@ -84,7 +84,7 @@ class SpectraTest(unittest.TestCase):
             self.assertEqual(3, g.field.pow)
 
     @parameters(orders.keys())
-    def test_orders(self, params):
+    def test_classical_orders(self, params):
         g = ClassicalGroup(*params)
         order = orders[params]
         self.assertEqual(order, g.order())
@@ -95,4 +95,14 @@ class SpectraTest(unittest.TestCase):
         apex = spectra[params]
         self.assertSetEqual(set(apex), set(g.apex()))
 
+    @parameters(exceptional_orders.keys())
+    def test_exceptional_orders(self, params):
+        g = ExceptionalGroup(*params)
+        order = exceptional_orders[params]
+        self.assertEqual(order, g.order())
 
+    @parameters(exceptional_spectra.keys())
+    def test_spectra(self, params):
+        g = ExceptionalGroup(*params)
+        apex = exceptional_spectra[params]
+        self.assertSetEqual(set(apex), set(g.apex()))

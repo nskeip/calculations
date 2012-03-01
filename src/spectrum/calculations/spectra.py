@@ -8,6 +8,8 @@ from spectrum.tools.tools import doc_inherit
 
 __author__ = 'Daniel Lytkin'
 
+_prod = lambda seq: reduce(lambda x, y: x * y, seq, 1)
+
 class Field:
     """Finite field.
     Can be created as Field(order) or Field(base, pow) where base**pow is the
@@ -163,8 +165,7 @@ class AlternatingGroup(Group):
     def order(self):
         if self._order is None:
             # n!/2
-            self._order = reduce(lambda x, y: x * y,
-                xrange(3, self._degree + 1))
+            self._order = _prod(xrange(3, self._degree + 1))
         return self._order
 
     def __str__(self):
@@ -178,9 +179,9 @@ class AlternatingGroup(Group):
 def _symplectic_order(n, field):
     n //= 2
     q = field.order
-    o = (q ** (n * n)) * reduce(lambda x, y: x * y,
-        (q ** (2 * i) - 1 for i in xrange(1, n + 1)))
-    return o
+    return (Integer({field.char: field.pow * n * n}) *
+            _prod((Integer(q ** i - 1) *
+                   Integer(q ** i + 1) for i in xrange(1, n + 1))))
 
 
 def _symplectic_spectrum_odd_c(n, field):
@@ -229,8 +230,11 @@ def _symplectic_spectrum(n, field):
 
 def _projective_symplectic_order(n, field):
     # equals to Sp(n, q) if q even
-    d = 1 + (field.char % 2) # 1 if char == 2, otherwise 2
-    return _symplectic_order(n, field) // d
+    #d = 1 if field.char == 2 else 2
+    o = _symplectic_order(n, field)
+    if field.char != 2:
+        o.div_by_prime(2)
+    return o
 
 
 def _projective_symplectic_spectrum_odd_c(n, field):
@@ -401,7 +405,7 @@ def _projective_omega_pm_spectrum(sign):
                 b = q ** (n - n1) - e * e1
                 d = 2 if _equal_two_part(a, b) else 1
                 a2.append(lcm(a, b) // d)
-            # (3)
+                # (3)
         a3 = SemisimpleElements(q, n, min_length=3, parity=sign)
         # (4)
         a4 = []
@@ -448,8 +452,13 @@ def _omega_pm_order(sign):
     def order(n, field):
         q = field.order
         n //= 2
-        return q ** (n * (n - 1)) * (q ** n - e) * reduce(lambda x, y: x * y,
-            ((q ** (2 * i) - 1) for i in xrange(1, n))) // gcd(q - e, 2)
+        o = (Integer({field.char: field.pow * n * (n - 1)}) *
+             Integer(q ** n - e) *
+             _prod((Integer(q ** i - 1) *
+                    Integer(q ** i + 1) for i in xrange(1, n))))
+        if field.char != 2:
+            o.div_by_prime(2)
+        return o
 
     return order
 
@@ -462,11 +471,14 @@ def _projective_omega_pm_order(sign):
         q = field.order
         n //= 2
         # gcd(4, q^n-e)
+        omega_order.div_by_prime(2)
         if e == 1:
-            divisor = 2 if (n % 2 == 1 and q % 4 == 3) else 4
+            divisor = 1 if (n % 2 == 1 and q % 4 == 3) else 2
         else:
-            divisor = 4 if (n % 2 == 1 and q % 4 == 3) else 2
-        return omega_order * gcd(q - e, 2) // divisor
+            divisor = 2 if (n % 2 == 1 and q % 4 == 3) else 1
+        if divisor > 1:
+            omega_order.div_by_prime(2)
+        return omega_order * gcd(q - e, 2)
 
     return order
 
@@ -477,12 +489,15 @@ def _special_orthogonal_order(sign):
     def order(n, field):
         q = field.order
         n //= 2
-        part = reduce(lambda x, y: x * y,
-            (q ** (2 * k) - 1 for k in xrange(1, n)))
+        part = _prod((Integer(q ** k - 1) *
+                      Integer(q ** k + 1) for k in xrange(1, n)))
         if not e:
-            return part * q ** (n * n) * (q ** (2 * n) - 1)
-        if field.char == 2: part *= 2
-        return part * q ** (n * (n - 1)) * (q ** n - e)
+            return (part * Integer({field.char: field.pow * n * n}) *
+                    Integer(q ** n - 1) * Integer(q ** n + 1))
+        if field.char == 2:
+            part *= 2
+        return (part * Integer({field.char: field.pow * n * (n - 1)}) *
+                Integer(q ** n - e))
 
     return order
 
@@ -626,24 +641,34 @@ def _projective_special_linear_spectrum(sign):
 
 def _projective_general_linear_order(n, field):
     q = field.order
-    return q ** (n * (n - 1) / 2) * reduce(lambda x, y: x * y,
-        (q ** i - 1 for i in xrange(2, n + 1)))
+    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+            _prod((Integer(q ** i - 1) for i in xrange(2, n + 1))))
 
 
 def _projective_general_unitary_order(n, field):
     q = field.order
-    return q ** (n * (n - 1) / 2) * reduce(lambda x, y: x * y,
-        ((q ** i - 1 if i % 2 == 0 else q ** i + 1) for i in xrange(2, n + 1)))
+    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+            _prod((Integer(q ** i - 1) *
+                   Integer(q ** i + 1) for i in xrange(1, n // 2 + 1))) *
+            _prod((Integer(q ** (2 * i + 1) + 1)) for i in xrange(1,
+                (n + 1) // 2)))
 
 
 def _projective_special_linear_order(n, field):
     q = field.order
-    return _projective_general_linear_order(n, field) / gcd(n, q - 1)
+    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+            _prod((Integer(q ** i - 1) for i in xrange(3, n + 1))) *
+            Integer(q + 1) * Integer((q - 1) // gcd(n, q - 1)))
 
 
 def _projective_special_unitary_order(n, field):
     q = field.order
-    return _projective_general_unitary_order(n, field) / gcd(n, q + 1)
+    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+            _prod((Integer(q ** i - 1) *
+                   Integer(q ** i + 1) for i in xrange(2, n // 2 + 1))) *
+            _prod((Integer(q ** (2 * i + 1) + 1)) for i in xrange(1,
+                (n + 1) // 2)) *
+            Integer(q - 1) * Integer((q + 1) // gcd(n, q + 1)))
 
 
 class ClassicalGroup(Group):
@@ -659,14 +684,18 @@ class ClassicalGroup(Group):
         "Omega+": (_omega_pm_spectrum(1), _omega_pm_order(1)),
         "Omega-": (_omega_pm_spectrum(-1), _omega_pm_order(-1)),
         "POmega+": (
-        _projective_omega_pm_spectrum(1), _projective_omega_pm_order(1)),
+            _projective_omega_pm_spectrum(1),
+            _projective_omega_pm_order(1)),
         "POmega-": (
-        _projective_omega_pm_spectrum(-1), _projective_omega_pm_order(-1)),
+            _projective_omega_pm_spectrum(-1),
+            _projective_omega_pm_order(-1)),
         "SO": (_special_orthogonal_odd_c, _special_orthogonal_order(0)),
         "SO+": (
-        _special_orthogonal_pm_spectrum(1), _special_orthogonal_order(1)),
+            _special_orthogonal_pm_spectrum(1),
+            _special_orthogonal_order(1)),
         "SO-": (
-        _special_orthogonal_pm_spectrum(-1), _special_orthogonal_order(-1)),
+            _special_orthogonal_pm_spectrum(-1),
+            _special_orthogonal_order(-1)),
         "PGL": (
             _projective_general_linear_spectrum(1),
             _projective_general_linear_order),
@@ -674,8 +703,9 @@ class ClassicalGroup(Group):
             _projective_general_linear_spectrum(-1),
             _projective_general_unitary_order),
         "SL": (_special_linear_spectrum(1), _projective_general_linear_order),
-        "SU": (_special_linear_spectrum(-1), _projective_general_unitary_order)
-        ,
+        "SU": (
+            _special_linear_spectrum(-1),
+            _projective_general_unitary_order),
         "PSL": (
             _projective_special_linear_spectrum(1),
             _projective_special_linear_order),
@@ -719,4 +749,146 @@ class ClassicalGroup(Group):
         return self._order
 
 
+def _g2_spectrum(field):
+    q = field.order
+    p = field.char
+    if p == 2:
+        return [8, 12, 2 * (q - 1), 2 * (q + 1), q ** 2 - 1, q ** 2 - q + 1,
+                q ** 2 + q + 1]
+    if p == 3 or p == 5:
+        return [p ** 2, p * (q - 1), p * (q + 1), q ** 2 - 1, q ** 2 - q + 1,
+                q ** 2 + q + 1]
+    return [p * (q - 1), p * (q + 1), q ** 2 - 1, q ** 2 - q + 1,
+            q ** 2 + q + 1]
+
+
+def _2f4_spectrum(field):
+    q = field.order
+    sq = 2 ** ((field.pow + 1) // 2)
+    ssq = 2 ** ((3 * field.pow + 1) // 2)
+    return [12, 16, 4 * (q - 1), 2 * (q + 1), 4 * (q - sq + 1),
+            4 * (q + sq + 1), q ** 2 - 1, q ** 2 + 1, q ** 2 - q + 1,
+            (q - 1) * (q - sq + 1),
+            (q - 1) * (q + sq + 1),
+            q ** 2 - ssq + q - sq + 1,
+            q ** 2 + ssq + q + sq + 1]
+
+
+def _2b2_spectrum(field):
+    q = field.order
+    sq = 2 ** ((field.pow + 1) // 2)
+    return [4, q - sq + 1, q + sq + 1, q - 1]
+
+
+def _2g2_spectrum(field):
+    q = field.order
+    sq = 3 ** ((field.pow + 1) // 2)
+    return [9, 6, (q + 1) // 2, q - 1, q - sq + 1, q + sq + 1]
+
+
+def _order_product(field, pow, pluses, minuses):
+    q = field.order
+    return (Integer({field.char: field.pow * pow}) *
+            _prod((Integer(q ** i + 1) for i in pluses)) *
+            _prod((Integer(q ** i - 1) for i in minuses)))
+
+
+def _e6_order(field):
+    q = field.order
+    return (_order_product(field, 36, [6, 4, 3, 3, 2, 1, 1], [9, 5, 3, 3, 1]) *
+            Integer((q - 1) // gcd(3, q - 1)))
+
+
+def _e7_order(field):
+    q = field.order
+    return (_order_product(field, 63, [9, 7, 6, 5, 4, 3, 3, 2, 1, 1],
+        [9, 7, 5, 3, 3, 1]) * Integer((q - 1) // gcd(2, q - 1)))
+
+
+def _e8_order(field):
+    return (_order_product(field, 120,
+        [15, 12, 10, 9, 7, 6, 6, 5, 4, 3, 3, 2, 1, 1],
+        [15, 9, 7, 5, 3, 3, 1, 1]))
+
+
+def _f4_order(field):
+    return _order_product(field, 24, [6, 4, 3, 3, 2, 1, 1], [3, 3, 1, 1])
+
+
+def _g2_order(field):
+    return _order_product(field, 6, [3, 1], [3, 1])
+
+
+def _2e6_order(field):
+    q = field.order
+    return (_order_product(field, 36, [9, 6, 5, 4, 3, 3, 2, 1], [3, 3, 1, 1]) *
+            Integer((q + 1) // gcd(3, q + 1)))
+
+
+def _3d4_order(field):
+    q = field.order
+    return _order_product(field, 12, [3, 1], [3, 1]) * (q ** 8 + q ** 4 + 1)
+
+
+def _2b2_order(field):
+    q = field.order
+    return Integer({2: field.pow * 2}) * (q ** 2 + 1) * (q - 1)
+
+
+def _2f4_order(field):
+    return _order_product(field, 12, [6, 3, 2, 1], [1, 1])
+
+
+def _2g2_order(field):
+    q = field.order
+    return Integer({3: field.pow * 3}) * (q ** 3 + 1) * (q - 1)
+
+
+class ExceptionalGroup(Group):
+    _groups = {
+        "E6": (None, _e6_order),
+        "2E6": (None, _2e6_order),
+        "E7": (None, _e7_order),
+        "E8": (None, _e8_order),
+        "F4": (None, _f4_order),
+        "2F4": (_2f4_spectrum, _2f4_order),
+        "G2": (_g2_spectrum, _g2_order),
+        "2G2": (_2g2_spectrum, _2g2_order),
+        "2B2": (_2b2_spectrum, _2b2_order),
+        "3D4": (None, _3d4_order)
+    }
+
+    def __init__(self, name, *field):
+        self._name = name
+        self._field = field[0] if isinstance(field[0], Field) else Field(
+            *field)
+        self._apex = None
+        self._order = None
+
+
+    def __str__(self):
+        return "{}({})".format(self._name, self._field.order)
+
+    @staticmethod
+    def types():
+        return sorted(ExceptionalGroup._groups.keys(),
+            key=lambda key: key.strip("2"))
+
+    @property
+    def field(self):
+        """Returns field of this group
+        """
+        return self._field
+
+    def apex(self):
+        if self._apex is None:
+            func = ExceptionalGroup._groups.get(self._name)[0]
+            self._apex = sort_and_filter(func(self._field))
+        return self._apex
+
+    def order(self):
+        if self._order is None:
+            func = ExceptionalGroup._groups.get(self._name)[1]
+            self._order = func(self._field)
+        return self._order
 
