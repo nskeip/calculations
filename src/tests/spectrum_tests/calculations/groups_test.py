@@ -1,5 +1,5 @@
 import unittest
-from spectrum_tests.calculations.spectra_data import spectra, exceptional_spectra
+from spectrum_tests.calculations.spectra_data import classical, exceptional
 from spectrum.calculations.groups import *
 from spectrum_tests.calculations.orders_data import orders, exceptional_orders
 from spectrum_tests.parametric import parametrized, parameters
@@ -100,14 +100,14 @@ class SpectraTest(unittest.TestCase):
         g = AlternatingGroup(21)
         self.assertSequenceEqual(expected, g.apex())
 
-    @parameters(spectra.keys())
+    @parameters(classical.keys())
     def test_classical_spectra(self, params):
         g = ClassicalGroup(*params)
-        apex = spectra[params]
+        apex = classical[params]
         self.assertSetEqual(set(apex), set(g.apex()))
 
-    @parameters(exceptional_spectra.keys())
+    @parameters(exceptional.keys())
     def test_spectra(self, params):
         g = ExceptionalGroup(*params)
-        apex = exceptional_spectra[params]
+        apex = exceptional[params]
         self.assertSetEqual(set(apex), set(g.apex()))

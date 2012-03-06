@@ -91,6 +91,9 @@ def get_exponent(number, base):
     return k if number == 1 else None
 
 
+prod = lambda seq: reduce(lambda x, y: x * y, seq, 1)
+
+
 def _removeFactor(number, factor):
     """Returns maximal power of 'factor', dividing 'number' and number divided
         by factor in that power
