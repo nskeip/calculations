@@ -41,6 +41,11 @@ class Field:
     @property
     def pow(self): return self._pow
 
+    def __repr__(self):
+        if self._pow == 1:
+            return "F({})".format(self._base)
+        return "F({}^{})".format(self._base, self._pow)
+
 
 class Group(object):
     """Interface for finite groups with method to calculate their spectra
