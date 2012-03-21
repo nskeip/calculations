@@ -15,7 +15,7 @@ class NumberBox(Entry):
     PRIME_POWER to input primes or prime powers. Use parity=1 or -1 to input
     even or odd numbers.
     """
-    # TODO: flags
+
     def __init__(self, parent, text_variable=None, constraints=None, **kw):
         self._var = text_variable or StringVar()
         self._constraints = constraints or Constraints()
