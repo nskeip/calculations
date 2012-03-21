@@ -20,7 +20,8 @@ def lcm(a, b):
 
 
 def prime_part(n, b):
-    """Returns b'-part of number n, which is the greatest divisor of n coprime to d
+    """Returns b'-part of number n, which is the greatest divisor of n coprime
+    to d
     """
     while True:
         d = gcd(n, b)
@@ -58,14 +59,86 @@ def sort_and_filter(sequence, reverse=False):
 
 
 def first_divisor(number):
-    """Returns lowest divisor of 'number' greater than 1
+    """Returns smallest divisor of 'number' greater than 1
     """
-    if not number % 2: return 2
+    if number % 2 == 0: return 2
+    #primes = []
     for j in xrange(1, int(sqrt(number)) // 2 + 1):
         i = 2 * j + 1
         if number % i == 0:
             return i
+            #if any(i % p == 0 for p in primes):
+            #    continue
+            #primes.append(i)
     return number
+
+
+def is_prime(n):
+    """Checks whether n is prime."""
+    return n == first_divisor(n)
+
+
+def is_prime_power(n):
+    """Checks whether n is a power of prime number."""
+    base = first_divisor(n)
+    return get_exponent(n, base) is not None
+
+
+def closest_prime(n):
+    """Returns closest prime number to n. If there are two such primes, returns
+    smaller one."""
+    if n < 3:
+        return 2
+    if is_prime(n):
+        return n
+    offset = 1 if n % 2 == 0 else 2
+    while True:
+        if is_prime(n - offset):
+            return n - offset
+        if is_prime(n + offset):
+            return n + offset
+        offset += 2
+
+
+def closest_prime_power(n):
+    """Returns closest prime power to n. If there are two such prime powers,
+    returns smaller one."""
+    if n < 3:
+        return 2
+    if is_prime_power(n):
+        return n
+    offset = 1
+    while True:
+        if is_prime_power(n - offset):
+            return n - offset
+        if is_prime_power(n + offset):
+            return n + offset
+        offset += 1
+
+
+def closest_power_of_two(n):
+    """Returns closest power of two to n.
+    """
+    k = 2 ** (n.bit_length() - 1)
+    if 2 * k - n > n - k:
+        return k
+    return k * 2
+
+
+def closest_odd_prime_power(n):
+    """Returns closest odd prime power to n. If there are two such prime powers,
+    returns smaller one."""
+    if n <= 3:
+        return 3
+    if n % 2 == 1 and is_prime_power(n):
+        return n
+    offset = 1 if n % 2 == 0 else 2
+    while True:
+        if is_prime_power(n - offset):
+            return n - offset
+        if is_prime_power(n + offset):
+            return n + offset
+        offset += 2
 
 
 def next_odd_divisor(number, previous):
@@ -254,3 +327,61 @@ class Integer:
     @property
     def factors(self):
         return self._factors
+
+
+PRIME = 1
+PRIME_POWER = 2
+
+class Constraints(object):
+    """Class representing numeric constraints, e.g. for dimension and
+    characteristic of classical group. Minimal value must fit the constraints.
+    """
+
+    def __init__(self, min=None, parity=0, primality=None):
+        self._min = min
+        self._parity = parity
+        self._primality = primality
+
+    def closest_valid(self, value):
+        """Returns closest number, that is valid under these constraints.
+        """
+        if self._min is not None:
+            value = max(value, self._min)
+        if self._primality == PRIME:
+            if self._parity == 1:
+                return 2 if 2 >= self._min else None
+            elif self._parity == -1:
+                value = closest_prime(value)
+            else:
+                value = closest_prime(value)
+                if value < 3:
+                    value = 3
+        elif self._primality == PRIME_POWER:
+            if self._parity == 1:
+                value = closest_power_of_two(value)
+            elif self._parity == -1:
+                value = closest_odd_prime_power(value)
+            else:
+                value = closest_prime_power(value)
+        else:
+            if self._parity == 1:
+                value -= value % 2
+            if self._parity == -1:
+                value -= 1 - (value % 2)
+
+        return value
+
+    def is_valid(self, value):
+        """Returns true iff given value is valid under these constraints.
+        """
+        if self._min is not None and value < self._min:
+            return False
+        if self._parity == 1 and value % 2 == 1:
+            return False
+        if self._parity == -1 and value % 2 == 0:
+            return False
+        if self._primality == PRIME and not is_prime(value):
+            return False
+        if self._primality == PRIME_POWER and not is_prime_power(value):
+            return False
+        return True

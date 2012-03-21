@@ -131,6 +131,22 @@ class ClassicalGroup(Group):
         'PGL', 'PGU', 'Omega', 'Omega+', 'POmega+', 'Omega-', 'POmega-', 'SL',
         'PSL', 'SO', 'SO+', 'SO-', 'SU', 'PSU', 'Sp', 'PSp')
 
+    # constraints for dimension
+    _dim_constraints = {
+        'Omega': Constraints(min=5, parity=-1),
+        'Omega+': Constraints(min=8, parity=1),
+        'Omega-': Constraints(min=8, parity=1),
+        'POmega+': Constraints(min=8, parity=1),
+        'POmega-': Constraints(min=8, parity=1),
+        'SO': Constraints(min=5, parity=-1),
+        'SO+': Constraints(min=8, parity=1),
+        'SO-': Constraints(min=8, parity=1),
+        }
+
+    # constraints for field order
+    _field_constraints = {'SO': Constraints(min=3,
+        primality=PRIME_POWER, parity=-1)}
+
     def __init__(self, name, dimension, *field):
         self._name = name
         self._dim = dimension
@@ -163,6 +179,19 @@ class ClassicalGroup(Group):
             func = classical_orders.get(self._name, lambda *arg: Integer())
             self._order = func(self._dim, self._field)
         return self._order
+
+    @staticmethod
+    def field_constraints(name):
+        """Returns constraints on field for specified kind of groups
+        """
+        return ClassicalGroup._field_constraints.get(name, Constraints(min=2,
+            primality=PRIME_POWER))
+
+    @staticmethod
+    def dim_constraints(name):
+        """Returns constraints on dimension for specified kind of groups
+        """
+        return ClassicalGroup._dim_constraints.get(name, Constraints(min=2))
 
 
 class ExceptionalGroup(Group):

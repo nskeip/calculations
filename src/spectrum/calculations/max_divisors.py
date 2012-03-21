@@ -69,7 +69,7 @@ def _min_power(p, n, primes):
         primes -= set(x.factors)
     return t
 
-#def _classical_params(m):
+#def _clas_params(m):
 #    """Returns list of candidates (n, Field), such that
 #    \pi(q*(q-1)*(q^2-1)*...*(q^n-1)) can be contained in the set of first m
 #    primes.

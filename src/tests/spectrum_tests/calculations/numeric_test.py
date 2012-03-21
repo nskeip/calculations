@@ -91,6 +91,29 @@ class NumericTest(unittest.TestCase):
         self.assertEqual(expected1, a)
         self.assertEqual(expected2, a)
 
+    def test_is_prime(self):
+        expected = {2: True, 3: True, 4: False, 5: True, 3569: False,
+                    3571: True, 27644437: True, 27644439: False,
+                    15485863: True}
+        for number, value in expected.items():
+            self.assertEqual(value, is_prime(number), msg=number)
+
+    def test_is_prime_power(self):
+        expected = {2: True, 3: True, 4: True, 5: True, 6: False, 128: True,
+                    81: True, 82: False}
+        for number, value in expected.items():
+            self.assertEqual(value, is_prime_power(number), msg=number)
+
+    def test_closest_prime(self):
+        expected = {2: 2, 3: 3, 4: 3, 95: 97}
+        for number, value in expected.items():
+            self.assertEqual(value, closest_prime(number), msg=number)
+
+    def test_closest_prime_power(self):
+        expected = {2: 2, 3: 3, 4: 4, 6: 5, 95: 97, 130: 131, 34: 32}
+        for number, value in expected.items():
+            self.assertEqual(value, closest_prime_power(number), msg=number)
+
     def test_getExponent(self):
         values = {(36, 6): 2,
                   (128, 2): 7,
@@ -101,3 +124,21 @@ class NumericTest(unittest.TestCase):
         }
         for key, value in values.iteritems():
             self.assertTrue(get_exponent(*key) == value)
+
+    def test_constraints(self):
+        c = Constraints(min=5, primality=PRIME)
+        self.assertTrue(c.is_valid(5))
+        self.assertFalse(c.is_valid(6))
+        self.assertFalse(c.is_valid(3))
+        self.assertEqual(7, c.closest_valid(8))
+
+        c = Constraints(min=20, primality=PRIME_POWER)
+        self.assertTrue(c.is_valid(25))
+        self.assertFalse(c.is_valid(19))
+        self.assertFalse(c.is_valid(26))
+
+        c = Constraints(min=5, primality=PRIME, parity=1)
+        self.assertTrue(c.closest_valid(5) is None)
+
+        c = Constraints(min=8, primality=PRIME_POWER, parity=1)
+        self.assertEqual(8, c.closest_valid(5))
