@@ -6,7 +6,7 @@ __author__ = 'Daniel Lytkin'
 
 class Layout(object):
     """Basic abstract implementation of layout.
-    Layout provides map vertices -> coordinates
+    Layout provides coordinates for vertices
     """
 
     def __init__(self, graph, default_location=Point(), width=400, height=400):
@@ -18,6 +18,8 @@ class Layout(object):
 
     @property
     def graph(self):
+        """Returns graph
+        """
         return self._graph
 
     def set_unlocked_location(self, vertex, point):
@@ -30,12 +32,15 @@ class Layout(object):
         self.__locations[vertex] = point
 
     def __getitem__(self, vertex):
+        """Returns coordinates for specified vertex.
+        """
         if not self.__locations.has_key(vertex):
             self.__locations[vertex] = self._defaultLocation
         return self.__locations[vertex]
 
     def set_lock(self, vertex, locked):
-        """Sets a lock on vertex, so that it won't be moved by layout."""
+        """Sets a lock on vertex, so that its position won't be changed by
+        layout."""
         if locked:
             self._locked.add(vertex)
         else:
@@ -43,6 +48,8 @@ class Layout(object):
                 self._locked.remove(vertex)
 
     def is_locked(self, vertex):
+        """Returns true if vertex is locked.
+        """
         return vertex in self._locked
 
     def update(self):
@@ -54,11 +61,16 @@ class Layout(object):
             del self.__locations[vertex]
 
     def reset(self):
+        """Resets vertices locations and unlocks all vertices
+        """
         self._locked.clear()
         self.__locations.clear()
 
 
 class RandomLayout(Layout):
+    """Places vertices randomly.
+    """
+
     def __init__(self, graph):
         super(RandomLayout, self).__init__(graph)
         self.reset()
@@ -71,6 +83,9 @@ class RandomLayout(Layout):
 
 
 class CircleLayout(Layout):
+    """Places vertices in circle of specified center and radius
+    """
+
     def __init__(self, graph, r, center=(50, 50), **kw):
         super(CircleLayout, self).__init__(graph, **kw)
         self._center = Point(*center)

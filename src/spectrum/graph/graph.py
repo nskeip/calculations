@@ -9,6 +9,10 @@ def ordered_pair(a, b):
 
 
 class Graph:
+    """Class representing graph. Vertices are indexed by numbers 0, 1, ...
+    Values are stored in 'vertices' array.
+    """
+
     def __init__(self, vertices=list()):
         self._vertices = []
         self._adjacency = []
@@ -20,6 +24,9 @@ class Graph:
         self._vertices.append(vertex)
 
     def index(self, vertex):
+        """Returns the index of vertex with given value. If there is no such
+        vertex, returns None
+        """
         try:
             return self._vertices.index(vertex)
         except ValueError:
@@ -37,6 +44,8 @@ class Graph:
 
     @property
     def edges(self):
+        """Returns list o graph's edges.
+        """
         edges = list()
         for i in xrange(len(self._adjacency)):
             for j in xrange(len(self._adjacency[i])):
@@ -62,6 +71,8 @@ class Graph:
         self._add_vertex(vertex)
 
     def add_vertices(self, vertices):
+        """Adds sets of vertices
+        """
         for vertex in vertices:
             self.add_vertex(vertex)
 
@@ -79,6 +90,8 @@ class Graph:
         self._set_adjacency(i1, i2, True)
 
     def add_edges(self, edges):
+        """Adds sets of edges
+        """
         for edge in edges:
             self.add_edge(*edge)
 
@@ -158,6 +171,8 @@ class Graph:
 
 
     def max_cocliques(self):
+        """Returns set of cocliques of maximal size (slow)
+        """
         cocliquesIndices = self._max_cocliques_between_indices(
             range(len(self._adjacency)))
         return [map(lambda i: self._vertices[i], coclique)
@@ -165,6 +180,8 @@ class Graph:
 
 
 def full_graph(n):
+    """Creates full graph on n vertices
+    """
     g = Graph()
     for i in xrange(n):
         g._vertices.append(i)

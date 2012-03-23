@@ -14,7 +14,7 @@ SELECTION_KW = {"outline": "#aaaaff"}
 
 
 class PickedState(Observable):
-    """Picked state of graph vertices. Used to manipulate vertices on canvas.
+    """'picked'/'not picked' state of graph vertices
     """
 
     def __init__(self):
@@ -22,10 +22,14 @@ class PickedState(Observable):
         self._picked = set()
 
     def clear(self):
+        """Sets all elements unpicked
+        """
         for item in self.get_picked().copy():
             self.pick(item, False)
 
     def pick(self, item, pick=True):
+        """Sets picked state of 'item'
+        """
         if pick:
             self._picked.add(item)
         else:
@@ -34,14 +38,23 @@ class PickedState(Observable):
         self.notify(item)
 
     def is_picked(self, item):
+        """Returns true if 'item' is in picked state
+        """
         return item in self._picked
 
     def get_picked(self):
+        """Returns set of all picked items
+        """
         return self._picked#.copy()
 
 
 class MousePlugin(object):
+    """Class responsible for all mouse manipulations with graph on canvas.
+    """
+
     def __init__(self, container):
+        """Initializes the plugin for 'container' canvas
+        """
         self._container = container
 
         self._selection = None
@@ -99,6 +112,9 @@ class MousePlugin(object):
 
 
 class Vertex(object):
+    """This class connects graph vertex with its shape on the canvas.
+    """
+
     def __init__(self, value, shape):
         self._value = value
         self._shape = shape
@@ -106,16 +122,28 @@ class Vertex(object):
         self._incident = set()
 
     @property
-    def shape(self): return self._shape
+    def shape(self):
+        """Returns the shape that corresponds to this vertex
+        """
+        return self._shape
 
     @property
-    def value(self): return self._value
+    def value(self):
+        """Returns vertex value
+        """
+        return self._value
 
     @property
-    def incident(self): return self._incident
+    def incident(self):
+        """Returns the set of incident vertices
+        """
+        return self._incident
 
 
 class Edge(object):
+    """This class connects graph edge with its shape on the canvas
+    """
+
     def __init__(self, start, end, shape):
         self._start = start
         self._end = end
@@ -133,6 +161,9 @@ class Edge(object):
 
 
 class GraphViewer(Canvas):
+    """This is a canvas with an ability to draw graphs.
+    """
+
     def __init__(self, layout, master=None, margin=20, **kw):
         Canvas.__init__(self, master, width=layout.size.x + 2 * margin,
             height=layout.size.y + 2 * margin, **kw)
@@ -172,19 +203,26 @@ class GraphViewer(Canvas):
         self._picked_vertex_state.add_listener(createListener())
 
         # handle resize
-        self.bind("<Configure>", lambda event: self.update_layout_size())
+        self.bind("<Configure>", lambda event: self._update_layout_size())
 
 
-    def update_layout_size(self):
+    def _update_layout_size(self):
+        """Updates layout space size so that it fits the canvas. Called on
+        every change of canvas size.
+        """
         self._layout.size = Point(self.winfo_width() - 2 * self.__margin,
             self.winfo_height() - 2 * self.__margin)
 
     @property
     def vertices(self):
+        """Returns set of vertices on the canvas.
+        """
         return self._vertices.viewvalues()
 
     @property
     def picked_vertex_state(self):
+        """Returns picked state of vertices on the canvas.
+        """
         return self._picked_vertex_state
 
     def get_object_id_by_location(self, point):
@@ -272,9 +310,13 @@ class GraphViewer(Canvas):
         return (Point(x, y) + Point(x1, y1)) / 2
 
     def get_vertex_location(self, vertex):
+        """Returns the center of vertex' shape
+        """
         return self._get_shape_center(vertex.shape.id)
 
     def set_vertex_location(self, vertex, location):
+        """Sets the location of the center of vertex' shape
+        """
         current = self.get_vertex_location(vertex)
         self.move_vertex(vertex, location - current)
 
@@ -304,6 +346,8 @@ class GraphViewer(Canvas):
 
     @property
     def layout(self):
+        """Returns layout instance
+        """
         return self._layout
 
     @layout.setter

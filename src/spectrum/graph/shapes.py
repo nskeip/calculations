@@ -3,6 +3,9 @@ from spectrum.graph.geometry import Point
 __author__ = 'Daniel Lytkin'
 
 class Shape(object):
+    """Abstract class representing shapes on the canvas
+    """
+
     def __init__(self, canvas):
         self._canvas = canvas
         self._id = None
@@ -59,6 +62,9 @@ class VertexShape(Shape):
 
 
 class CircleShape(VertexShape):
+    """Circle shape
+    """
+
     def __init__(self, canvas, radius, location=Point(), **kw):
         super(CircleShape, self).__init__(canvas)
         r = radius
