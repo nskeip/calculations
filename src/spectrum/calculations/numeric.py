@@ -204,6 +204,7 @@ class Integer:
     """
 
     def __init__(self, *args):
+        self._factorization_str = False
         if not args:
             self._int = 1
             self._factors = Counter()
@@ -291,8 +292,21 @@ class Integer:
     #    def __floordiv__(self, other):
     #        return self.__div__(other)
 
-    def __repr__(self):
-        return "{} = {}".format(self._int, self._factors)
+    def enable_factorization_str(self, enable=True):
+        """Sets __str__ to show factorized number instead of a product
+        """
+        self._factorization_str = enable
+        if enable:
+            self.factorize()
+
+    def __str__(self):
+        if not self._factorization_str:
+            return str(self._int)
+        factors = self._factors.items()
+        factors.sort(key=lambda x: x[0])
+        factor_power_str = (lambda f, p: "{}^{}".format(f, p)
+        if p > 1 else str(f))
+        return " * ".join(factor_power_str(f, p) for f, p in factors)
 
     def div_by_prime(self, prime):
         for factor in self._factors.keys():
