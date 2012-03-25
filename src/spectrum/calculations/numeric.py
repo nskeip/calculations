@@ -292,6 +292,9 @@ class Integer:
     #    def __floordiv__(self, other):
     #        return self.__div__(other)
 
+    def __mod__(self, other):
+        return self._int % int(other)
+
     def enable_factorization_str(self, enable=True):
         """Sets __str__ to show factorized number instead of a product
         """

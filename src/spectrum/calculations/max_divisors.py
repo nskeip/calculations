@@ -116,6 +116,3 @@ def classical_groups(m):
         key=lambda group: (max(group.order().factors.keys()), group.order()))
     return ret
 
-for group in classical_groups(10):
-    print str(group), group.order()
-

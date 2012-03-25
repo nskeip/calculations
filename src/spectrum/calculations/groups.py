@@ -141,7 +141,9 @@ class ClassicalGroup(Group):
         'SO': Constraints(min=5, parity=-1),
         'SO+': Constraints(min=8, parity=1),
         'SO-': Constraints(min=8, parity=1),
-        }
+        'Sp': Constraints(min=4, parity=1),
+        'PSp': Constraints(min=4, parity=1)
+    }
 
     # constraints for field order
     _field_constraints = {'SO': Constraints(min=3,

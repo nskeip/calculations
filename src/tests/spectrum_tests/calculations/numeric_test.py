@@ -114,6 +114,11 @@ class NumericTest(unittest.TestCase):
         for number, value in expected.items():
             self.assertEqual(value, closest_prime_power(number), msg=number)
 
+    def test_mod(self):
+        a = Integer((2, 2), 3)
+        b = 7
+        self.assertEqual(5, a % b)
+
     def test_getExponent(self):
         values = {(36, 6): 2,
                   (128, 2): 7,
