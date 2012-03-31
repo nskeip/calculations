@@ -1,63 +1,9 @@
-from Tkinter import Frame, OptionMenu, StringVar, Radiobutton, Entry, LabelFrame, Label
-import re
+from Tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
 from spectrum.calculations.groups import ClassicalGroup, SporadicGroup, AlternatingGroup, ExceptionalGroup
-from spectrum.calculations.numeric import Constraints
+from spectrum.calculations.numeric import Constraints, PRIME_POWER
+from spectrum.gui.gui_elements import NumberBox, OptionList
 
 __author__ = 'Daniel Lytkin'
-
-_non_decimal = re.compile('[^\d]+')
-
-PRIME = 1
-PRIME_POWER = 2
-
-class NumberBox(Entry):
-    """Entry box, that allows only integer text. Set primality to PRIME or
-    PRIME_POWER to input primes or prime powers. Use parity=1 or -1 to input
-    even or odd numbers.
-    """
-
-    def __init__(self, parent, text_variable=None, constraints=None, **kw):
-        self._var = text_variable or StringVar()
-        self._constraints = constraints or Constraints()
-        self._var.set(1)
-        self.refresh_input()
-
-        Entry.__init__(self, parent, textvariable=self._var, width=10, **kw)
-        self.bind("<FocusOut>", lambda event: self.refresh_input())
-
-    def set_constraints(self, constraints):
-        self._constraints = constraints
-        self.refresh_input()
-
-    def refresh_input(self):
-        # remove any non-decimal character
-        input = int(_non_decimal.sub('', self._var.get()))
-        value = input
-
-        value = self._constraints.closest_valid(value)
-
-
-        #if input != value:
-        # changed
-        self._var.set(str(value))
-
-
-    @property
-    def variable(self):
-        """Returns string variable associated with this widget."""
-        return self._var
-
-
-class OptionList(OptionMenu):
-    def __init__(self, parent, variable=None, values=list(), **kwargs):
-        self._var = variable or StringVar()
-        OptionMenu.__init__(self, parent, self._var, *values, **kwargs)
-        if values:
-            self._var.set(values[0])
-
-    @property
-    def variable(self):
-        return self._var
 
 
 class GroupSelect(Frame):
@@ -101,7 +47,7 @@ class GroupSelect(Frame):
         Label(self._alt_params, text="Degree").grid(sticky='w')
         self._alt_degree = NumberBox(self._alt_params,
             constraints=Constraints(min=5))
-        self._alt_degree.grid(row=0, column=1, sticky='w')
+        self._alt_degree.grid(row=0, column=1, sticky='we')
 
         # classical
         self._clas_params = Frame(group_params_frame)
@@ -113,15 +59,15 @@ class GroupSelect(Frame):
         self._clas_type.variable.trace("w",
             lambda n, i, m: self._classical_group_type_selection())
 
-        self._clas_type.grid(row=0, column=1, sticky='w')
+        self._clas_type.grid(row=0, column=1, sticky='we')
 
         Label(self._clas_params, text="Dimension").grid(row=1, sticky='w')
         self._clas_dim = NumberBox(self._clas_params)
-        self._clas_dim.grid(row=1, column=1, sticky='w')
+        self._clas_dim.grid(row=1, column=1, sticky='we')
         Label(self._clas_params, text="Field order").grid(row=2, sticky='w')
         self._clas_field = NumberBox(self._clas_params,
             constraints=Constraints(primality=PRIME_POWER))
-        self._clas_field.grid(row=2, column=1, sticky='w')
+        self._clas_field.grid(row=2, column=1, sticky='we')
 
         self._classical_group_type_selection()
 
@@ -132,18 +78,18 @@ class GroupSelect(Frame):
         self._ex_type = OptionList(self._ex_params,
             values=ExceptionalGroup.types())
         self._ex_type.setvar(value=ExceptionalGroup.types()[0])
-        self._ex_type.grid(row=0, column=1, sticky='w')
+        self._ex_type.grid(row=0, column=1, sticky='we')
         Label(self._ex_params, text="Field order").grid(row=1, sticky='w')
         self._ex_field = NumberBox(self._ex_params,
             constraints=Constraints(primality=PRIME_POWER))
-        self._ex_field.grid(row=1, column=1, sticky='w')
+        self._ex_field.grid(row=1, column=1, sticky='we')
 
         # sporadic
         self._spor_params = Frame(group_params_frame)
         Label(self._spor_params, text="Group").grid(row=0, sticky='w')
         self._sporadic_group = OptionList(self._spor_params,
             values=SporadicGroup.all_groups())
-        self._sporadic_group.grid(row=0, column=1, sticky='w')
+        self._sporadic_group.grid(row=0, column=1, sticky='we')
 
         # configure columns
         for child_frame in group_params_frame.winfo_children():
@@ -153,6 +99,8 @@ class GroupSelect(Frame):
 
     @property
     def selected_group(self):
+        """Returns currently selected group
+        """
         if self._group_type.get() == "Alternating":
             return AlternatingGroup(int(self._alt_degree.get()))
         if self._group_type.get() == "Classical":

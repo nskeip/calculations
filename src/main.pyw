@@ -1,5 +1,6 @@
+from spectrum.calculations.groups import ClassicalGroup
 from spectrum.graph.graph import full_graph
-from spectrum.gui.main_window import MainWindow
+from spectrum.gui.facade_frame import Facade
 
 __author__ = 'Daniel Lytkin'
 
@@ -11,7 +12,11 @@ graph = full_graph(15)
 graph.add_vertex(20)
 graph.add_vertex(16)
 
-MainWindow().mainloop()
+f = Facade(None, group=ClassicalGroup("PSL", 5, 3))
+f.pack(expand=True, fill='both')
+
+f.mainloop()
+#MainWindow().mainloop()
 
 #window = PanedWindow(root, orient='horizontal', sashrelief="ridge")
 

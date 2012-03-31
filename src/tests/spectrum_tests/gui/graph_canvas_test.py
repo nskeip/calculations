@@ -1,5 +1,5 @@
 import unittest
-from spectrum.graph.drawing import PickedState
+from spectrum.gui.graph.graph_canvas import PickedState
 
 __author__ = 'Daniel Lytkin'
 

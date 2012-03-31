@@ -64,7 +64,7 @@ class MousePlugin(object):
         self._picked_state = container.picked_vertex_state
 
         container.bind("<Button-1>", self._on_press)
-        container.bind("<ButtonRelease-1>", self._on_release)
+        container.bind("<ButtonRelease-1>", lambda event: self._on_release)
         container.bind("<Motion>", self._on_drag)
 
     def _on_drag(self, event):
@@ -99,7 +99,7 @@ class MousePlugin(object):
             self._selection_rect = self._container.create_rectangle(
                 event.x, event.y, event.x, event.y, **SELECTION_KW)
 
-    def _on_release(self, event):
+    def _on_release(self):
         self._click = None
         if self._selection is not None:
             selection = self._container.coords(self._selection_rect)
@@ -160,11 +160,11 @@ class Edge(object):
     def end(self): return self._end
 
 
-class GraphViewer(Canvas):
+class GraphCanvas(Canvas):
     """This is a canvas with an ability to draw graphs.
     """
 
-    def __init__(self, layout, master=None, margin=20, **kw):
+    def __init__(self, master, layout, margin=20, **kw):
         Canvas.__init__(self, master, width=layout.size.x + 2 * margin,
             height=layout.size.y + 2 * margin, **kw)
 
