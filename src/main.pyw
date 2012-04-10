@@ -1,22 +1,20 @@
-from spectrum.calculations.groups import ClassicalGroup
-from spectrum.graph.graph import full_graph
-from spectrum.gui.facade_frame import Facade
+from spectrum.gui.main_window import MainWindow
 
 __author__ = 'Daniel Lytkin'
 
 #root = Tk()
 
-graph = full_graph(15)
+#graph = full_graph(15)
 #graph.add_edge(0, 1)
 #graph.add_edge(1, 2)
-graph.add_vertex(20)
-graph.add_vertex(16)
+#graph.add_vertex(20)
+#graph.add_vertex(16)
 
-f = Facade(None, group=ClassicalGroup("PSL", 5, 3))
-f.pack(expand=True, fill='both')
-
-f.mainloop()
-#MainWindow().mainloop()
+#f = Facade(None, group=ClassicalGroup("PSL", 15, 3))
+#f.pack(expand=True, fill='both')
+#
+#f.mainloop()
+MainWindow().mainloop()
 
 #window = PanedWindow(root, orient='horizontal', sashrelief="ridge")
 

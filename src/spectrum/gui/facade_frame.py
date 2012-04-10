@@ -1,4 +1,7 @@
 from Tkinter import Frame, PanedWindow, LabelFrame
+from spectrum.calculations.graphs import PrimeGraph
+from spectrum.graph.layout import SpringLayout
+from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
 from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer
 
 __author__ = 'Daniel Lytkin'
@@ -12,8 +15,8 @@ class Facade(Frame):
     def __init__(self, parent, group, **kw):
         Frame.__init__(self, parent, **kw)
         self._group = group
-        self._show_apex = True
-        self._show_graph = True
+        #        self._show_apex = True
+        #        self._show_graph = True
         self._init_components()
 
 
@@ -56,6 +59,14 @@ class Facade(Frame):
 
 
         # prime graph
+        # TODO: add different layouts and other options
+        graph = PrimeGraph(self._group.apex())
+        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
+        self._graph_canvas.pack(expand=True, fill='both')
+        iterations_plugin = IterationsPlugin()
+        iterations_plugin.apply(self._graph_canvas)
+        iterations_plugin.iterate(50)
+
 
 
 

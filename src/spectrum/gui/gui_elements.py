@@ -2,7 +2,6 @@ from Tkinter import Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkb
 import re
 import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
-from spectrum.gui.graph.graph_canvas import GraphCanvas
 
 __author__ = 'Daniel Lytkin'
 
@@ -88,43 +87,6 @@ class ApexListContainer(Frame):
         self._reset_button = Button(self, text="Reset",
             command=self.apex_list.reset)
         self._reset_button.grid(row=1, column=1, sticky='nesw')
-
-
-class GraphContainer(Frame):
-    def __init__(self, parent, graph_layout=None, **kw):
-        Frame.__init__(self, parent, **kw)
-        self.columnconfigure(0, weight=1)
-        self._graph_layout = graph_layout
-        self._init_components()
-
-
-    def _init_components(self):
-        self._header_panel = Frame(self, relief="groove")
-        self._header_panel.grid(sticky='nwe')
-        self._header_panel.columnconfigure(0, weight=1)
-
-        self._close_button = Button(self._header_panel, text='Close',
-            command=self.destroy)
-        self._close_button.grid(sticky='e')
-
-        self._graph_panel = Frame(self)
-        self._graph_panel.grid(sticky='nesw')
-        self.rowconfigure(1, weight=1)
-
-        if self._graph_layout is not None:
-            self._graph_viewer = GraphCanvas(self._graph_panel,
-                self._graph_layout)
-
-
-    @property
-    def graph_panel(self):
-        """Returns the panel, that contains GraphViewer canvas.
-        """
-        return self._graph_panel
-
-    @property
-    def graph_viewer(self):
-        return self._graph_viewer
 
 
 class NumberBox(Entry):
@@ -266,6 +228,23 @@ class GroupNameLabel(Label):
         self._group = group
         self['text'] = str(group)
 
+
+class FrameWithCloseButton(Frame):
+    """This is a frame that has Close button in top right corner
+    """
+
+    def __init__(self, parent, **kw):
+        Frame.__init__(self, parent, **kw)
+        self._init_button_area()
+
+
+    def _init_button_area(self):
+        self._button_area = Frame(self, relief='raised', bd=1)
+        self._button_area.pack(expand=False, fill='x')
+
+        self._close_button = Button(self._button_area, text='Close', bd=1,
+            command=self.destroy)
+        self._close_button.pack(side='right')
 
 
 
