@@ -106,15 +106,15 @@ class SpringLayout(Layout):
     particles.
     """
 
-    def __init__(self, graph, spring_rate=1.0, spring_length=200,
-                 electric_rate=1.0, damping=0.5, **kw):
+    def __init__(self, graph, spring_rate=0.2, spring_length=30,
+                 electric_rate=6.0, damping=0.5, **kw):
         super(SpringLayout, self).__init__(graph, **kw)
         self._spring_rate = spring_rate
         self._spring_length = spring_length
         self._electric_rate = electric_rate
         self._damping = damping
 
-        self.reset()
+        self.reset() # set random initial positions
 
 
     def reset(self):
@@ -141,7 +141,7 @@ class SpringLayout(Layout):
         c = 10 * self._spring_rate * (self._spring_length - r) / r
         return (self[vertex] - self[other]) * c
 
-    def step(self, time_step):
+    def step(self, time_step=0.2):
         """Calculates position of vertices after a lapse of `time_step' after
         last position.
         """
@@ -174,6 +174,15 @@ class SpringLayout(Layout):
             vel = Point(
                 transform_force(self[vertex].x, self.size.x, vel.x),
                 transform_force(self[vertex].y, self.size.y, vel.y))
+
+            # here we constrain maximal speed
+            step_distance_x = math.fabs(vel.x) * time_step
+            if step_distance_x > self.size.x * 0.1:
+                vel *= 0.1 * self.size.x / step_distance_x
+            step_distance_y = math.fabs(vel.y) * time_step
+            if step_distance_y > self.size.y * 0.1:
+                vel *= 0.1 * self.size.x / step_distance_y
+
             self._velocities[vertex] = vel
 
             # this is to prevent going behind borders:
