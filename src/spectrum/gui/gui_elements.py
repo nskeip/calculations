@@ -74,19 +74,16 @@ class ApexListContainer(Frame):
 
 
     def _init_components(self):
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
-
         self.apex_list = ApexList(self, self._apex)
-        self.apex_list.grid(columnspan=2, sticky='nesw')
+        self.apex_list.pack(expand=True, fill='both')
 
         self._factorize_button = Button(self, text="Factorize",
             command=self.apex_list.factorize_selected)
-        self._factorize_button.grid(row=1, column=0, sticky='nesw')
+        self._factorize_button.pack(side='left', expand=True, fill='x')
 
         self._reset_button = Button(self, text="Reset",
             command=self.apex_list.reset)
-        self._reset_button.grid(row=1, column=1, sticky='nesw')
+        self._reset_button.pack(side='left')
 
 
 class NumberBox(Entry):
@@ -195,14 +192,11 @@ class IntegerContainer(Frame):
         Frame.__init__(self, parent, **kw)
 
         self._integer_view = IntegerView(self, integer)
-        self._integer_view.grid(sticky="nesw")
+        self._integer_view.pack(expand=True, fill='x', side='left')
 
         self._button = CheckBox(self, indicatoron=0, text="F",
             command=self._set_factorization)
-        self._button.grid(row=0, column=1, sticky="nesw")
-
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        self._button.pack(side='left')
 
     def _set_factorization(self):
         self._integer_view.toggle_factorization(self._button.is_selected())
