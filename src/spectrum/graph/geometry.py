@@ -31,6 +31,9 @@ class Point(tuple):
         return (-self) + other
 
     def __mul__(self, other):
+        """If multiplied by integer, returns vector multiplied by scalar;
+        if multiplied by other vector, returns scalar product.
+        """
         if isinstance(other, tuple):
             # scalar product
             return self[0] * other[0] + self[1] * other[1]
@@ -52,5 +55,12 @@ class Point(tuple):
         return Point(function(self.x), function(self.y))
 
     def square(self):
+        """Returns scalar square of the vector
+        """
         return self * self
+
+    def identity(self):
+        """Returns the vector divided by its length
+        """
+        return self / (self.square() ** 0.5)
 

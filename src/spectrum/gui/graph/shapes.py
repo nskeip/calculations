@@ -68,6 +68,7 @@ class CircleShape(VertexShape):
     def __init__(self, canvas, radius, location=Point(), **kw):
         super(CircleShape, self).__init__(canvas)
         r = radius
+        self._radius = radius
         x, y = location.x, location.y
         self._id = canvas.create_oval(x - r, y - r, x + r, y + r, fill="white",
             **kw)

@@ -335,10 +335,10 @@ class GraphCanvas(Canvas):
         """
         id = vertex.shape.id
         self.move(id, v.x, v.y)
-        self._update_vertex_label_location(vertex)
         canvas_location = self._get_shape_center(id)
         layout_location = self._convert_canvas_location(canvas_location)
         self._layout[self.graph.index(vertex.value)] = layout_location
+        self._update_vertex_label_location(vertex)
         # move edges ends
         for edge in vertex.incident:
             if vertex is edge.start:
@@ -347,10 +347,21 @@ class GraphCanvas(Canvas):
                 self._move_edge(edge, Point(), v)
 
     def _update_vertex_label_location(self, vertex):
-        v_location = self.coords(vertex.shape.id)
-        self.coords(vertex.label_id, *v_location[:2])
+        #v_location = self._get_shape_center(vertex.shape.id)
+
+        vertex_index = self.graph.index(vertex.value)
+        label_vector = self._layout.get_label_vector(vertex_index)
+        vertex_location = self.get_vertex_location(vertex)
+        label_radius = self._get_shape_radius(vertex.label_id)
+        distance = label_radius + vertex.shape.radius
+        label_location = vertex_location + distance * label_vector
+        self.coords(vertex.label_id, *label_location)
         self.tag_raise(vertex.label_id, vertex.shape.id)
 
+
+    def _get_shape_radius(self, id):
+        x, y, x1, y1 = self.bbox(id)
+        return (Point(x1, y1) - Point(x, y)).square() ** 0.5 / 2
 
     def _get_shape_center(self, id):
         x, y, x1, y1 = self.coords(id)
@@ -376,7 +387,7 @@ class GraphCanvas(Canvas):
         """Converts layout coordinates to canvas coordinates
         """
         margin = self.__margin
-        return margin + location.x, margin + location.y
+        return Point(margin + location.x, margin + location.y)
 
     def _convert_canvas_location(self, location):
         """Converts canvas coordinates to layout coordinates

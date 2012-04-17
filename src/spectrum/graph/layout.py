@@ -66,6 +66,15 @@ class Layout(object):
         self._locked.clear()
         self.__locations.clear()
 
+    def get_label_vector(self, vertex):
+        """Returns identity vector locating the side of vertex where the
+        density of edges is the least.
+        """
+        default = Point(0, 1)
+        edgeVec = lambda neighbor: (self[vertex] - self[neighbor]).identity()
+        return reduce(lambda x, y: x + y,
+            map(edgeVec, self._graph.neighbors(vertex)), default).identity()
+
 
 class RandomLayout(Layout):
     """Places vertices randomly.
