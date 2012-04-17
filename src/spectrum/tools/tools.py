@@ -1,8 +1,11 @@
 from Tkinter import  Variable
+import platform
 
 __author__ = 'Daniel Lytkin'
 
 from functools import wraps
+
+IS_MAC = platform.system() == "Darwin"
 
 class DocInherit(object):
     """doc_inherit decorator

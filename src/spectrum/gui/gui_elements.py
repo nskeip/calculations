@@ -1,7 +1,9 @@
-from Tkinter import Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label
+from Tkinter import Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar
 import re
 import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
+from spectrum.tools import pyperclip
+from spectrum.tools.tools import IS_MAC
 
 __author__ = 'Daniel Lytkin'
 
@@ -16,6 +18,30 @@ class ApexList(Listbox):
         self.bind("<Return>",
             lambda event: self.factorize_selected())
 
+        self._init_menu()
+
+        self._right_click = None
+
+
+    def _init_menu(self):
+        self._menu = Menu(self, tearoff=0)
+        self._menu.add_command(label="Copy", command=self._copy_one)
+        self._menu.add_command(label="Copy all", command=self._copy_all)
+        self._menu.add_command(label="Factorize all", command=self.factorize)
+
+        # right button on Mac and other systems
+        button = '2' if IS_MAC else '3'
+        self.bind("<Button-{}>".format(button), self._right_click)
+
+    def _right_click(self, event):
+        self._right_click = event.x, event.y
+        self._menu.post(event.x_root, event.y_root)
+
+    def _copy_one(self):
+        pyperclip.setcb(self.get(self.nearest(self._right_click[1])))
+
+    def _copy_all(self):
+        pyperclip.setcb(", ".join(map(str, self._apex)))
 
     def curselection(self):
         """Return list of indices of currently selected items."""
@@ -74,8 +100,15 @@ class ApexListContainer(Frame):
 
 
     def _init_components(self):
-        self.apex_list = ApexList(self, self._apex)
-        self.apex_list.pack(expand=True, fill='both')
+        upper_pane = Frame(self)
+        upper_pane.pack(expand=True, fill='both')
+
+        self.apex_list = ApexList(upper_pane, self._apex)
+        self.apex_list.pack(side='left', expand=True, fill='both')
+
+        self._scrollbar = Scrollbar(upper_pane, command=self.apex_list.yview)
+        self._scrollbar.pack(expand=True, fill='y')
+        self.apex_list['yscrollcommand'] = self._scrollbar.set
 
         self._factorize_button = Button(self, text="Factorize",
             command=self.apex_list.factorize_selected)
@@ -83,7 +116,7 @@ class ApexListContainer(Frame):
 
         self._reset_button = Button(self, text="Reset",
             command=self.apex_list.reset)
-        self._reset_button.pack(side='left')
+        self._reset_button.pack()
 
 
 class NumberBox(Entry):

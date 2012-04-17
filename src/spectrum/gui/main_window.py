@@ -45,10 +45,10 @@ class MainWindow(Frame):
         self._menu = Menu(toplevel)
         toplevel['menu'] = self._menu
 
-        view = Menu(self._menu)
+        view = Menu(self._menu, tearoff=0)
         self._menu.add_cascade(label="View", menu=view)
 
-        graph_view = Menu(view)
+        graph_view = Menu(view, tearoff=0)
         view.add_cascade(label="View graphs", menu=graph_view)
 
         graph_view_var = self._properties.get_variable("graphframeview")
@@ -72,10 +72,10 @@ class MainWindow(Frame):
             for child in self._right_pane.winfo_children():
                 child.destroy()
             container = FrameWithCloseButton(self._right_pane)
-            self._right_pane.add(container)
+            self._right_pane.add(container, minsize=600)
         elif view == "row":
             container = FrameWithCloseButton(self._right_pane)
-            self._right_pane.add(container)
+            self._right_pane.add(container, minsize=600)
         else: # view == "window":
             container = Toplevel()
 
