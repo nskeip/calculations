@@ -2,7 +2,7 @@ from Tkinter import Frame, PanedWindow, Button, Menu, StringVar, Toplevel
 from spectrum.gui.facade_frame import Facade
 from spectrum.gui.group_select import GroupSelect
 from spectrum.gui.gui_elements import FrameWithCloseButton
-from spectrum.tools.tools import Properties
+from spectrum.tools.tools import properties
 
 __author__ = 'Daniel Lytkin'
 
@@ -14,12 +14,6 @@ class MainWindow(Frame):
         self._init_properties()
         self._init_components()
 
-    @property
-    def properties(self):
-        """Returns Properties instance: a dict that can contain both regular
-        entries and Tkinter Variables
-        """
-        return self._properties
 
     def _init_components(self):
         self._panes = PanedWindow(self, orient='horizontal',
@@ -51,7 +45,7 @@ class MainWindow(Frame):
         graph_view = Menu(view, tearoff=0)
         view.add_cascade(label="View graphs", menu=graph_view)
 
-        graph_view_var = self._properties.get_variable("graphframeview")
+        graph_view_var = properties.get_variable("graphframeview")
         graph_view.add_radiobutton(label="Only one", value="onlyone",
             variable=graph_view_var)
         graph_view.add_radiobutton(label="In a row", value="row",
@@ -61,13 +55,12 @@ class MainWindow(Frame):
 
 
     def _init_properties(self):
-        self._properties = Properties()
-        self._properties.add_variable("graphframeview", StringVar(),
+        properties.add_variable("graphframeview", StringVar(),
             initial="onlyone")
 
 
     def _go(self):
-        view = self._properties["graphframeview"]
+        view = properties["graphframeview"]
         if view == "onlyone":
             for child in self._right_pane.winfo_children():
                 child.destroy()
@@ -80,14 +73,7 @@ class MainWindow(Frame):
             container = Toplevel()
 
         facade = Facade(container, self._group_select.selected_group)
-        w = facade.winfo_reqwidth()
-        h = facade.winfo_reqheight()
 
-        if isinstance(container, Toplevel):
-            pass
-        else:
-            self._right_pane.paneconfig(container, width=600, height=100)
-            #container.config(width=600, height=100)
         facade.pack(expand=True, fill='both')
         facade.update_layout()
 

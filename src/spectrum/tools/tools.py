@@ -111,3 +111,6 @@ class Properties(object):
             raise ValueError(
                 "Entry with key '{}' is not a Variable instance.".format(key))
         return value
+
+
+properties = Properties()
