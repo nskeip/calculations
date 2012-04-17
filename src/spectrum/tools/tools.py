@@ -1,3 +1,5 @@
+from Tkinter import  Variable
+
 __author__ = 'Daniel Lytkin'
 
 from functools import wraps
@@ -58,3 +60,51 @@ class DocInherit(object):
         return func
 
 doc_inherit = DocInherit
+
+
+class Properties(object):
+    """This class is like dictionary, but can contain StringVars and IntVars.
+    If the property 'x' is a StringVar or IntVar, then Properties['x'] will
+     call get() method of the variable; Properties['x'] = y will call set()
+     method.
+    If 'x' is some other type, then Properties['x'] will return or substitute
+     the value like the regular dictionary.
+
+     To add a property as Variable, use add_variable() method.
+     For other properties use Properties['key'] = value
+    """
+
+    def __init__(self):
+        self._dict = dict()
+
+    def __getitem__(self, item):
+        value = self._dict[item]
+        if isinstance(value, Variable):
+            return value.get()
+        return value
+
+    def __setitem__(self, key, value):
+        previous = self._dict.get(key)
+        if isinstance(previous, Variable):
+            previous.set(value)
+        else:
+            # None or not Variable
+            self._dict[key] = value
+
+    def __delitem__(self, key):
+        del self._dict[key]
+
+    def add_variable(self, key, variable, initial=None):
+        self._dict[key] = variable
+        if initial is not None:
+            variable.set(initial)
+
+    def get_variable(self, key):
+        """Returns Variable instance for the given key. Raises ValueError if
+        Properties[key] is not a Variable instance.
+        """
+        value = self._dict[key]
+        if not isinstance(value, Variable):
+            raise ValueError(
+                "Entry with key '{}' is not a Variable instance.".format(key))
+        return value

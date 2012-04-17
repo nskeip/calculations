@@ -24,6 +24,14 @@ class Facade(Frame):
     def group(self):
         return self._group
 
+    @property
+    def apex_list_container(self):
+        return self._apex_container
+
+    @property
+    def graph_canvas(self):
+        return self._graph_canvas
+
     def _init_components(self):
         self._panes = PanedWindow(self, orient='horizontal',
             sashrelief='raised')
@@ -63,9 +71,13 @@ class Facade(Frame):
         graph = PrimeGraph(self._group.apex())
         self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
         self._graph_canvas.pack(expand=True, fill='both')
-        iterations_plugin = IterationsPlugin()
-        iterations_plugin.apply(self._graph_canvas)
-        iterations_plugin.iterate(50)
+
+        self._iterations_plugin = IterationsPlugin()
+        self._iterations_plugin.apply(self._graph_canvas)
+
+
+    def update_layout(self):
+        self._iterations_plugin.iterate(50)
 
 
 
