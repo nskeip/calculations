@@ -7,3 +7,16 @@ Add missing exceptional groups.
 Fix window sizing.
 Add latex representations.
 Add integer cache.
+
+Test performance of group and integer caching:
+    Create list of different parameters with some constraints.
+    Create list of permutations of that list.
+    Create groups for each parameters in each permutation.
+    Try for different constraints.
+
+    Or:
+    Create huge dict of fake parameters;
+    Place real parameters in it;
+    Compare performance of creation of groups with searching the dict.
+    Try for different real parameters.
+
