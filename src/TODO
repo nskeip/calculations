@@ -1,0 +1,9 @@
+Add support to locate labels inside vertex circles.
+Add saving graph to image.
+Add vertex equivalence.
+Add cocliques.
+Add layout calibrating window.
+Add missing exceptional groups.
+Fix window sizing.
+Add latex representations.
+Add integer cache.

@@ -1,11 +1,31 @@
 from numeric import *
 from partition import Partitions
+from spectrum.calculations.graphs import PrimeGraph
 from spectrum.calculations.orders import sporadic_orders, classical_orders, exceptional_orders
 from spectrum.calculations.spectra import sporadic_spectra, classical_spectra, exceptional_spectra
 from spectrum.tools.tools import doc_inherit
 
 
 __author__ = 'Daniel Lytkin'
+
+_CACHE = True  # whether group caching is enabled
+
+if _CACHE:
+    class GroupCache(type):
+        """Metaclass for cached group classes. It adds __call__ method to class
+        objects, which is called before creating any instances, and searches the
+        cache for the group first.
+        """
+        cache = dict()
+
+        def __call__(cls, *args):
+            # this is called before creating any instances
+            key = (cls.__name__, args)
+            instance = cls.cache.get(key)
+            if instance is None:
+                instance = type.__call__(cls, *args)
+                GroupCache.cache[key] = instance
+            return instance
 
 
 class Field:
@@ -48,8 +68,11 @@ class Field:
 
 
 class Group(object):
-    """Interface for finite groups with method to calculate their spectra
+    """Abstract class for finite groups.
     """
+
+    def __init__(self):
+        self._prime_graph = None
 
     def apex(self):
         """Returns apex of the group, which is the set of its element orders
@@ -62,6 +85,13 @@ class Group(object):
         """Returns group order."""
         raise NotImplementedError()
 
+    def prime_graph(self):
+        """Returns prime graph the group.
+        """
+        if self._prime_graph is None:
+            self._prime_graph = PrimeGraph(self.apex())
+        return self._prime_graph
+
 
 class SporadicGroup(Group):
     _groups = ('M11', 'M12', 'J1', 'M22', 'J2', 'M23', "2F4(2)'", 'HS', 'J3',
@@ -69,6 +99,7 @@ class SporadicGroup(Group):
                'HN', 'Ly', 'Th', 'Fi23', 'Co1', 'J4', "Fi24'", 'B', 'M')
 
     def __init__(self, name):
+        super(SporadicGroup, self).__init__()
         self._name = name
 
     @doc_inherit
@@ -91,8 +122,11 @@ class SporadicGroup(Group):
 class AlternatingGroup(Group):
     """AlternatingGroup(n) represents alternating group of degree n
     """
+    if _CACHE:
+        __metaclass__ = GroupCache
 
     def __init__(self, degree):
+        super(AlternatingGroup, self).__init__()
         self._degree = degree
         self._apex = None
         self._order = None
@@ -127,6 +161,9 @@ class ClassicalGroup(Group):
     ClassicalGroup("PSp", 14, 32)
     ClassicalGroup("PSp", 14, 2, 5)
     """
+    if _CACHE:
+        __metaclass__ = GroupCache
+
     _groups = (
         'PGL', 'PGU', 'Omega', 'Omega+', 'POmega+', 'Omega-', 'POmega-', 'SL',
         'PSL', 'SO', 'SO+', 'SO-', 'SU', 'PSU', 'Sp', 'PSp')
@@ -150,6 +187,7 @@ class ClassicalGroup(Group):
         primality=PRIME_POWER, parity=-1)}
 
     def __init__(self, name, dimension, *field):
+        super(ClassicalGroup, self).__init__()
         self._name = name
         self._dim = dimension
         self._field = field[0] if isinstance(field[0], Field) else Field(
@@ -197,10 +235,14 @@ class ClassicalGroup(Group):
 
 
 class ExceptionalGroup(Group):
+    if _CACHE:
+        __metaclass__ = GroupCache
+
     _groups = (
         "E6", "2E6", "E7", "E8", "F4", "2F4", "G2", "2G2", "2B2", "3D4",)
 
     def __init__(self, name, *field):
+        super(ExceptionalGroup, self).__init__()
         self._name = name
         self._field = field[0] if isinstance(field[0], Field) else Field(
             *field)
