@@ -1,11 +1,26 @@
 from itertools import combinations, product
 import unittest
-from spectrum.calculations import semisimple
+from spectrum.calculations.numeric import lcm
 from spectrum.calculations.partition import Partitions
-from spectrum.calculations.semisimple import SemisimpleElements, MixedElements
+from spectrum.calculations.semisimple import SemisimpleElements, MixedElements, SpectraElement
 from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
+
+def evaluate(q, ni, ei=-1):
+    """Calculates sesmisimple element with base q, partition ni and signs ei,
+    which is precisely
+    lcm(q^ni[1] + ei[1], ..., q^ni[k] + ei[k]) where k is the length of
+    partition.
+    ei may be a single integer - in this it is considered as same sign for each
+    element.
+    """
+    try:
+    # for integer ei
+        return reduce(lcm, (q ** n + ei for n in ni))
+    except TypeError:
+    # for sequence ei
+        return reduce(lcm, (q ** n + e for (n, e) in zip(ni, ei)))
 
 
 class Signs:
@@ -37,20 +52,58 @@ class Signs:
             pass
 
 
+class SpectraElementTest(unittest.TestCase):
+    def test_str(self):
+        elem = SpectraElement(3, 2, [2, 3, 4], [1, -1, 1])
+        expected = "3 * [2^2 + 1, 2^3 - 1, 2^4 + 1]"
+        self.assertEqual(expected, str(elem))
+
+        elem = SpectraElement(3)
+        self.assertEqual("3", str(elem))
+
+        elem = SpectraElement(q=2, partition=[2, 3, 4], signs=[1, -1, 1])
+        expected = "[2^2 + 1, 2^3 - 1, 2^4 + 1]"
+        self.assertEqual(expected, str(elem))
+
+        elem = SpectraElement(q=2, partition=[1, 1, 4], signs=[1, -1, 1])
+        expected = "[2 + 1, 2 - 1, 2^4 + 1]"
+        self.assertEqual(expected, str(elem))
+
+        elem = SpectraElement(q=2, partition=[1], signs=[1])
+        expected = "2 + 1"
+        self.assertEqual(expected, str(elem))
+
+        elem = SpectraElement(quotient=2, q=2, partition=[1], signs=[1])
+        expected = "2 * (2 + 1)"
+        self.assertEqual(expected, str(elem))
+
+
+    def test_lcm(self):
+        elem1 = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
+        elem2 = SpectraElement(q=2, partition=[3, 4], signs=[1, -1])
+        expected = "[2^2 + 1, 2^3 - 1, 2^3 + 1, 2^4 - 1]"
+        self.assertEqual(expected, str(elem1.lcm(elem2)))
+
+    def test_mult(self):
+        elem = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
+        expected = "2 * [2^2 + 1, 2^3 - 1]"
+        self.assertEqual(expected, str(elem * 2))
+
+
 @parametrized
 class SemisimpleTest(unittest.TestCase):
     def test_evaluate(self):
         ni = [8, 4, 4, 3, 2, 1]
         ei = [1, 1, -1, 1, -1, -1]
         q = 3
-        r = semisimple.evaluate(q, ni, ei)
+        r = evaluate(q, ni, ei)
         self.assertEqual(75331760, r)
 
     def test_evaluate_minuses(self):
         ni = [8, 7, 4, 3, 1]
         q = 4
-        r = semisimple.evaluate(q, ni)
-        rp = semisimple.evaluate(q, ni, [-1] * len(ni))
+        r = evaluate(q, ni)
+        rp = evaluate(q, ni, [-1] * len(ni))
         self.assertEqual(rp, r)
 
     @parameters(combinations(range(2, 15), 2))
@@ -59,11 +112,11 @@ class SemisimpleTest(unittest.TestCase):
         Test elements [q^{n_1}-1, ..., q^{n_k}-1] for all n_1+...+n_k=n
         """
         n, q = params
-        ss = SemisimpleElements(q, n, sign=1)
+        ss = SemisimpleElements(q, n, sign=1, verbose=False)
 
         divisible = set()
         for ni in Partitions(n):
-            elem = semisimple.evaluate(q, ni)
+            elem = evaluate(q, ni)
             found = False
             for x in ss:
                 if x % elem == 0:
@@ -92,7 +145,7 @@ class SemisimpleTest(unittest.TestCase):
         # very slow! For every partition of size n it calculates 2^n parity tuples.
         ss = list(
             SemisimpleElements(q, n, min_length=min_length, parity=parity,
-                sign=sign))
+                sign=sign, verbose=False))
         signsMod = 0 if parity == 1 else 1
 
         divisible = set()
@@ -104,7 +157,7 @@ class SemisimpleTest(unittest.TestCase):
             for ei in signs:
                 # skip needless signs
                 if parity and ei.count(1) % 2 != signsMod: continue
-                elem = semisimple.evaluate(q, ni, ei)
+                elem = evaluate(q, ni, ei)
                 # every element must divide at least one of items in ss
                 # also every item in ss must be equal to at least one element
                 found = False
@@ -125,8 +178,8 @@ class SemisimpleTest(unittest.TestCase):
     def test_all_semisimple(self, params):
         self.all_semisimple(*params)
 
-    @parameters(
-        [(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
+    @parameters(filter(lambda (n, q, l): n > l, combinations(range(2, 15), 3)))
+    #[(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
     def test_min_length(self, params):
         n, q, l = params
         self.all_semisimple(n, q, min_length=l)
@@ -142,7 +195,7 @@ class SemisimpleTest(unittest.TestCase):
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
 
-    @parameters(product(range(2, 15), range(2, 15), (-1, 1)))
+    @parameters(product(range(2, 10), range(2, 15), (-1, 1)))
     def test_semisimple_parity(self, params):
         n, q, p = params
         self.all_semisimple(n, q, parity=p)

@@ -1,25 +1,72 @@
 from numeric import lcm
+from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
 
 __author__ = 'Daniel Lytkin'
 
-def evaluate(q, ni, ei=-1):
-    """Calculates sesmisimple element with base q, partition ni and signs ei,
-    which is precisely
-    lcm(q^ni[1] + ei[1], ..., q^ni[k] + ei[k]) where k is the length of
-    partition.
-    ei may be a single integer - in this it is considered as same sign for each
-    element.
+
+class SpectraElement(long):
+    """Special long extension for spectra elements. It contains information on
+    how it was calculated. If 'verbose' is False, creates long, without any
+    additional info
     """
-    try:
-    # for integer ei
-        return reduce(lcm, (q ** n + ei for n in ni))
-    except TypeError:
-    # for sequence ei
-        return reduce(lcm, (q ** n + e for (n, e) in zip(ni, ei)))
+
+    def __new__(cls, quotient=1, q=0, partition=list(), signs=list(),
+                verbose=True):
+        class_ = SpectraElement if verbose else long
+        return long.__new__(class_, quotient * reduce(lcm,
+            (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
+
+    def __init__(self, quotient=1, q=0, partition=list(), signs=list(),
+                 verbose=True):
+        """Creates element = quotient * [q ^ n_1 + e_1, ...] for n_i in
+        'partition', e_i in 'signs'
+        """
+        self._quotient = Integer(quotient)
+        self._quotient.enable_factorization_str()
+        self._q = q
+        self._partition = partition
+        self._signs = signs
+        super(SpectraElement, self).__init__(self)
+
+    def __str__(self):
+        quotient = str(self._quotient) if (self._quotient != 1) else ""
+        sign = lambda e: "+ 1" if e > 0 else "- 1"
+        power = lambda k: "^" + str(k) if k > 1 else ""
+        element = lambda ni, ei: "{}{} {}".format(self._q, power(ni), sign(ei))
+        elements = ", ".join(
+            element(ni, ei) for (ni, ei) in zip(self._partition, self._signs))
+        if len(self._partition) == 1:
+            brackets = "({})" if self._quotient != 1 else "{}"
+        else:
+            brackets = "[{}]"
+        lcm_str = brackets.format(elements) if elements else ""
+        return " * ".join(filter(bool, (quotient, lcm_str)))
+
+    def lcm(self, other):
+        """Returns lcm of this and other. 'q' must be the same. Quotients are
+        multiplied.
+        """
+        elem = long.__new__(SpectraElement, lcm(self, other))
+        quotient = self._quotient * other._quotient
+        elem.__init__(quotient=quotient, q=self._q,
+            partition=list(self._partition) + list(other._partition),
+            signs=list(self._signs) + list(other._signs))
+        return elem
+
+    def __mul__(self, other):
+        """Multiplies quotient by integer
+        """
+        elem = long.__new__(SpectraElement, long(self) * other)
+        elem.__init__(quotient=self._quotient * other, q=self._q,
+            partition=self._partition, signs=self._signs)
+        return elem
+
+    def __rmul__(self, other):
+        return self * other
 
 
-class SemisimpleElements:
+class SemisimpleElements(object):
     """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for
     all partitions n_1 + ... + n_k = n.
     If 'parity' is set to 1 or -1, generates elements with even or odd number
@@ -29,27 +76,30 @@ class SemisimpleElements:
     'sign' or 'parity' arguments must be only used separately.
     """
 
-    def __init__(self, q, n, min_length=1, parity=0, sign=0):
+    def __init__(self, q, n, min_length=1, parity=0, sign=0, verbose=True):
         self._q = q
         self._n = n
         self._min_length = min_length
         self._parity = parity
         self._sign = sign
+        self._verbose = verbose
 
     def _with_sign_generator(self):
-        """Generates semisimple element with specified epsilon
+        """Generates semisimple element with specified sign
         (for Linear and Unitary groups)
         """
         q = self._q
         n = self._n
         # [q^n_1 - 1, ..., q^n_k - 1] if sign = 1, else
         # [q^n_1 - sign^n_1, ..., q^n_k - sign^n_k]
-        f = ((lambda ni: -1) if self._sign == 1 else
-             lambda ni: (-1 if nk % 2 == 0 else 1 for nk in ni))
+        f = lambda nk: (-1 if (self._sign == 1 or nk % 2 == 0) else 1)
+        #        f = ((lambda ni: -1) if self._sign == 1 else
+        #             lambda ni: (-1 if nk % 2 == 0 else 1 for nk in ni))
         for ni in BoundedSets(n):
             if len(ni) + n - sum(ni) < self._min_length:
                 continue
-            yield evaluate(q, ni, ei=f(ni))
+            yield SpectraElement(q=q, partition=ni, signs=map(f, ni),
+                verbose=self._verbose)
 
     def _with_parity_generator(self):
         """Generates semisimple elements with even or odd number of pluses"""
@@ -64,14 +114,17 @@ class SemisimpleElements:
                         continue
                     plusPartition = plusPartition + [1]
                     minuses -= 1
-                plusLcm = evaluate(q, plusPartition, 1) if pluses else 1
+                plusPart = plusPartition if pluses else []
                 for minusPartition in BoundedSets(minuses):
                     rest = n - sum(plusPartition) - sum(minusPartition)
                     if len(plusPartition) + len(
                         minusPartition) + rest < self._min_length:
                         continue
-                    minusLcm = evaluate(q, minusPartition) if minuses else 1
-                    yield lcm(plusLcm, minusLcm)
+                    minusPart = minusPartition if minuses else []
+                    yield SpectraElement(q=q,
+                        partition=plusPart + minusPart,
+                        signs=[1] * len(plusPart) + [-1] * len(minusPart),
+                        verbose=self._verbose)
 
     def _general_generator(self):
         """Generates all semisimple elements"""
@@ -80,17 +133,20 @@ class SemisimpleElements:
         for left in xrange((n + 2) // 2):
             right = n - left
             leftPartitions = MaximalBoundedSets(left)
-            for lPart in leftPartitions:
-                lLcms = (evaluate(q, lPart),
-                         evaluate(q, lPart, ei=1)) if left else (1, 1)
+            for lPartition in leftPartitions:
+                lPart = lPartition if left else []
                 rightPartitions = MaximalBoundedSets(right)
-                for rPart in rightPartitions:
-                    if len(lPart) + len(rPart) < self._min_length:
+                for rPartition in rightPartitions:
+                    if len(lPartition) + len(rPartition) < self._min_length:
                         continue
-                    rLcms = (evaluate(q, rPart, ei=1),
-                             evaluate(q, rPart)) if right else (1, 1)
-                    yield lcm(lLcms[0], rLcms[0])
-                    yield lcm(lLcms[1], rLcms[1])
+                    rPart = rPartition if right else []
+                    yield SpectraElement(q=q, partition=lPart + rPart,
+                        signs=[-1] * len(lPart) + [1] * len(rPart),
+                        verbose=self._verbose)
+                    yield SpectraElement(q=q, partition=lPart + rPart,
+                        signs=[1] * len(lPart) +
+                              [-1] * len(rPart),
+                        verbose=self._verbose)
 
     def __iter__(self):
         if self._sign:
@@ -100,7 +156,7 @@ class SemisimpleElements:
         return self._general_generator()
 
 
-class MixedElements:
+class MixedElements(object):
     """Generates elements of form g(k) * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
     for all k and partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """

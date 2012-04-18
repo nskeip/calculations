@@ -1,6 +1,6 @@
 from itertools import chain
 from spectrum.calculations.numeric import get_exponent, gcd, lcm
-from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, evaluate
+from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement
 from spectrum.calculations.set import FullBoundedSets
 
 __author__ = 'Daniel Lytkin'
@@ -179,9 +179,10 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     # (5)
     a5 = []
     for elem in SemisimpleElements(q, n - 2, min_length=2, parity=sign):
-        a5.append(p * lcm(q - 1, elem))
-        a5.append(p * lcm(q + 1, elem))
-        # (6)
+        a5.append(elem.lcm(SpectraElement(p, q, [1], [-1])))
+        a5.append(elem.lcm(SpectraElement(p, q, [1], [1])))
+
+    # (6)
     t = (q ** (n - 2) - sign) // 2
     a6 = [p * lcm(q - 1, t), p * lcm(q + 1, t)]
     # (7)
@@ -214,10 +215,12 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     signMod = 0 if sign == 1 else 1
     for ni in FullBoundedSets(n - 3):
         if len(ni) % 2 != signMod: continue
-        a5.append(4 * lcm(q - 1, evaluate(q, ni, 1)))
+        a5.append(4 * SpectraElement(q=q, partition=[1] + ni,
+            signs=[-1] + [1] * len(ni)))
         # (6)
-    a6 = (4 * lcm(q + 1, elem) for elem in SemisimpleElements(q, n - 3,
-        parity=sign))
+    a6 = (elem.lcm(
+        SpectraElement(4, q, [1], [1])) for elem in SemisimpleElements(q, n - 3
+        , parity=sign))
     # (7)
     k = get_exponent(n - 2, 2)
     a7 = [] if k is None else [4 * (n - 2)]
@@ -271,9 +274,10 @@ def _projective_omega_pm_spectrum(sign):
         # (6)
         a6 = []
         for elem in SemisimpleElements(q, n - 2, min_length=2, parity=sign):
-            a6.append(p * lcm(q - 1, elem))
-            a6.append(p * lcm(q + 1, elem))
-            # (7)
+            a6.append(elem.lcm(SpectraElement(p, q, [1], [-1])))
+            a6.append(elem.lcm(SpectraElement(p, q, [1], [1])))
+
+        # (7)
         t = (q ** (n - 2) - sign) // 2
         a7 = [p * lcm(q - 1, t), p * lcm(q + 1, t)]
         # (8)
@@ -326,8 +330,8 @@ def _special_orthogonal_pm_spectrum(sign):
         # (3)
         a3 = []
         for elem in SemisimpleElements(q, n - 2, parity=e):
-            a3.append(p * lcm(q - 1, elem))
-            a3.append(p * lcm(q + 1, elem))
+            a3.append(elem.lcm(SpectraElement(p, q, [1], [-1])))
+            a3.append(elem.lcm(SpectraElement(p, q, [1], [1])))
             # (4)
         k = get_exponent(2 * n - 3, p)
         a4 = [] if k is None else [2 * p * (2 * n - 3)]
@@ -409,8 +413,8 @@ def _projective_special_linear_spectrum(sign):
         for n1 in xrange(1, (n + 2) // 2):
             pair = (n1, n - n1)
             signs = (-eps(n1), -eps(n - n1))
-            a2.append(evaluate(q, pair, ei=signs) // gcd(n // gcd(n1, n - n1),
-                q - e))
+            a2.append(lcm(q ** pair[0] + signs[0], q ** pair[1] + signs[1]) //
+                      gcd(n // gcd(n1, n - n1), q - e))
             # (3)
         a3 = SemisimpleElements(q, n, min_length=3, sign=e)
         # (4)
