@@ -1,6 +1,6 @@
 __author__ = 'Daniel Lytkin'
 
-class Partitions:
+class Partitions(object):
     """Class providing iterator on partitions
     Required parameter:
         number - the number to partition

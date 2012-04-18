@@ -198,7 +198,7 @@ def _factorize_number(number):
     return factors
 
 
-class Integer:
+class Integer(object):
     """Represents integer with methods to factorize.
     Usage: Integer(12345) for number 12345 or Integer((2,5), (3,2), 5, 7) for number 2^5 * 3^3 * 5 * 7
     """

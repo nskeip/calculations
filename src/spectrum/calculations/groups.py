@@ -28,7 +28,7 @@ if _CACHE:
             return instance
 
 
-class Field:
+class Field(object):
     """Finite field.
     Can be created as Field(order) or Field(base, pow) where base**pow is the
     order of the field. `order' must be a prime power, otherwise the wrong
