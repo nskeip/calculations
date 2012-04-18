@@ -184,7 +184,9 @@ class ClassicalGroup(Group):
         'PGL', 'PGU', 'Omega', 'Omega+', 'POmega+', 'Omega-', 'POmega-', 'SL',
         'PSL', 'SO', 'SO+', 'SO-', 'SU', 'PSU', 'Sp', 'PSp')
 
-
+    _latex = {'Omega+': 'Omega^+', 'Omega-': 'Omega^-',
+              'POmega+': 'POmega^+', 'POmega-': 'POmega^-', 'SO+': 'SO^+',
+              'SO-': 'SO^-'}
 
     # constraints for dimension
     _dim_constraints = {
@@ -215,6 +217,13 @@ class ClassicalGroup(Group):
 
     def __str__(self):
         return "{}({}, {})".format(self._name, self._dim, self._field.order)
+
+    def str_latex(self):
+        name = ClassicalGroup._latex.get(self._name, self._name)
+        dim = str(self._dim)
+        if len(dim) > 1:
+            dim = "{" + dim + "}"
+        return "{}_{}({})".format(name, dim, self._field.order)
 
     @staticmethod
     def types():
@@ -259,6 +268,10 @@ class ExceptionalGroup(Group):
     _groups = (
         "E6", "2E6", "E7", "E8", "F4", "2F4", "G2", "2G2", "2B2", "3D4",)
 
+    _latex = {"E6": 'E_6', "2E6": '{}^2E_6', "E7": 'E_7', "E8": 'E_8',
+              "F4": 'F_4', "2F4": '{}^2F_4', "G2": 'G_2', "2G2": '{}^2G_2',
+              "2B2": '{}^2B_2', "3D4": '{}^3D_4'}
+
     def __init__(self, name, *field):
         super(ExceptionalGroup, self).__init__()
         self._name = name
@@ -270,6 +283,10 @@ class ExceptionalGroup(Group):
 
     def __str__(self):
         return "{}({})".format(self._name, self._field.order)
+
+    def str_latex(self):
+        name = ExceptionalGroup._latex.get(self._name, self._name)
+        return "{}({})".format(name, self._field.order)
 
     @staticmethod
     def types():
