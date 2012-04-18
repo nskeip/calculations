@@ -1,7 +1,7 @@
 import unittest
 from spectrum_tests.calculations.spectra_data import classical, exceptional
 from spectrum.calculations.groups import *
-from spectrum_tests.calculations.orders_data import orders, exceptional_orders
+from spectrum_tests.calculations.orders_data import orders
 from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
