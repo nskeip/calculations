@@ -204,7 +204,6 @@ class Integer(object):
     """
 
     def __init__(self, *args):
-        self._factorization_str = False
         if not args:
             self._int = 1
             self._factors = Counter()
@@ -295,21 +294,39 @@ class Integer(object):
     def __mod__(self, other):
         return self._int % int(other)
 
-    def enable_factorization_str(self, enable=True):
-        """Sets __str__ to show factorized number instead of a product
-        """
-        self._factorization_str = enable
-        if enable:
-            self.factorize()
-
     def __str__(self):
-        if not self._factorization_str:
-            return str(self._int)
+        return str(self._int)
+
+    def str_factorized(self):
+        """Returns factorized string representation
+        """
+        self.factorize()
         factors = self._factors.items()
         factors.sort(key=lambda x: x[0])
-        factor_power_str = (lambda f, p: "{}^{}".format(f, p)
-        if p > 1 else str(f))
+        power = lambda k: "^" + str(k) if k > 1 else ""
+        factor_power_str = lambda f, p: "{}{}".format(f, power(p))
         return " * ".join(factor_power_str(f, p) for f, p in factors)
+
+    def str_verbose(self):
+        """Same as str_factorised
+        """
+        return self.str_factorized()
+
+    def str_latex(self):
+        """Returns factorized latex representation
+        """
+        self.factorize()
+        factors = self._factors.items()
+        factors.sort(key=lambda x: x[0])
+
+        def power(k):
+            if k == 1:
+                return ""
+            template = "^{}" if k < 10 else "^{{{}}}"
+            return template.format(k)
+
+        factor_power_str = lambda f, p: "{}{}".format(f, power(p))
+        return " \cdot ".join(factor_power_str(f, p) for f, p in factors)
 
     def div_by_prime(self, prime):
         for factor in self._factors.keys():

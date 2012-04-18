@@ -65,6 +65,42 @@ class DocInherit(object):
 doc_inherit = DocInherit
 
 
+class StringViewFormatter(object):
+    """This class wraps Integer, SpectraElement, Group, Field etc. instances
+    and provides some string formatting methods (Factorized view, LaTeX view
+    etc.)
+    """
+    NORMAL = 0
+    VERBOSE = 1
+    LATEX = 2
+
+    def __init__(self, object_, mode=0):
+        self._object = object_
+        self.mode = mode
+
+        self._modes = {0: self.str_normal,
+                       1: self.str_verbose,
+                       2: self.str_latex}
+
+    def str_normal(self):
+        return str(self._object)
+
+    def str_verbose(self):
+        try:
+            return self._object.str_verbose()
+        except AttributeError:
+            return "Error: no str_verbose() method in object " + self._object
+
+    def str_latex(self):
+        try:
+            return self._object.str_latex()
+        except AttributeError:
+            return "Error: no str_latex() method in object " + self._object
+
+    def __str__(self):
+        return self._modes[self.mode]()
+
+
 class Properties(object):
     """This class is like dictionary, but can contain StringVars and IntVars.
     If the property 'x' is a StringVar or IntVar, then Properties['x'] will

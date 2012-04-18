@@ -10,6 +10,9 @@ __author__ = 'Daniel Lytkin'
 
 _CACHE = True  # whether group caching is enabled
 
+# whether to surround group name with \operatorname{} in str_latex()
+#LATEX_OPERATORNAME = True
+
 if _CACHE:
     class GroupCache(type):
         """Metaclass for cached group classes. It adds __call__ method to class
@@ -61,7 +64,7 @@ class Field(object):
     @property
     def pow(self): return self._pow
 
-    def __repr__(self):
+    def __str__(self):
         if self._pow == 1:
             return "F({})".format(self._base)
         return "F({}^{})".format(self._base, self._pow)
@@ -98,6 +101,13 @@ class SporadicGroup(Group):
                'M24', 'McL', 'He', 'Ru', 'Suz', "O'N", 'Co3', 'Co2', 'Fi22',
                'HN', 'Ly', 'Th', 'Fi23', 'Co1', 'J4', "Fi24'", 'B', 'M')
 
+    _latex = {'Co1': 'Co_1', 'Co3': 'Co_3', 'Co2': 'Co_2', "Fi24'": "Fi_{24}'",
+              'M24': 'M_{24}', 'J1': 'J_1', 'M22': 'M_{22}', 'M23': 'M_{23}',
+              'M11': 'M_{11}', 'J4': 'J_4', 'M12': 'M_{12}', 'J2': 'J_{2}',
+              "2F4(2)'": "{}^2F_4(2)'", 'J3': 'J_3', 'Fi23': 'Fi_{23}',
+              'Fi22': 'Fi_{22}'}
+
+
     def __init__(self, name):
         super(SporadicGroup, self).__init__()
         self._name = name
@@ -112,6 +122,9 @@ class SporadicGroup(Group):
 
     def __str__(self):
         return self._name
+
+    def str_latex(self):
+        return SporadicGroup._latex.get(self._name, self._name)
 
     @staticmethod
     def all_groups():
@@ -154,6 +167,9 @@ class AlternatingGroup(Group):
     def __str__(self):
         return "Alt({})".format(self._degree)
 
+    def str_latex(self):
+        return str(self)
+
 
 class ClassicalGroup(Group):
     """Usage:
@@ -167,6 +183,8 @@ class ClassicalGroup(Group):
     _groups = (
         'PGL', 'PGU', 'Omega', 'Omega+', 'POmega+', 'Omega-', 'POmega-', 'SL',
         'PSL', 'SO', 'SO+', 'SO-', 'SU', 'PSU', 'Sp', 'PSp')
+
+
 
     # constraints for dimension
     _dim_constraints = {

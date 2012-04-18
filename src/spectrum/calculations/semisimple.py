@@ -23,17 +23,18 @@ class SpectraElement(long):
         'partition', e_i in 'signs'
         """
         self._quotient = Integer(quotient)
-        self._quotient.enable_factorization_str()
         self._q = q
         self._partition = partition
         self._signs = signs
         super(SpectraElement, self).__init__(self)
 
-    def __str__(self):
-        quotient = str(self._quotient) if (self._quotient != 1) else ""
-        sign = lambda e: "+ 1" if e > 0 else "- 1"
+    def str_verbose(self):
+        quotient = self._quotient.str_factorized() if (
+        self._quotient != 1) else ""
+        sign = lambda e: "+" if e > 0 else "-"
         power = lambda k: "^" + str(k) if k > 1 else ""
-        element = lambda ni, ei: "{}{} {}".format(self._q, power(ni), sign(ei))
+        element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
+            sign(ei))
         elements = ", ".join(
             element(ni, ei) for (ni, ei) in zip(self._partition, self._signs))
         if len(self._partition) == 1:
@@ -42,6 +43,28 @@ class SpectraElement(long):
             brackets = "[{}]"
         lcm_str = brackets.format(elements) if elements else ""
         return " * ".join(filter(bool, (quotient, lcm_str)))
+
+    def str_latex(self):
+        quotient = self._quotient.str_factorized() if (
+        self._quotient != 1) else ""
+        sign = lambda e: "+" if e > 0 else "-"
+
+        def power(k):
+            if k == 1:
+                return ""
+            template = "^{}" if k < 10 else "^{{{}}}"
+            return template.format(k)
+
+        element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
+            sign(ei))
+        elements = ", ".join(
+            element(ni, ei) for (ni, ei) in zip(self._partition, self._signs))
+        if len(self._partition) == 1:
+            brackets = "({})" if self._quotient != 1 else "{}"
+        else:
+            brackets = "[{}]"
+        lcm_str = brackets.format(elements) if elements else ""
+        return " ".join(filter(bool, (quotient, lcm_str)))
 
     def lcm(self, other):
         """Returns lcm of this and other. 'q' must be the same. Quotients are

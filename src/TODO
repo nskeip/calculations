@@ -20,3 +20,4 @@ Test performance of group and integer caching:
     Compare performance of creation of groups with searching the dict.
     Try for different real parameters.
 
+Implement latex formatting.
