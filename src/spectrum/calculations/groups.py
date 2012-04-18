@@ -21,7 +21,7 @@ if _CACHE:
         def __call__(cls, *args):
             # this is called before creating any instances
             key = (cls.__name__, args)
-            instance = cls.cache.get(key)
+            instance = GroupCache.cache.get(key)
             if instance is None:
                 instance = type.__call__(cls, *args)
                 GroupCache.cache[key] = instance
