@@ -18,10 +18,9 @@ class GroupSelect(Frame):
         self._type_radio_buttons[default_type].select()
 
     def _init_components(self):
-        self.columnconfigure(0, weight=1)
         # group type selection (alternating, classical, sporadic, exceptional)
         group_type_frame = LabelFrame(self, text="Group type")
-        group_type_frame.grid(sticky='nesw', padx=10, pady=5)
+        group_type_frame.pack(expand=True, fill='x', padx=10, pady=5)
 
         # group type radio buttons (Alternating, Classical etc.)
         self._group_type = StringVar()
@@ -29,21 +28,20 @@ class GroupSelect(Frame):
         for type in ("Alternating", "Classical", "Exceptional", "Sporadic"):
             self._type_radio_buttons[type] = Radiobutton(group_type_frame,
                 variable=self._group_type, value=type, text=type)
-            # stick every control to the left
-        for child_frame in group_type_frame.winfo_children():
-            child_frame.grid(sticky='w', padx=10)
-            # set group type selection handler
+            self._type_radio_buttons[type].pack(anchor='nw', padx=10)
+
+        # set group type selection handler
         self._group_type.trace("w",
             lambda n, i, m: self._group_type_selection())
 
         # parameters for each group (degree for alternating, field and
         # dimension for classical etc.
         group_params_frame = LabelFrame(self, text="Parameters")
-        group_params_frame.grid(sticky='we', padx=10, pady=5)
-        group_params_frame.columnconfigure(0, weight=1)
+        group_params_frame.pack(expand=True, fill='x', padx=10, pady=5)
 
         # alternating
         self._alt_params = Frame(group_params_frame)
+        self._alt_params.columnconfigure(1, weight=1)
         Label(self._alt_params, text="Degree").grid(sticky='w')
         self._alt_degree = NumberBox(self._alt_params,
             constraints=Constraints(min=5))
@@ -86,16 +84,15 @@ class GroupSelect(Frame):
 
         # sporadic
         self._spor_params = Frame(group_params_frame)
+        self._spor_params.columnconfigure(1, weight=1)
         Label(self._spor_params, text="Group").grid(row=0, sticky='w')
         self._sporadic_group = OptionList(self._spor_params,
             values=SporadicGroup.all_groups())
         self._sporadic_group.grid(row=0, column=1, sticky='we')
 
-        # configure columns
+        # pack params frames
         for child_frame in group_params_frame.winfo_children():
-            child_frame.grid(sticky='we', padx=10)
-            child_frame.columnconfigure(0, weight=1)
-            child_frame.columnconfigure(1, weight=2)
+            child_frame.pack(expand=True, fill='x', padx=10)
 
     @property
     def selected_group(self):
@@ -122,9 +119,9 @@ class GroupSelect(Frame):
 
         def set_visible(widget, visible):
             if visible:
-                widget.grid(sticky='we')
+                widget.pack(expand=True, fill='both', padx=10, anchor='nw')
             else:
-                widget.grid_forget()
+                widget.forget()
 
         type = self._group_type.get()
         set_visible(self._alt_params, type == "Alternating")
