@@ -114,6 +114,10 @@ class NumericTest(unittest.TestCase):
         for number, value in expected.items():
             self.assertEqual(value, closest_prime_power(number), msg=number)
 
+    def test_binary_expansion(self):
+        expected = [32, 8, 4, 1]
+        self.assertEqual(expected, binary_expansion(45))
+
     def test_mod(self):
         a = Integer((2, 2), 3)
         b = 7

@@ -125,6 +125,17 @@ def closest_power_of_two(n):
     return k * 2
 
 
+def binary_expansion(n):
+    """Returns binary expansion of n
+    """
+    ret = []
+    while n > 0:
+        power = 2 ** (n.bit_length() - 1)
+        n -= power
+        ret.append(power)
+    return ret
+
+
 def closest_odd_prime_power(n):
     """Returns closest odd prime power to n. If there are two such prime powers,
     returns smaller one."""
