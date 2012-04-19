@@ -1,5 +1,6 @@
 from collections import Counter
 from math import sqrt
+import operator
 
 __author__ = 'Daniel Lytkin'
 
@@ -175,7 +176,7 @@ def get_exponent(number, base):
     return k if number == 1 else None
 
 
-prod = lambda seq: reduce(lambda x, y: x * y, seq, 1)
+prod = lambda seq: reduce(operator.mul, seq, 1)
 
 
 def _removeFactor(number, factor):
@@ -238,7 +239,7 @@ class Integer(object):
             self._multiply()
 
     def _multiply(self):
-        self._int = reduce(lambda x, y: x * y, self._factors.elements(), 1)
+        self._int = reduce(operator.mul, self._factors.elements(), 1)
 
     def __int__(self):
         return self._int
