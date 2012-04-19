@@ -28,9 +28,17 @@ class SpectraElement(long):
         self._signs = signs
         super(SpectraElement, self).__init__(self)
 
+    @property
+    def quotient(self):
+        return self._quotient
+
+    @property
+    def partition(self):
+        return self._partition
+
     def str_verbose(self):
         quotient = self._quotient.str_factorized() if (
-        self._quotient != 1) else ""
+            self._quotient != 1) else ""
         sign = lambda e: "+" if e > 0 else "-"
         power = lambda k: "^" + str(k) if k > 1 else ""
         element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
@@ -46,7 +54,7 @@ class SpectraElement(long):
 
     def str_latex(self):
         quotient = self._quotient.str_factorized() if (
-        self._quotient != 1) else ""
+            self._quotient != 1) else ""
         sign = lambda e: "+" if e > 0 else "-"
 
         def power(k):
