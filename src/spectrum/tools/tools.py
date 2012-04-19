@@ -100,13 +100,13 @@ class StringViewFormatter(object):
         try:
             return self._object.str_verbose()
         except AttributeError:
-            return "Error: no str_verbose() method in object " + self._object
+            return str(self._object)
 
     def str_latex(self):
         try:
             return self._object.str_latex()
         except AttributeError:
-            return "Error: no str_latex() method in object " + self._object
+            return str(self._object)
 
     def str_mixed(self):
         return self.str_normal() + " = " + self.str_verbose()
