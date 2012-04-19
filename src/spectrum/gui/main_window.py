@@ -9,7 +9,7 @@ __author__ = 'Daniel Lytkin'
 class MainWindow(Frame):
     def __init__(self, **kw):
         Frame.__init__(self, **kw)
-        self.winfo_toplevel().minsize(width=600, height=400)
+        self.winfo_toplevel().minsize(width=800, height=480)
         self.pack(expand=True, fill='both')
         self._init_properties()
         self._init_components()

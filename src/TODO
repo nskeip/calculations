@@ -5,7 +5,6 @@ Add cocliques.
 Add layout calibrating window.
 Add missing exceptional groups.
 Fix window sizing.
-Add latex representations.
 Add integer cache.
 
 Test performance of group and integer caching:

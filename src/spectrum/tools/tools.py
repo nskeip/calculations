@@ -69,10 +69,16 @@ class StringViewFormatter(object):
     """This class wraps Integer, SpectraElement, Group, Field etc. instances
     and provides some string formatting methods (Factorized view, LaTeX view
     etc.)
+    Modes:
+        NORMAL - regular str(object)
+        VERBOSE - factorised for integer, lcm for spectra element etc
+        LATEX - latex-compatible text
+        MIXED - 'NORMAL = VERBOSE'
     """
     NORMAL = 0
     VERBOSE = 1
     LATEX = 2
+    MIXED = 3
 
     def __init__(self, object_, mode=0):
         self._object = object_
@@ -80,7 +86,12 @@ class StringViewFormatter(object):
 
         self._modes = {0: self.str_normal,
                        1: self.str_verbose,
-                       2: self.str_latex}
+                       2: self.str_latex,
+                       3: self.str_mixed}
+
+    @property
+    def object(self):
+        return self._object
 
     def str_normal(self):
         return str(self._object)
@@ -96,6 +107,9 @@ class StringViewFormatter(object):
             return self._object.str_latex()
         except AttributeError:
             return "Error: no str_latex() method in object " + self._object
+
+    def str_mixed(self):
+        return self.str_normal() + " = " + self.str_verbose()
 
     def __str__(self):
         return self._modes[self.mode]()

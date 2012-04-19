@@ -2,8 +2,9 @@ from Tkinter import Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkb
 import re
 import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
+from spectrum.calculations.semisimple import SpectraElement
 from spectrum.tools import pyperclip
-from spectrum.tools.tools import IS_MAC
+from spectrum.tools.tools import IS_MAC, StringViewFormatter
 
 __author__ = 'Daniel Lytkin'
 
@@ -16,7 +17,7 @@ class ApexList(Listbox):
         Listbox.__init__(self, parent, **kw)
         self.set_apex(apex)
         self.bind("<Return>",
-            lambda event: self.factorize_selected())
+            lambda event: self.expand_selected())
 
         self._init_menu()
 
@@ -25,9 +26,13 @@ class ApexList(Listbox):
 
     def _init_menu(self):
         self._menu = Menu(self, tearoff=0)
-        self._menu.add_command(label="Copy", command=self._copy_one)
+        self._menu.add_command(label="Copy", command=self._copy_selected)
+        self._menu.add_command(label="Copy LaTeX",
+            command=self._copy_selected_latex)
         self._menu.add_command(label="Copy all", command=self._copy_all)
-        self._menu.add_command(label="Factorize all", command=self.factorize)
+        self._menu.add_command(label="Copy all LaTex",
+            command=self._copy_all_latex)
+        self._menu.add_command(label="Expand", command=self.expand_selected)
 
         # right button on Mac and other systems
         button = '2' if IS_MAC else '3'
@@ -35,13 +40,34 @@ class ApexList(Listbox):
 
     def _right_click(self, event):
         self._right_click = event.x, event.y
+        clicked_index = self.nearest(event.y)
+        if not self.selection_includes(clicked_index):
+            self.selection_clear(0, 'END')
+            self.selection_set(clicked_index)
         self._menu.post(event.x_root, event.y_root)
 
-    def _copy_one(self):
-        pyperclip.setcb(self.get(self.nearest(self._right_click[1])))
+    def _copy_selected(self):
+        pyperclip.setcb(", ".join(map(self.get, self.curselection())))
+
+    def _copy_selected_latex(self):
+        def elem_latex(index):
+            e = self._apex[index]
+            if e.mode == StringViewFormatter.NORMAL:
+                return e.str_normal()
+            return e.str_latex()
+
+        pyperclip.setcb(", ".join(map(elem_latex, self.curselection())))
 
     def _copy_all(self):
         pyperclip.setcb(", ".join(map(str, self._apex)))
+
+    def _copy_all_latex(self):
+        def elem_latex(e):
+            if e.mode == StringViewFormatter.NORMAL:
+                return e.str_normal()
+            return e.str_latex()
+
+        pyperclip.setcb(", ".join(map(elem_latex, self._apex)))
 
     def curselection(self):
         """Return list of indices of currently selected items."""
@@ -57,34 +83,40 @@ class ApexList(Listbox):
         for i in xrange(len(self._apex)):
             self._update_text(i)
 
-    def factorize(self, indices=None):
-        """Sets elements with specified indices to show factorized view
+    def expand(self, indices=None):
+        """Sets elements with specified indices to show verbose view
         """
-        if indices is None:
-            indices = range(len(self._apex))
+        prev_selection = self.curselection()
         for index in indices:
-            self._apex[index].enable_factorization_str()
+            self._apex[index].mode = StringViewFormatter.MIXED
             self._update_text(index)
-        if indices:
-            next = max(indices) + 1
-            self.see(next)
-            self.selection_set(next)
+        for index in prev_selection:
+            self.selection_set(index)
 
-    def factorize_selected(self):
-        self.factorize(self.curselection())
+    def expand_all(self):
+        self.expand(range(len(self._apex)))
+
+    def expand_selected(self):
+        self.expand(self.curselection())
 
     def reset(self):
         """Resets every element back to plain integer view
         """
         for index in range(len(self._apex)):
-            self._apex[index].enable_factorization_str(False)
+            self._apex[index].mode = StringViewFormatter.NORMAL
             self._update_text(index)
 
     def set_apex(self, apex):
         """Sets apex shown in this list
         """
-        self._apex = [Integer(number) for number in apex]
-        self._apex.sort()
+
+        def transform_number(number):
+            if type(number) in (SpectraElement, Integer):
+                return StringViewFormatter(number)
+            return StringViewFormatter(Integer(number))
+
+        self._apex = [transform_number(number) for number in apex]
+        self._apex.sort(key=lambda e: e.object)
         self.delete(0, "END")
         self.insert(0, *self._apex)
 
@@ -100,23 +132,36 @@ class ApexListContainer(Frame):
 
 
     def _init_components(self):
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
         upper_pane = Frame(self)
-        upper_pane.pack(expand=True, fill='both')
+        upper_pane.columnconfigure(0, weight=1)
+        upper_pane.rowconfigure(0, weight=1)
 
         self.apex_list = ApexList(upper_pane, self._apex)
-        self.apex_list.pack(side='left', expand=True, fill='both')
+        self.apex_list.grid(row=0, column=0, sticky='nesw')
 
-        self._scrollbar = Scrollbar(upper_pane, command=self.apex_list.yview)
-        self._scrollbar.pack(expand=True, fill='y')
-        self.apex_list['yscrollcommand'] = self._scrollbar.set
+        self._scrollbar_x = Scrollbar(upper_pane, command=self.apex_list.xview,
+            orient='horizontal')
+        self._scrollbar_x.grid(row=1, column=0, sticky='ews')
+        self.apex_list['xscrollcommand'] = self._scrollbar_x.set
+        self._scrollbar_y = Scrollbar(upper_pane, command=self.apex_list.yview)
+        self._scrollbar_y.grid(row=0, column=1, sticky='nse')
+        self.apex_list['yscrollcommand'] = self._scrollbar_y.set
 
-        self._factorize_button = Button(self, text="Factorize",
-            command=self.apex_list.factorize_selected)
-        self._factorize_button.pack(side='left', expand=True, fill='x')
+        buttons_pane = Frame(self)
 
-        self._reset_button = Button(self, text="Reset",
+        self._expand_button = Button(buttons_pane, text="Expand all",
+            command=self.apex_list.expand_all)
+        self._expand_button.pack(side='left', expand=True, fill='x')
+
+        self._reset_button = Button(buttons_pane, text="Reset",
             command=self.apex_list.reset)
         self._reset_button.pack()
+
+        upper_pane.grid(sticky='nesw')
+        buttons_pane.grid(row=1, sticky='nesw')
 
 
 class NumberBox(Entry):
@@ -186,35 +231,73 @@ class CheckBox(Checkbutton):
         return bool(self._var.get())
 
 
-class IntegerView(Entry):
+class IntegerView(Label):
     """This is the frame for displaying Integer with ability to factorize it.
     """
 
     def __init__(self, parent, integer=Integer(), **kw):
-        kw['state'] = 'readonly'
-        self._var = StringVar()
-        Entry.__init__(self, parent, textvariable=self._var, **kw)
-        self._integer = integer
-        self._update_indeger()
-        self._factorization_enabled = False
+        #kw['state'] = 'disabled'
+        kw.setdefault('anchor', 'nw')
+        kw.setdefault('relief', 'sunken')
 
-    def _update_indeger(self):
-        self._var.set(self._integer)
+        kw.setdefault('width', 10)
+        kw.setdefault('justify', 'left')
+        self._var = StringVar()
+        Label.__init__(self, parent, textvariable=self._var, **kw)
+        self._integer_view = StringViewFormatter(integer)
+        self._update_integer()
+        self._factorization_enabled = False
+        self.bind("<Configure>", self._update_width)
+
+        self._init_menu()
+
+    def _init_menu(self):
+        self._menu = Menu(self, tearoff=0)
+        self._menu.add_command(label="Copy", command=self._copy)
+        self._menu.add_command(label="Copy LaTeX", command=self._copy_latex)
+
+        # right button on Mac and other systems
+        button = '2' if IS_MAC else '3'
+        self.bind("<Button-{}>".format(button), self._right_click)
+
+    def _right_click(self, event):
+        self._menu.post(event.x_root, event.y_root)
+
+    def _copy(self):
+        pyperclip.setcb(str(self._integer_view))
+
+    def _copy_latex(self):
+        if self._factorization_enabled:
+            cb = self._integer_view.str_latex()
+        else:
+            cb = self._integer_view.str_normal()
+        pyperclip.setcb(cb)
+
+
+    def _update_width(self, event):
+        self['wraplength'] = self.winfo_width() - 10
+
+    def _update_integer(self):
+        self._var.set(self._integer_view)
 
     @property
     def integer(self):
-        return self._integer
+        return self._integer_view.object
 
     @integer.setter
     def integer(self, value):
-        self._integer = value
-        self._integer.enable_factorization_str(self._factorization_enabled)
-        self._update_indeger()
+        self._integer_view = StringViewFormatter(value)
+        if self._factorization_enabled:
+            self._integer_view.mode = StringViewFormatter.VERBOSE
+        self._update_integer()
 
     def toggle_factorization(self, value):
         self._factorization_enabled = value
-        self._integer.enable_factorization_str(value)
-        self._update_indeger()
+        if value:
+            self._integer_view.mode = StringViewFormatter.VERBOSE
+        else:
+            self._integer_view.mode = StringViewFormatter.NORMAL
+        self._update_integer()
 
 
 class IntegerContainer(Frame):
@@ -244,7 +327,21 @@ class GroupNameLabel(Label):
         #        kw.setdefault('anchor', 'w')
         kw.setdefault('font', tkFont.Font(size=20))
         Label.__init__(self, parent, **kw)
+        self._init_menu()
 
+    def _init_menu(self):
+        self._menu = Menu(self, tearoff=0)
+        self._menu.add_command(label="Copy LaTeX", command=self._copy_latex)
+
+        # right button on Mac and other systems
+        button = '2' if IS_MAC else '3'
+        self.bind("<Button-{}>".format(button), self._right_click)
+
+    def _right_click(self, event):
+        self._menu.post(event.x_root, event.y_root)
+
+    def _copy_latex(self):
+        pyperclip.setcb(self._group.str_latex())
 
     @property
     def group(self):
