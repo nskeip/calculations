@@ -1,5 +1,4 @@
-from Tkinter import Frame, PanedWindow, LabelFrame
-from spectrum.calculations.graphs import PrimeGraph
+from Tkinter import Frame, PanedWindow, LabelFrame, Button
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
 from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer
@@ -12,11 +11,11 @@ class Facade(Frame):
     graph.
     """
 
-    def __init__(self, parent, group, **kw):
+    def __init__(self, parent, group, show_graph=True, **kw):
         Frame.__init__(self, parent, **kw)
         self._group = group
         #        self._show_apex = True
-        #        self._show_graph = True
+        self._show_graph = show_graph
         self._init_components()
 
 
@@ -31,6 +30,18 @@ class Facade(Frame):
     @property
     def graph_canvas(self):
         return self._graph_canvas
+
+    def _show_graph_canvas(self):
+        self._show_graph_button.forget()
+        # TODO: add different layouts and other options
+        graph = self._group.prime_graph()
+        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
+        self._graph_canvas.pack(expand=True, fill='both')
+
+        self._iterations_plugin = IterationsPlugin()
+        self._iterations_plugin.apply(self._graph_canvas)
+
+        self.update_layout()
 
     def _init_components(self):
         self._panes = PanedWindow(self, orient='horizontal',
@@ -65,19 +76,20 @@ class Facade(Frame):
             apex=self._group.apex())
         self._apex_container.pack(expand=True, fill='both')
 
-
-        # prime graph
-        # TODO: add different layouts and other options
-        graph = PrimeGraph(self._group.apex())
-        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
-        self._graph_canvas.pack(expand=True, fill='both')
-
-        self._iterations_plugin = IterationsPlugin()
-        self._iterations_plugin.apply(self._graph_canvas)
+        self._show_graph_button = Button(self._right_pane, text='Show graph',
+            command=self._show_graph_canvas)
+        self._graph_canvas = None
+        if self._show_graph:
+            self._show_graph_canvas()
+        else:
+            self._show_graph_button.pack()
 
 
     def update_layout(self):
-        self._iterations_plugin.iterate(50)
+        try:
+            self._iterations_plugin.iterate(50)
+        except AttributeError:
+            pass
 
 
 

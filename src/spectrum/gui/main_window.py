@@ -1,7 +1,7 @@
 from Tkinter import Frame, PanedWindow, Button, Menu, StringVar, Toplevel
 from spectrum.gui.facade_frame import Facade
 from spectrum.gui.group_select import GroupSelect
-from spectrum.gui.gui_elements import FrameWithCloseButton
+from spectrum.gui.gui_elements import FrameWithCloseButton, CheckBox
 from spectrum.tools.tools import properties
 
 __author__ = 'Daniel Lytkin'
@@ -27,6 +27,11 @@ class MainWindow(Frame):
 
         self._group_select = GroupSelect(self._left_pane)
         self._group_select.pack(expand=True, fill='x')
+
+        self._show_graph_checkbutton = CheckBox(self._left_pane,
+            text='Show graph')
+        self._show_graph_checkbutton.select()
+        self._show_graph_checkbutton.pack()
 
         self._go_button = Button(self._left_pane, text='Go', command=self._go)
         self._go_button.pack()
@@ -61,21 +66,20 @@ class MainWindow(Frame):
 
     def _go(self):
         view = properties["graphframeview"]
+
         if view == "onlyone":
             for child in self._right_pane.winfo_children():
                 child.destroy()
+        if view in ("onlyone", "row"):
             container = FrameWithCloseButton(self._right_pane)
             self._right_pane.add(container, minsize=600)
-        elif view == "row":
-            container = FrameWithCloseButton(self._right_pane)
-            self._right_pane.add(container, minsize=600)
-        else: # view == "window":
+        else:
             container = Toplevel()
 
-        facade = Facade(container, self._group_select.selected_group)
+        facade = Facade(container, self._group_select.selected_group,
+            show_graph=self._show_graph_checkbutton.is_selected())
 
         facade.pack(expand=True, fill='both')
-        facade.update_layout()
 
 
 
