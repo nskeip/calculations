@@ -21,9 +21,7 @@ __author__ = 'Daniel Lytkin'
 
 def default_naming(name, param):
     try:
-        for p in param:
-            name += '_' + str(p)
-        return name
+        return name + '_' + '_'.join(str(p) for p in param)
     except TypeError:
         return name + '_' + str(param)
 
