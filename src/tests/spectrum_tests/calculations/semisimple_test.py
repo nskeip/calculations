@@ -55,39 +55,39 @@ class Signs:
 class SpectraElementTest(unittest.TestCase):
     def test_str(self):
         elem = SpectraElement(3, 2, [2, 3, 4], [1, -1, 1])
-        expected = "3 * [2^2 + 1, 2^3 - 1, 2^4 + 1]"
-        self.assertEqual(expected, str(elem))
+        expected = "3 * [2^4 + 1, 2^3 - 1, 2^2 + 1]"
+        self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(3)
-        self.assertEqual("3", str(elem))
+        self.assertEqual("3", elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[2, 3, 4], signs=[1, -1, 1])
-        expected = "[2^2 + 1, 2^3 - 1, 2^4 + 1]"
-        self.assertEqual(expected, str(elem))
+        expected = "[2^4 + 1, 2^3 - 1, 2^2 + 1]"
+        self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[1, 1, 4], signs=[1, -1, 1])
-        expected = "[2 + 1, 2 - 1, 2^4 + 1]"
-        self.assertEqual(expected, str(elem))
+        expected = "[2^4 + 1, 2 + 1, 2 - 1]"
+        self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[1], signs=[1])
         expected = "2 + 1"
-        self.assertEqual(expected, str(elem))
+        self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(quotient=2, q=2, partition=[1], signs=[1])
         expected = "2 * (2 + 1)"
-        self.assertEqual(expected, str(elem))
+        self.assertEqual(expected, elem.str_verbose())
 
 
     def test_lcm(self):
         elem1 = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
         elem2 = SpectraElement(q=2, partition=[3, 4], signs=[1, -1])
-        expected = "[2^2 + 1, 2^3 - 1, 2^3 + 1, 2^4 - 1]"
-        self.assertEqual(expected, str(elem1.lcm(elem2)))
+        expected = "[2^4 - 1, 2^3 + 1, 2^3 - 1, 2^2 + 1]"
+        self.assertEqual(expected, elem1.lcm(elem2).str_verbose())
 
     def test_mult(self):
         elem = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
-        expected = "2 * [2^2 + 1, 2^3 - 1]"
-        self.assertEqual(expected, str(elem * 2))
+        expected = "2 * [2^3 - 1, 2^2 + 1]"
+        self.assertEqual(expected, (elem * 2).str_verbose())
 
 
 @parametrized

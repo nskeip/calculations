@@ -1,7 +1,6 @@
 import unittest
-from spectrum_tests.calculations.spectra_data import classical, exceptional
-from spectrum.calculations.groups import *
-from spectrum_tests.calculations.orders_data import orders
+from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
+from spectrum_tests.calculations import orders_data, spectra_data
 from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
@@ -65,16 +64,16 @@ class OrdersTest(unittest.TestCase):
         g = AlternatingGroup(15)
         self.assertEqual(expected, g.order())
 
-    @parameters(orders.keys())
+    @parameters(orders_data.classical_orders_data.keys())
     def test_classical_orders(self, params):
         g = ClassicalGroup(*params)
-        order = orders[params]
+        order = orders_data.classical_orders_data[params]
         self.assertEqual(order, g.order())
 
-    @parameters(exceptional_orders.keys())
+    @parameters(orders_data.exceptional_orders_data.keys())
     def test_exceptional_orders(self, params):
         g = ExceptionalGroup(*params)
-        order = exceptional_orders[params]
+        order = orders_data.exceptional_orders_data[params]
         self.assertEqual(order, g.order())
 
 
@@ -100,14 +99,14 @@ class SpectraTest(unittest.TestCase):
         g = AlternatingGroup(21)
         self.assertSequenceEqual(expected, g.apex())
 
-    @parameters(classical.keys())
+    @parameters(spectra_data.classical.keys())
     def test_classical_spectra(self, params):
         g = ClassicalGroup(*params)
-        apex = classical[params]
+        apex = spectra_data.classical[params]
         self.assertSetEqual(set(apex), set(g.apex()))
 
-    @parameters(exceptional.keys())
+    @parameters(spectra_data.exceptional.keys())
     def test_spectra(self, params):
         g = ExceptionalGroup(*params)
-        apex = exceptional[params]
+        apex = spectra_data.exceptional[params]
         self.assertSetEqual(set(apex), set(g.apex()))

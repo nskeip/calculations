@@ -6,6 +6,8 @@ Add layout calibrating window.
 Add missing exceptional groups.
 Fix window sizing.
 Add integer cache.
+Add partition cache.
+Add semisimple elements cache.
 
 Test performance of group and integer caching:
     Create list of different parameters with some constraints.

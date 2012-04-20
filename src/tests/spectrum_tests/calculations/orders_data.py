@@ -1,6 +1,6 @@
 __author__ = 'Daniel Lytkin'
 
-orders = {
+classical_orders_data = {
     ("Sp", 4, 2): 720,
     ("Sp", 4, 3): 51840,
     ("Sp", 4, 4): 979200,
@@ -599,7 +599,7 @@ orders = {
     ("PSU", 5, 8): 4656663745464977326080,
     }
 
-exceptional_orders = {
+exceptional_orders_data = {
     ("2B2", 8): 29120,
     ("G2", 3): 4245696,
     ("2B2", 32): 32537600,

@@ -12,7 +12,9 @@ _non_decimal = re.compile('[^\d]+')
 
 
 class ApexList(Listbox):
-    def __init__(self, parent, apex=list(), **kw):
+    def __init__(self, parent, apex=None, **kw):
+        if apex is None:
+            apex = []
         kw.setdefault('selectmode', 'extended')
         Listbox.__init__(self, parent, **kw)
         self.set_apex(apex)
@@ -125,7 +127,9 @@ class ApexListContainer(Frame):
     """This is a container for ApexList. Provides some additional buttons
     """
 
-    def __init__(self, parent, apex=list(), **kw):
+    def __init__(self, parent, apex=None, **kw):
+        if apex is None:
+            apex = []
         self._apex = apex
         Frame.__init__(self, parent, **kw)
         self._init_components()
@@ -203,7 +207,9 @@ class NumberBox(Entry):
 
 
 class OptionList(OptionMenu):
-    def __init__(self, parent, variable=None, values=list(), **kwargs):
+    def __init__(self, parent, variable=None, values=None, **kwargs):
+        if values is None:
+            values = []
         self._var = variable or StringVar()
         OptionMenu.__init__(self, parent, self._var, *values, **kwargs)
         if values:

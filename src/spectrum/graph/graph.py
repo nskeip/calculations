@@ -13,7 +13,9 @@ class Graph(object):
     Values are stored in 'vertices' array.
     """
 
-    def __init__(self, vertices=list()):
+    def __init__(self, vertices=None):
+        if vertices is None:
+            vertices = []
         self._vertices = []
         self._adjacency = []
         for vertex in set(vertices):

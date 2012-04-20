@@ -11,17 +11,25 @@ class SpectraElement(long):
     additional info
     """
 
-    def __new__(cls, quotient=1, q=0, partition=list(), signs=list(),
+    def __new__(cls, quotient=1, q=0, partition=None, signs=None,
                 verbose=True):
+        if partition is None:
+            partition = []
+        if signs is None:
+            signs = []
         class_ = SpectraElement if verbose else long
         return long.__new__(class_, quotient * reduce(lcm,
             (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
-    def __init__(self, quotient=1, q=0, partition=list(), signs=list(),
+    def __init__(self, quotient=1, q=0, partition=None, signs=None,
                  verbose=True):
         """Creates element = quotient * [q ^ n_1 + e_1, ...] for n_i in
         'partition', e_i in 'signs'
         """
+        if partition is None:
+            partition = []
+        if signs is None:
+            signs = []
         self._quotient = Integer(quotient)
         self._q = q
         self._partition = partition
@@ -44,7 +52,8 @@ class SpectraElement(long):
         element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
             sign(ei))
         elements = ", ".join(
-            element(ni, ei) for (ni, ei) in zip(self._partition, self._signs))
+            element(ni, ei) for (ni, ei) in sorted(
+                zip(self._partition, self._signs), reverse=True))
         if len(self._partition) == 1:
             brackets = "({})" if self._quotient != 1 else "{}"
         else:
@@ -66,7 +75,8 @@ class SpectraElement(long):
         element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
             sign(ei))
         elements = ", ".join(
-            element(ni, ei) for (ni, ei) in zip(self._partition, self._signs))
+            element(ni, ei) for (ni, ei) in sorted(
+                zip(self._partition, self._signs), reverse=True))
         if len(self._partition) == 1:
             brackets = "({})" if self._quotient != 1 else "{}"
         else:
