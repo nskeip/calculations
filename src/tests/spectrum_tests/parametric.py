@@ -1,4 +1,4 @@
-from functools import wraps
+import functools
 from types import FunctionType
 
 __author__ = 'Daniel Lytkin'
@@ -70,7 +70,7 @@ def parametrized(testCase):
                 testParams = param
                 testMethod = attr
 
-                @wraps(testMethod)
+                @functools.wraps(testMethod)
                 def newMethod(self):
                     return testMethod(self, testParams)
 

@@ -1,5 +1,5 @@
-from itertools import combinations
 import unittest
+import itertools
 from spectrum.calculations.partition import *
 from spectrum_tests.parametric import parametrized, parameters
 
@@ -35,7 +35,8 @@ class PartitionTest(unittest.TestCase):
 
         self.assertSequenceEqual(expected, allPartitions)
 
-    @parameters(filter(lambda (n, k): n > k, combinations(range(1, 10), 2)))
+    @parameters(
+        filter(lambda (n, k): n > k, itertools.combinations(range(1, 10), 2)))
     def test_first_fixed_length_partition(self, params):
         n, k = params
         p = Partitions(n, length=k).__iter__().next()
@@ -48,7 +49,8 @@ class PartitionTest(unittest.TestCase):
         expected = [[9, 1], [8, 2], [7, 3], [6, 4], [5, 5]]
         self.assertSequenceEqual(expected, p)
 
-    @parameters(filter(lambda (n, k): n > k, combinations(range(1, 10), 2)))
+    @parameters(
+        filter(lambda (n, k): n > k, itertools.combinations(range(1, 10), 2)))
     def test_length(self, params):
         # self.maxDiff = None
         n, k = params

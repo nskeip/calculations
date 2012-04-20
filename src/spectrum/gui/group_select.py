@@ -1,6 +1,7 @@
 from Tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
+from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup, SporadicGroup, AlternatingGroup, ExceptionalGroup
-from spectrum.calculations.numeric import Constraints, PRIME_POWER
+from spectrum.calculations.numeric import Constraints
 from spectrum.gui.gui_elements import NumberBox, OptionList
 
 __author__ = 'Daniel Lytkin'
@@ -64,7 +65,7 @@ class GroupSelect(Frame):
         self._clas_dim.grid(row=1, column=1, sticky='we')
         Label(self._clas_params, text="Field order").grid(row=2, sticky='w')
         self._clas_field = NumberBox(self._clas_params,
-            constraints=Constraints(primality=PRIME_POWER))
+            constraints=Constraints(primality=numeric.PRIME_POWER))
         self._clas_field.grid(row=2, column=1, sticky='we')
 
         self._classical_group_type_selection()
@@ -79,7 +80,7 @@ class GroupSelect(Frame):
         self._ex_type.grid(row=0, column=1, sticky='we')
         Label(self._ex_params, text="Field order").grid(row=1, sticky='w')
         self._ex_field = NumberBox(self._ex_params,
-            constraints=Constraints(primality=PRIME_POWER))
+            constraints=Constraints(primality=numeric.PRIME_POWER))
         self._ex_field.grid(row=1, column=1, sticky='we')
 
         # sporadic

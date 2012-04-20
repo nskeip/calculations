@@ -1,8 +1,7 @@
-from numeric import *
 from partition import Partitions
 from spectrum.calculations.graphs import PrimeGraph
-from spectrum.calculations.orders import sporadic_orders, classical_orders, exceptional_orders
-from spectrum.calculations.spectra import sporadic_spectra, classical_spectra, exceptional_spectra
+from spectrum.calculations import orders, spectra, numeric
+from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit
 
 
@@ -43,7 +42,7 @@ class Field(object):
         if len(arg) == 1:
             if arg[0] <= 1:
                 raise ValueError("Field order must be at least 2")
-            self._base = first_divisor(arg[0])
+            self._base = numeric.first_divisor(arg[0])
             self._pow = 1
             self._order = self._base
             while self._order < arg[0]:
@@ -114,11 +113,11 @@ class SporadicGroup(Group):
 
     @doc_inherit
     def apex(self):
-        return sporadic_spectra.get(self._name, [])
+        return spectra.sporadic_spectra.get(self._name, [])
 
     @doc_inherit
     def order(self):
-        return sporadic_orders.get(self._name)
+        return orders.sporadic_orders.get(self._name)
 
     def __str__(self):
         return self._name
@@ -153,15 +152,15 @@ class AlternatingGroup(Group):
         if self._apex is None:
             n = self._degree
             partitions = filter(lambda x: (len(x) + n) % 2 == 0, Partitions(n))
-            self._apex = sort_and_filter(
-                [reduce(lcm, partition) for partition in partitions])
+            self._apex = numeric.sort_and_filter(
+                [reduce(numeric.lcm, partition) for partition in partitions])
         return self._apex
 
     @doc_inherit
     def order(self):
         if self._order is None:
             # n!/2
-            self._order = prod(xrange(3, self._degree + 1))
+            self._order = numeric.prod(xrange(3, self._degree + 1))
         return self._order
 
     def __str__(self):
@@ -204,7 +203,7 @@ class ClassicalGroup(Group):
 
     # constraints for field order
     _field_constraints = {'SO': Constraints(min=3,
-        primality=PRIME_POWER, parity=-1)}
+        primality=numeric.PRIME_POWER, parity=-1)}
 
     def __init__(self, name, dimension, *field):
         super(ClassicalGroup, self).__init__()
@@ -237,13 +236,14 @@ class ClassicalGroup(Group):
 
     def apex(self):
         if self._apex is None:
-            func = classical_spectra.get(self._name, lambda *arg: [])
-            self._apex = sort_and_filter(func(self._dim, self._field))
+            func = spectra.classical_spectra.get(self._name, lambda *arg: [])
+            self._apex = numeric.sort_and_filter(func(self._dim, self._field))
         return self._apex
 
     def order(self):
         if self._order is None:
-            func = classical_orders.get(self._name, lambda *arg: Integer())
+            func = orders.classical_orders.get(self._name,
+                lambda *arg: Integer())
             self._order = func(self._dim, self._field)
         return self._order
 
@@ -252,7 +252,7 @@ class ClassicalGroup(Group):
         """Returns constraints on field for specified kind of groups
         """
         return ClassicalGroup._field_constraints.get(name, Constraints(min=2,
-            primality=PRIME_POWER))
+            primality=numeric.PRIME_POWER))
 
     @staticmethod
     def dim_constraints(name):
@@ -300,13 +300,14 @@ class ExceptionalGroup(Group):
 
     def apex(self):
         if self._apex is None:
-            func = exceptional_spectra.get(self._name, lambda *arg: [])
-            self._apex = sort_and_filter(func(self._field))
+            func = spectra.exceptional_spectra.get(self._name, lambda *arg: [])
+            self._apex = numeric.sort_and_filter(func(self._field))
         return self._apex
 
     def order(self):
         if self._order is None:
-            func = exceptional_orders.get(self._name, lambda *arg: Integer())
+            func = orders.exceptional_orders.get(self._name,
+                lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
 

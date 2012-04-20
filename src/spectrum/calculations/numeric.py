@@ -1,6 +1,6 @@
 from collections import Counter
-from math import sqrt
 import operator
+import math
 
 __author__ = 'Daniel Lytkin'
 
@@ -64,7 +64,7 @@ def first_divisor(number):
     """
     if number % 2 == 0: return 2
     #primes = []
-    for j in xrange(1, int(sqrt(number)) // 2 + 1):
+    for j in xrange(1, int(math.sqrt(number)) // 2 + 1):
         i = 2 * j + 1
         if number % i == 0:
             return i
@@ -157,7 +157,7 @@ def next_odd_divisor(number, previous):
     """Returns next divisor greater than 'previous'.
     Number must not be divisible by any number <= previous.
     """
-    for j in xrange(previous // 2 + 1, int(sqrt(number)) // 2 + 1):
+    for j in xrange(previous // 2 + 1, int(math.sqrt(number)) // 2 + 1):
         i = 2 * j + 1
         if number % i == 0:
             return i

@@ -1,5 +1,6 @@
-from itertools import combinations
-from numeric import Integer, gcd, prime_part
+import itertools
+from spectrum.calculations import numeric
+from spectrum.calculations.numeric import Integer
 from spectrum.graph.graph import Graph
 
 __author__ = 'Daniel Lytkin'
@@ -10,7 +11,7 @@ class PrimeGraph(Graph):
         for elem in spectrum:
             factors = Integer(elem).factorize().keys()
             self.add_vertices(factors)
-            self.add_edges(combinations(factors, 2))
+            self.add_edges(itertools.combinations(factors, 2))
 
 
 class FastGraph(Graph):
@@ -29,9 +30,9 @@ class FastGraph(Graph):
         l = len(self._vertices)
         for i in range(l):
             b = self._vertices[i]
-            d = gcd(a, b)
+            d = numeric.gcd(a, b)
             if d == 1: continue
-            bd = prime_part(b, d)
+            bd = numeric.prime_part(b, d)
             if bd == 1:
                 self._vertices[i] = d
                 for neighbor in neighbors:
@@ -44,7 +45,7 @@ class FastGraph(Graph):
                     self._adjacency[dIndex][neighbor] = True
                 neighbors.append(dIndex)
 
-            a = prime_part(a, d)
+            a = numeric.prime_part(a, d)
             if a == 1: break
         if a > 1:
             index = self._add_vertex(a)

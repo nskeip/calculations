@@ -1,7 +1,8 @@
 from Tkinter import Canvas
-from shapes import create_default_shape, EdgeShape
+from shapes import EdgeShape
+from spectrum.graph import graph
 from spectrum.graph.geometry import Point
-from spectrum.graph.graph import ordered_pair
+from spectrum.gui.graph import shapes
 from spectrum.tools.observers import Observable
 
 __author__ = 'Daniel Lytkin'
@@ -77,8 +78,8 @@ class MousePlugin(object):
                             Point(event.x, event.y) - self._click)
                     self._click = Point(event.x, event.y)
             else:
-                x0, x1 = ordered_pair(self._selection.x, event.x)
-                y0, y1 = ordered_pair(self._selection.y, event.y)
+                x0, x1 = graph.ordered_pair(self._selection.x, event.x)
+                y0, y1 = graph.ordered_pair(self._selection.y, event.y)
                 self._canvas.coords(self._selection_rect, x0, y0, x1, y1)
 
     def _on_press(self, event):
@@ -213,7 +214,7 @@ class GraphCanvas(Canvas):
         self._picked_vertex_state = PickedState()
 
         self._create_vertex_shape = (lambda vertex:
-                                     create_default_shape(self, vertex))
+                                     shapes.create_default_shape(self, vertex))
         self.update()
 
 

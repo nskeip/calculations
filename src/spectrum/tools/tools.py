@@ -1,9 +1,8 @@
 from Tkinter import  Variable
+import functools
 import platform
 
 __author__ = 'Daniel Lytkin'
-
-from functools import wraps
 
 IS_MAC = platform.system() == "Darwin"
 
@@ -38,7 +37,7 @@ class DocInherit(object):
     def get_with_inst(self, obj, cls):
         overridden = getattr(super(cls, obj), self.name, None)
 
-        @wraps(self.mthd, assigned=('__name__', '__module__'))
+        @functools.wraps(self.mthd, assigned=('__name__', '__module__'))
         def f(*args, **kwargs):
             return self.mthd(obj, *args, **kwargs)
 
@@ -50,7 +49,7 @@ class DocInherit(object):
             overridden = getattr(parent, self.name, None)
             if overridden: break
 
-        @wraps(self.mthd, assigned=('__name__', '__module__'))
+        @functools.wraps(self.mthd, assigned=('__name__', '__module__'))
         def f(*args, **kwargs):
             return self.mthd(*args, **kwargs)
 

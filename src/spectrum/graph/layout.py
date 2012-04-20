@@ -1,5 +1,5 @@
-from random import random
 import math
+import random
 from spectrum.graph.geometry import Point
 
 __author__ = 'Daniel Lytkin'
@@ -86,8 +86,9 @@ class RandomLayout(Layout):
 
     def __getitem__(self, vertex):
         if not self.__locations.has_key(vertex):
-            self.set_unlocked_location(vertex, Point(self.size.x * random(),
-                self.size.y * random()))
+            self.set_unlocked_location(vertex,
+                Point(self.size.x * random.random(),
+                    self.size.y * random.random()))
         return self.__locations[vertex]
 
 
@@ -130,8 +131,9 @@ class SpringLayout(Layout):
         super(SpringLayout, self).reset()
         # set random initial positions
         for vertex in range(len(self._graph.vertices)):
-            self.set_unlocked_location(vertex, Point(self.size.x * random(),
-                self.size.y * random()))
+            self.set_unlocked_location(vertex,
+                Point(self.size.x * random.random(),
+                    self.size.y * random.random()))
         self._velocities = dict.fromkeys(
             range(len(self._graph.vertices)), Point())
 

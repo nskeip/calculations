@@ -2,7 +2,7 @@ from Tkinter import Frame, PanedWindow, Button, Menu, StringVar, Toplevel
 from spectrum.gui.facade_frame import Facade
 from spectrum.gui.group_select import GroupSelect
 from spectrum.gui.gui_elements import FrameWithCloseButton, CheckBox
-from spectrum.tools.tools import properties
+from spectrum.tools import tools
 
 __author__ = 'Daniel Lytkin'
 
@@ -50,7 +50,7 @@ class MainWindow(Frame):
         graph_view = Menu(view, tearoff=0)
         view.add_cascade(label="View graphs", menu=graph_view)
 
-        graph_view_var = properties.get_variable("graphframeview")
+        graph_view_var = tools.properties.get_variable("graphframeview")
         graph_view.add_radiobutton(label="Only one", value="onlyone",
             variable=graph_view_var)
         graph_view.add_radiobutton(label="In a row", value="row",
@@ -60,12 +60,12 @@ class MainWindow(Frame):
 
 
     def _init_properties(self):
-        properties.add_variable("graphframeview", StringVar(),
+        tools.properties.add_variable("graphframeview", StringVar(),
             initial="onlyone")
 
 
     def _go(self):
-        view = properties["graphframeview"]
+        view = tools.properties["graphframeview"]
 
         if view == "onlyone":
             for child in self._right_pane.winfo_children():

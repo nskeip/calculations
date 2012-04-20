@@ -1,5 +1,6 @@
-from itertools import chain
-from spectrum.calculations.numeric import get_exponent, gcd, lcm
+import itertools
+from spectrum.calculations import numeric
+from spectrum.calculations.numeric import gcd, lcm
 from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement
 from spectrum.calculations.set import FullBoundedSets
 
@@ -55,9 +56,9 @@ def _symplectic_spectrum_odd_c(n, field):
     a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k)
     # (3)
-    k = get_exponent(2 * n - 1, p)
+    k = numeric.get_exponent(2 * n - 1, p)
     a3 = [] if k is None else [2 * p * (2 * n - 1)]
-    return chain(a1, a2, a3)
+    return itertools.chain(a1, a2, a3)
 
 
 def _symplectic_spectrum_even_c(n, field):
@@ -73,9 +74,9 @@ def _symplectic_spectrum_even_c(n, field):
     a3 = MixedElements(q, n, lambda k: 2 ** (k - 1) + 1,
         lambda k: 2 ** (k + 1))
     # (4)
-    k = get_exponent(n - 1, 2)
+    k = numeric.get_exponent(n - 1, 2)
     a4 = [] if k is None else [(n - 1) * 4]
-    return chain(a1, a2, a3, a4)
+    return itertools.chain(a1, a2, a3, a4)
 
 
 def _symplectic_spectrum(n, field):
@@ -102,9 +103,9 @@ def _projective_symplectic_spectrum_odd_c(n, field):
     a3 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k)
     # (4)
-    k = get_exponent(2 * n - 1, p)
+    k = numeric.get_exponent(2 * n - 1, p)
     a4 = [] if k is None else [p * (2 * n - 1)]
-    return chain(a1, a2, a3, a4)
+    return itertools.chain(a1, a2, a3, a4)
 
 
 def _projective_symplectic_spectrum(n, field):
@@ -139,9 +140,9 @@ def _omega_spectrum_odd_c(n, field):
     a4 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k, min_length=2)
     # (5)
-    k = get_exponent(2 * n - 1, p)
+    k = numeric.get_exponent(2 * n - 1, p)
     a5 = [] if k is None else [p * (2 * n - 1)]
-    return chain(a1, a2, a3, a4, a5)
+    return itertools.chain(a1, a2, a3, a4, a5)
 
 
 def _omega_spectrum(n, field):
@@ -186,13 +187,13 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     t = (q ** (n - 2) - sign) // 2
     a6 = [p * lcm(q - 1, t), p * lcm(q + 1, t)]
     # (7)
-    k = get_exponent(2 * n - 3, p)
+    k = numeric.get_exponent(2 * n - 3, p)
     a7 = [] if k is None else [p * (2 * n - 3) * gcd(4, q ** n - sign) // 2]
     # (8)
     a8 = [p * (q * q - 1), p * (q * q + 1)] if n == 4 and sign == 1 else []
     # (9)
     a9 = [9 * (q - 1), 9 * (q + 1)] if n == 4 and p == 3 and sign == 1 else []
-    return chain(a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    return itertools.chain(a1, a2, a3, a4, a5, a6, a7, a8, a9)
 
 
 def _omega_pm_spectrum_even_c(n, field, sign):
@@ -222,9 +223,9 @@ def _omega_pm_spectrum_even_c(n, field, sign):
         SpectraElement(4, q, [1], [1])) for elem in SemisimpleElements(q, n - 3
         , parity=sign))
     # (7)
-    k = get_exponent(n - 2, 2)
+    k = numeric.get_exponent(n - 2, 2)
     a7 = [] if k is None else [4 * (n - 2)]
-    return chain(a1, a2, a3, a4, a5, a6, a7)
+    return itertools.chain(a1, a2, a3, a4, a5, a6, a7)
 
 
 def _equal_two_part(a, b):
@@ -281,9 +282,9 @@ def _projective_omega_pm_spectrum(sign):
         t = (q ** (n - 2) - sign) // 2
         a7 = [p * lcm(q - 1, t), p * lcm(q + 1, t)]
         # (8)
-        k = get_exponent(2 * n - 3, p)
+        k = numeric.get_exponent(2 * n - 3, p)
         a8 = [] if k is None else [p * (2 * n - 3)]
-        return chain(a1, a2, a3, a4, a5, a6, a7, a8)
+        return itertools.chain(a1, a2, a3, a4, a5, a6, a7, a8)
 
     return spectrum
 
@@ -310,9 +311,9 @@ def _special_orthogonal_odd_c_spectrum(n, field):
     a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
         lambda k: p ** k)
     # (3)
-    k = get_exponent(2 * n - 1, p)
+    k = numeric.get_exponent(2 * n - 1, p)
     a3 = [] if k is None else [p * (2 * n - 1)]
-    return chain(a1, a2, a3)
+    return itertools.chain(a1, a2, a3)
 
 
 def _special_orthogonal_pm_spectrum(sign):
@@ -333,9 +334,9 @@ def _special_orthogonal_pm_spectrum(sign):
             a3.append(elem.lcm(SpectraElement(p, q, [1], [-1])))
             a3.append(elem.lcm(SpectraElement(p, q, [1], [1])))
             # (4)
-        k = get_exponent(2 * n - 3, p)
+        k = numeric.get_exponent(2 * n - 3, p)
         a4 = [] if k is None else [2 * p * (2 * n - 3)]
-        return chain(a1, a2, a3, a4)
+        return itertools.chain(a1, a2, a3, a4)
 
     return spectrum
 
@@ -356,9 +357,9 @@ def _projective_general_linear_spectrum(sign):
         a3 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
             lambda k: p ** k, sign=e)
         # (4)
-        k = get_exponent(n - 1, p)
+        k = numeric.get_exponent(n - 1, p)
         a4 = [] if k is None else [p * (n - 1)]
-        return chain(a1, a2, a3, a4)
+        return itertools.chain(a1, a2, a3, a4)
 
     return spectrum
 
@@ -388,11 +389,11 @@ def _special_linear_spectrum(sign):
         a4 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
             lambda k: p ** k, min_length=2, sign=e)
         # (5)
-        k = get_exponent(n - 1, p)
+        k = numeric.get_exponent(n - 1, p)
         a5 = [] if k is None else [p * (n - 1) * d]
         # (6)
         a6 = [p * gcd(2, q - 1) * (q + e)] if n == 4 else []
-        return chain(a1, a2, a3, a4, a5, a6)
+        return itertools.chain(a1, a2, a3, a4, a5, a6)
 
     return spectrum
 
@@ -430,9 +431,9 @@ def _projective_special_linear_spectrum(sign):
         a5 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
             lambda k: p ** k, min_length=2, sign=e)
         # (6)
-        k = get_exponent(n - 1, p)
+        k = numeric.get_exponent(n - 1, p)
         a6 = [] if k is None else [p * (n - 1)]
-        return chain(a1, a2, a3, a4, a5, a6)
+        return itertools.chain(a1, a2, a3, a4, a5, a6)
 
     return spectrum
 

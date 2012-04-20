@@ -1,6 +1,6 @@
-from itertools import combinations, product
 import unittest
-from spectrum.calculations.numeric import lcm
+import itertools
+from spectrum.calculations import numeric
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.semisimple import SemisimpleElements, MixedElements, SpectraElement
 from spectrum_tests.parametric import parameters, parametrized
@@ -17,10 +17,10 @@ def evaluate(q, ni, ei=-1):
     """
     try:
     # for integer ei
-        return reduce(lcm, (q ** n + ei for n in ni))
+        return reduce(numeric.lcm, (q ** n + ei for n in ni))
     except TypeError:
     # for sequence ei
-        return reduce(lcm, (q ** n + e for (n, e) in zip(ni, ei)))
+        return reduce(numeric.lcm, (q ** n + e for (n, e) in zip(ni, ei)))
 
 
 class Signs:
@@ -106,7 +106,7 @@ class SemisimpleTest(unittest.TestCase):
         rp = evaluate(q, ni, [-1] * len(ni))
         self.assertEqual(rp, r)
 
-    @parameters(combinations(range(2, 15), 2))
+    @parameters(itertools.combinations(range(2, 15), 2))
     def test_minus(self, params):
         """
         Test elements [q^{n_1}-1, ..., q^{n_k}-1] for all n_1+...+n_k=n
@@ -174,11 +174,12 @@ class SemisimpleTest(unittest.TestCase):
 
         self.assertSetEqual(divisible, set(ss))
 
-    @parameters(combinations(range(2, 15), 2))
+    @parameters(itertools.combinations(range(2, 15), 2))
     def test_all_semisimple(self, params):
         self.all_semisimple(*params)
 
-    @parameters(filter(lambda (n, q, l): n > l, combinations(range(2, 15), 3)))
+    @parameters(filter(lambda (n, q, l): n > l,
+        itertools.combinations(range(2, 15), 3)))
     #[(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
     def test_min_length(self, params):
         n, q, l = params
@@ -195,13 +196,13 @@ class SemisimpleTest(unittest.TestCase):
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
 
-    @parameters(product(range(2, 10), range(2, 15), (-1, 1)))
+    @parameters(itertools.product(range(2, 10), range(2, 15), (-1, 1)))
     def test_semisimple_parity(self, params):
         n, q, p = params
         self.all_semisimple(n, q, parity=p)
         self.all_semisimple(n, q, parity=p, min_length=10)
 
-    @parameters(product(range(2, 15), range(2, 15), (-1, 1)))
+    @parameters(itertools.product(range(2, 15), range(2, 15), (-1, 1)))
     def test_semisimple_sign(self, params):
         n, q, p = params
         self.all_semisimple(n, q, sign=p)

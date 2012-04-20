@@ -3,8 +3,8 @@ import re
 import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
 from spectrum.calculations.semisimple import SpectraElement
-from spectrum.tools import pyperclip
-from spectrum.tools.tools import IS_MAC, StringViewFormatter
+from spectrum.tools import pyperclip, tools
+from spectrum.tools.tools import StringViewFormatter
 
 __author__ = 'Daniel Lytkin'
 
@@ -37,7 +37,7 @@ class ApexList(Listbox):
         self._menu.add_command(label="Expand", command=self.expand_selected)
 
         # right button on Mac and other systems
-        button = '2' if IS_MAC else '3'
+        button = '2' if tools.IS_MAC else '3'
         self.bind("<Button-{}>".format(button), self._right_click)
 
     def _right_click(self, event):
@@ -263,7 +263,7 @@ class IntegerView(Label):
         self._menu.add_command(label="Copy LaTeX", command=self._copy_latex)
 
         # right button on Mac and other systems
-        button = '2' if IS_MAC else '3'
+        button = '2' if tools.IS_MAC else '3'
         self.bind("<Button-{}>".format(button), self._right_click)
 
     def _right_click(self, event):
@@ -340,7 +340,7 @@ class GroupNameLabel(Label):
         self._menu.add_command(label="Copy LaTeX", command=self._copy_latex)
 
         # right button on Mac and other systems
-        button = '2' if IS_MAC else '3'
+        button = '2' if tools.IS_MAC else '3'
         self.bind("<Button-{}>".format(button), self._right_click)
 
     def _right_click(self, event):

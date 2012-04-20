@@ -1,5 +1,5 @@
 import unittest
-from spectrum.calculations.max_divisors import first_primes, primes_less_than, is_prime
+from spectrum.modules.max_divisors import first_primes, primes_less_than, is_prime
 
 __author__ = 'Daniel Lytkin'
 

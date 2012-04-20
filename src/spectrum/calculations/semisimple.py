@@ -1,4 +1,4 @@
-from numeric import lcm
+from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
 
@@ -18,7 +18,7 @@ class SpectraElement(long):
         if signs is None:
             signs = []
         class_ = SpectraElement if verbose else long
-        return long.__new__(class_, quotient * reduce(lcm,
+        return long.__new__(class_, quotient * reduce(numeric.lcm,
             (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
     def __init__(self, quotient=1, q=0, partition=None, signs=None,
@@ -88,7 +88,7 @@ class SpectraElement(long):
         """Returns lcm of this and other. 'q' must be the same. Quotients are
         multiplied.
         """
-        elem = long.__new__(SpectraElement, lcm(self, other))
+        elem = long.__new__(SpectraElement, numeric.lcm(self, other))
         quotient = self._quotient * other._quotient
         elem.__init__(quotient=quotient, q=self._q,
             partition=list(self._partition) + list(other._partition),
