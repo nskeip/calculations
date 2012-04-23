@@ -15,6 +15,8 @@ Copyright 2012 Daniel Lytkin.
 
 """
 from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError
+import codecs
+import tkFileDialog
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
 from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer
@@ -148,6 +150,9 @@ class Facade(Frame):
         vertex_label_position.add_radiobutton(label="Center", value="center",
             variable=vertexlabelposition_var)
 
+        graph_options.add_command(label="Save graph...",
+            command=self.call_graph_save_dialog)
+
         self.bind("<Destroy>", self.__destroy_menu)
 
     #noinspection PyUnusedLocal
@@ -156,6 +161,15 @@ class Facade(Frame):
             self._menu.delete(self._menu_index)
         except TclError:
             pass
+
+    def call_graph_save_dialog(self):
+        file_name = tkFileDialog.asksaveasfilename(defaultextension='.ps',
+            filetypes=[('PostScript', '.ps')], parent=self.winfo_toplevel(),
+            title="Save graph as image")
+        if file_name:
+            with codecs.open(file_name, 'w', encoding='utf-8') as file:
+                file.write(self._graph_canvas.postscript())
+
 
     def update_layout(self):
         try:
