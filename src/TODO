@@ -1,4 +1,4 @@
-Add support to locate labels inside vertex circles.
+Documentation! http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 Add saving graph to image.
 Add vertex equivalence.
 Add cocliques.

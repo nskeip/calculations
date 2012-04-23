@@ -212,7 +212,7 @@ class Edge(object):
     def end(self): return self._end
 
 
-class GraphCanvas(Canvas):
+class GraphCanvas(Canvas, object):
     """This is a canvas with an ability to draw graphs.
     """
 
@@ -222,13 +222,11 @@ class GraphCanvas(Canvas):
 
         self.__margin = margin
 
+        self._vertex_label_mode = "auto"
         # map value -> Vertex object
         self._vertices = dict()
-
         self._layout = layout
-
         self._picked_vertex_state = PickedState()
-
         self._create_vertex_shape = (lambda vertex:
                                      shapes.create_default_shape(self, vertex))
         self.update()
@@ -257,6 +255,16 @@ class GraphCanvas(Canvas):
         # handle resize
         self.bind("<Configure>", lambda event: self._update_layout_size())
 
+
+    @property
+    def vertex_label_mode(self):
+        return self._vertex_label_mode
+
+    @vertex_label_mode.setter
+    def vertex_label_mode(self, value):
+        if value in ("auto", "center"):
+            self._vertex_label_mode = value
+            self.update_labels_locations()
 
     def _update_layout_size(self):
         """Updates layout space size so that it fits the canvas. Called on
@@ -367,14 +375,27 @@ class GraphCanvas(Canvas):
         #v_location = self._get_shape_center(vertex.shape.id)
 
         vertex_index = self.graph.index(vertex.value)
-        label_vector = self._layout.get_label_vector(vertex_index)
         vertex_location = self.get_vertex_location(vertex)
-        label_radius = self._get_shape_radius(vertex.label_id)
-        distance = label_radius + vertex.shape.radius
-        label_location = vertex_location + distance * label_vector
+        if self._vertex_label_mode == "auto":
+            label_vector = self._layout.get_label_vector(vertex_index)
+            label_radius = self._get_shape_radius(vertex.label_id)
+            distance = label_radius + vertex.shape.radius
+            label_location = vertex_location + distance * label_vector
+        else: #center
+            label_location = vertex_location
+            #noinspection PyArgumentList
         self.coords(vertex.label_id, *label_location)
         self.tag_raise(vertex.label_id, vertex.shape.id)
 
+    def update_labels_locations(self):
+        """Updates locations of vertex labels.
+
+        Used when labels position logic ('center', 'auto') changes from
+        outside, e.g. from window menu.
+
+        """
+        for vertex in self._vertices.values():
+            self._update_vertex_label_location(vertex)
 
     def _get_shape_radius(self, id):
         x, y, x1, y1 = self.bbox(id)

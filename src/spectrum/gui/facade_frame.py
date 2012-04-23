@@ -14,10 +14,11 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, PanedWindow, LabelFrame, Button
+from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
 from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer
+from spectrum.tools import tools
 
 __author__ = 'Daniel Lytkin'
 
@@ -32,6 +33,8 @@ class Facade(Frame):
         self._group = group
         #        self._show_apex = True
         self._show_graph = show_graph
+        self._init_variables()
+        self._init_menu()
         self._init_components()
 
 
@@ -53,6 +56,9 @@ class Facade(Frame):
         graph = self._group.prime_graph()
         self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
         self._graph_canvas.pack(expand=True, fill='both')
+
+        self._graph_canvas.vertex_label_mode = self.getvar(
+            name=self.winfo_name() + ".vertexlabelposition")
 
         self._iterations_plugin = IterationsPlugin()
         self._iterations_plugin.apply(self._graph_canvas)
@@ -100,6 +106,56 @@ class Facade(Frame):
         else:
             self._show_graph_button.pack()
 
+    def _init_variables(self):
+        def set_default_var(self, name):
+            """Sets widget-specific var with same value as root.
+            """
+            default_var = self.getvar(name)
+            local_var_name = self.winfo_name() + "." + name
+            self.setvar(local_var_name, default_var)
+            return local_var_name
+
+        local_name = set_default_var(self, "vertexlabelposition")
+        tools.trace_variable(self, local_name, "w",
+            self._change_vertex_label_position)
+
+    def _change_vertex_label_position(self, name, *arg):
+        # override default value
+        self.setvar("vertexlabelposition", self.getvar(name))
+        if self._graph_canvas is not None:
+            self._graph_canvas.vertex_label_mode = self.getvar(name)
+
+
+    def _init_menu(self):
+        toplevel = self.winfo_toplevel()
+        if toplevel['menu']:
+            self._menu = self.nametowidget(name=toplevel['menu'])
+        else:
+            self._menu = Menu(toplevel)
+            toplevel['menu'] = self._menu
+
+        graph_options = Menu(self._menu, tearoff=0)
+        self._menu.add_cascade(label="Graph", menu=graph_options)
+        self._menu_index = self._menu.index("end")
+
+        vertex_label_position = Menu(graph_options, tearoff=0)
+        graph_options.add_cascade(label="Label position",
+            menu=vertex_label_position)
+
+        vertexlabelposition_var = self.winfo_name() + ".vertexlabelposition"
+        vertex_label_position.add_radiobutton(label="Auto", value="auto",
+            variable=vertexlabelposition_var)
+        vertex_label_position.add_radiobutton(label="Center", value="center",
+            variable=vertexlabelposition_var)
+
+        self.bind("<Destroy>", self.__destroy_menu)
+
+    #noinspection PyUnusedLocal
+    def __destroy_menu(self, event):
+        try:
+            self._menu.delete(self._menu_index)
+        except TclError:
+            pass
 
     def update_layout(self):
         try:
