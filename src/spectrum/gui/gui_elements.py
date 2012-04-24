@@ -48,7 +48,7 @@ class ApexList(Listbox):
         self._menu.add_command(label="Copy LaTeX",
             command=self._copy_selected_latex)
         self._menu.add_command(label="Copy all", command=self._copy_all)
-        self._menu.add_command(label="Copy all LaTex",
+        self._menu.add_command(label="Copy all LaTeX",
             command=self._copy_all_latex)
         self._menu.add_command(label="Expand", command=self.expand_selected)
 
@@ -60,7 +60,7 @@ class ApexList(Listbox):
         self._right_click = event.x, event.y
         clicked_index = self.nearest(event.y)
         if not self.selection_includes(clicked_index):
-            self.selection_clear(0, 'END')
+            self.selection_clear(0, 'end')
             self.selection_set(clicked_index)
         self._menu.post(event.x_root, event.y_root)
 
