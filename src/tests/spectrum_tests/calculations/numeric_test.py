@@ -150,6 +150,19 @@ class NumericTest(unittest.TestCase):
         for key, value in values.iteritems():
             self.assertTrue(get_exponent(*key) == value)
 
+    def test_is_power_of_two(self):
+        values = {1: True,
+                  2: True,
+                  3: False,
+                  4: True,
+                  5: False,
+                  7: False,
+                  8: True,
+                  1024: True,
+                  2050: False}
+        for key, value in values.iteritems():
+            self.assertEqual(value, is_power_of_two(key))
+
     def test_constraints(self):
         c = Constraints(min=5, primality=PRIME)
         self.assertTrue(c.is_valid(5))

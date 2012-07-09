@@ -228,6 +228,12 @@ def closest_power_of_two(n):
     return k * 2
 
 
+def is_power_of_two(n):
+    """Returns whether n is a power of 2
+    """
+    return get_exponent(n, 2) is not None
+
+
 def binary_expansion(n):
     """Returns binary expansion of n
     """
