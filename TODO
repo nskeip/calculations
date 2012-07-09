@@ -1,12 +1,16 @@
 Documentation! http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 Add vertex equivalence.
 Add cocliques.
-Add layout calibrating window.
+Add layout calibration window.
 Add missing exceptional groups.
 Fix window sizing.
 Add integer cache.
 Add partition cache.
 Add semisimple elements cache.
+Add README
+
+Use 'abc' package for abstract classes.
+Pass all the code through pylint
 
 Test performance of group and integer caching:
     Create list of different parameters with some constraints.
@@ -19,3 +23,6 @@ Test performance of group and integer caching:
     Place real parameters in it;
     Compare performance of creation of groups with searching the dict.
     Try for different real parameters.
+
+    Or:
+    Batch calculate apex of lots of groups of same type.
