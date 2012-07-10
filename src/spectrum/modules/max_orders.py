@@ -156,7 +156,7 @@ def print_max_elems():
                 elem.object.partition, reverse=True)
         print
 
-print_max_elems()
+#print_max_elems()
 #
 #
 #def print_max_mixed_elements():
