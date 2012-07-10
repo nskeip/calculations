@@ -15,8 +15,11 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+import sys
 
 __author__ = 'Daniel Lytkin'
+
+sys.path.append("..")
 
 unittest.TextTestRunner(verbosity=2).run(
     unittest.defaultTestLoader.discover('.', '*_test.py'))
