@@ -126,11 +126,12 @@ class SpectraElement(long):
 class SemisimpleElements(object):
     """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for
     all partitions n_1 + ... + n_k = n.
-    If 'parity' is set to 1 or -1, generates elements with even or odd number
+    If `min_length' is set to t, then k >= t. Only min_length=1, 2 or 3 are supported.
+    If `parity' is set to 1 or -1, generates elements with even or odd number
     of pluses respectively.
-    If 'sign' is set to 1 or -1, generates elements of form
+    If `sign' is set to 1 or -1, generates elements of form
     LCM(q^{n_1}-sign^{n_1}, ..., q^{n_k}-sign^{n_k})
-    'sign' or 'parity' arguments must be only used separately.
+    `sign' or `parity' arguments must be only used separately.
     """
 
     def __init__(self, q, n, min_length=1, parity=0, sign=0, verbose=True):
@@ -194,7 +195,9 @@ class SemisimpleElements(object):
                 lPart = lPartition if left else []
                 rightPartitions = MaximalBoundedSets(right)
                 for rPartition in rightPartitions:
-                    if len(lPartition) + len(rPartition) < self._min_length:
+                    rest = n - sum(lPartition) - sum(rPartition)
+                    length = len(lPartition) + len(rPartition)
+                    if length + rest < self._min_length:
                         continue
                     rPart = rPartition if right else []
                     yield SpectraElement(q=q, partition=lPart + rPart,

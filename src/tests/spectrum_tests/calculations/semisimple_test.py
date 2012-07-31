@@ -186,20 +186,24 @@ class SemisimpleTest(unittest.TestCase):
                 self.assertTrue(found,
                     msg="element with base {}, partition {} and signs {} = {} "\
                         "doesn't divide any of {}".format(str(q), str(ni),
-                        str(ei), str(elem), str(ss)))
+                        str(ei), str(elem), str(set(ss))))
 
         self.assertSetEqual(divisible, set(ss))
 
-    @parameters(itertools.combinations(range(2, 15), 2))
+    @parameters(itertools.product(range(2, 11), range(2, 15), range(1, 4)))
     def test_all_semisimple(self, params):
-        self.all_semisimple(*params)
+        n, q, t = params
+        self.all_semisimple(n, q, min_length=t)
 
-    @parameters(filter(lambda (n, q, l): n > l,
-        itertools.combinations(range(2, 15), 3)))
-    #[(n, q, l) for n, q, l in combinations(range(2, 15), 3) if n > l])
-    def test_min_length(self, params):
-        n, q, l = params
-        self.all_semisimple(n, q, min_length=l)
+    @parameters(itertools.product(range(2, 11), range(2, 15), range(1, 4), (-1, 1)))
+    def test_semisimple_parity(self, params):
+        n, q, t, p = params
+        self.all_semisimple(n, q, parity=p, min_length=t)
+
+    @parameters(itertools.product(range(2, 11), range(2, 15), range(1, 4), (-1, 1)))
+    def test_semisimple_sign(self, params):
+        n, q, t, p = params
+        self.all_semisimple(n, q, sign=p, min_length=t)
 
     def test_mixed(self):
         n = 3
@@ -211,15 +215,3 @@ class SemisimpleTest(unittest.TestCase):
         mixed = list(MixedElements(q, n, f, g))
         expected = [246, 240, 30, 24, 120, 120, 90, 72]
         self.assertSetEqual(set(mixed), set(expected))
-
-    @parameters(itertools.product(range(2, 10), range(2, 15), (-1, 1)))
-    def test_semisimple_parity(self, params):
-        n, q, p = params
-        self.all_semisimple(n, q, parity=p)
-        self.all_semisimple(n, q, parity=p, min_length=10)
-
-    @parameters(itertools.product(range(2, 15), range(2, 15), (-1, 1)))
-    def test_semisimple_sign(self, params):
-        n, q, p = params
-        self.all_semisimple(n, q, sign=p)
-        self.all_semisimple(n, q, sign=p, min_length=10)
