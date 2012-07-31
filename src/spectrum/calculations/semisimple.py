@@ -14,6 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
+import itertools
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
@@ -165,15 +166,16 @@ class SemisimpleElements(object):
         n = self._n
         plusesMod = 0 if self._parity == 1 else 1
         for pluses in xrange(plusesMod, n + 1):
-            for plusPartition in FullBoundedSets(pluses):
+            plusPartitions = FullBoundedSets(pluses)
+            if pluses > 0:
+                plusPartitions = itertools.chain(plusPartitions,
+                    (partition + [1] for partition in FullBoundedSets(pluses - 1)))
+            for plusPartition in plusPartitions:
                 minuses = n - pluses
                 if not len(plusPartition) % 2 == plusesMod:
-                    if pluses == n:
-                        continue
-                    plusPartition = plusPartition + [1]
-                    minuses -= 1
+                    continue
                 plusPart = plusPartition if pluses else []
-                for minusPartition in BoundedSets(minuses):
+                for minusPartition in MaximalBoundedSets(minuses):
                     rest = n - sum(plusPartition) - sum(minusPartition)
                     if len(plusPartition) + len(
                         minusPartition) + rest < self._min_length:
