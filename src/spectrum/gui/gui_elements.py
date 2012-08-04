@@ -134,7 +134,7 @@ class ApexList(Listbox):
             return StringViewFormatter(Integer(number))
 
         self._apex = [transform_number(number) for number in apex]
-        self._apex.sort(key=lambda e: e.object)
+        self._apex.sort(key=lambda e: e.object, reverse=True)
         self.delete(0, "END")
         self.insert(0, *self._apex)
 
