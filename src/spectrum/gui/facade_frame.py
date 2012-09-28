@@ -74,7 +74,7 @@ class Facade(Frame):
 
         self._left_pane = Frame(self._panes, padx=2, pady=2)
         self._right_pane = Frame(self._panes)
-        self._panes.add(self._left_pane)
+        self._panes.add(self._left_pane, width=500)
         self._panes.add(self._right_pane)
 
         # group name
