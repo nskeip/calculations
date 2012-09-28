@@ -70,7 +70,7 @@ class SpectraElement(long):
             sign(ei))
         elements = ", ".join(
             element(ni, ei) for (ni, ei) in sorted(
-                zip(self._partition, self._signs), reverse=True))
+                zip(self._partition, self._signs)))
         if len(self._partition) == 1:
             brackets = "({})" if self._quotient != 1 else "{}"
         else:
