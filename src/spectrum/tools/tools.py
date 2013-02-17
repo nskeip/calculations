@@ -22,6 +22,24 @@ __author__ = 'Daniel Lytkin'
 
 IS_MAC = platform.system() == "Darwin"
 
+class ObjectCache(type):
+    """Metaclass for cache-enabled classes. It adds __call__ method to class
+    objects, which is called before creating any instances, and searches the
+    cache for the object creates with same arguments first.
+    """
+    cache = dict()
+
+    def __call__(cls, *args, **kwargs):
+        # this is called before creating any instances
+        key = tuple([cls.__name__, ] + list(args) + sorted(kwargs.items()))
+        instance = ObjectCache.cache.get(key)
+        if instance is None:
+            #noinspection PyArgumentList
+            instance = type.__call__(cls, *args, **kwargs)
+            ObjectCache.cache[key] = instance
+        return instance
+
+
 class DocInherit(object):
     """doc_inherit decorator
 

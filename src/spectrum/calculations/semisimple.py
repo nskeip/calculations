@@ -18,9 +18,11 @@ import itertools
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
+from spectrum.tools.tools import ObjectCache
 
 __author__ = 'Daniel Lytkin'
 
+_CACHE = True
 
 class SpectraElement(long):
     """Special long extension for spectra elements. It contains information on
@@ -60,6 +62,10 @@ class SpectraElement(long):
     @property
     def partition(self):
         return self._partition
+
+    @property
+    def signs(self):
+        return self._signs
 
     def str_verbose(self):
         quotient = self._quotient.str_factorized() if (
@@ -134,6 +140,9 @@ class SemisimpleElements(object):
     LCM(q^{n_1}-sign^{n_1}, ..., q^{n_k}-sign^{n_k})
     `sign' or `parity' arguments must be only used separately.
     """
+
+    if _CACHE:
+        __metaclass__ = ObjectCache
 
     def __init__(self, q, n, min_length=1, parity=0, sign=0, verbose=True):
         self._q = q
