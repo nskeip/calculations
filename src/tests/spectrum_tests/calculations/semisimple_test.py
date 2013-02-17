@@ -71,18 +71,18 @@ class Signs:
 class SpectraElementTest(unittest.TestCase):
     def test_str(self):
         elem = SpectraElement(3, 2, [2, 3, 4], [1, -1, 1])
-        expected = "3 * [2^4 + 1, 2^3 - 1, 2^2 + 1]"
+        expected = "3 * [2^2 + 1, 2^3 - 1, 2^4 + 1]"
         self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(3)
         self.assertEqual("3", elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[2, 3, 4], signs=[1, -1, 1])
-        expected = "[2^4 + 1, 2^3 - 1, 2^2 + 1]"
+        expected = "[2^2 + 1, 2^3 - 1, 2^4 + 1]"
         self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[1, 1, 4], signs=[1, -1, 1])
-        expected = "[2^4 + 1, 2 + 1, 2 - 1]"
+        expected = "[2 - 1, 2 + 1, 2^4 + 1]"
         self.assertEqual(expected, elem.str_verbose())
 
         elem = SpectraElement(q=2, partition=[1], signs=[1])
@@ -97,12 +97,12 @@ class SpectraElementTest(unittest.TestCase):
     def test_lcm(self):
         elem1 = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
         elem2 = SpectraElement(q=2, partition=[3, 4], signs=[1, -1])
-        expected = "[2^4 - 1, 2^3 + 1, 2^3 - 1, 2^2 + 1]"
+        expected = "[2^2 + 1, 2^3 - 1, 2^3 + 1, 2^4 - 1]"
         self.assertEqual(expected, elem1.lcm(elem2).str_verbose())
 
     def test_mult(self):
         elem = SpectraElement(q=2, partition=[2, 3], signs=[1, -1])
-        expected = "2 * [2^3 - 1, 2^2 + 1]"
+        expected = "2 * [2^2 + 1, 2^3 - 1]"
         self.assertEqual(expected, (elem * 2).str_verbose())
 
 
@@ -148,13 +148,13 @@ class SemisimpleTest(unittest.TestCase):
     def test_signs(self):
         signs = list(Signs(4))
         expected = [[-1, -1, -1, -1], [1, -1, -1, -1],
-            [-1, 1, -1, -1], [1, 1, -1, -1],
-            [-1, -1, 1, -1], [1, -1, 1, -1],
-            [-1, 1, 1, -1], [1, 1, 1, -1],
-            [-1, -1, -1, 1], [1, -1, -1, 1],
-            [-1, 1, -1, 1], [1, 1, -1, 1],
-            [-1, -1, 1, 1], [1, -1, 1, 1],
-            [-1, 1, 1, 1], [1, 1, 1, 1]]
+                    [-1, 1, -1, -1], [1, 1, -1, -1],
+                    [-1, -1, 1, -1], [1, -1, 1, -1],
+                    [-1, 1, 1, -1], [1, 1, 1, -1],
+                    [-1, -1, -1, 1], [1, -1, -1, 1],
+                    [-1, 1, -1, 1], [1, 1, -1, 1],
+                    [-1, -1, 1, 1], [1, -1, 1, 1],
+                    [-1, 1, 1, 1], [1, 1, 1, 1]]
         self.assertSequenceEqual(expected, signs)
 
     def all_semisimple(self, n, q, min_length=1, parity=0, sign=0):
