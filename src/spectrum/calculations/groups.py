@@ -18,7 +18,7 @@ from partition import Partitions
 from spectrum.calculations.graphs import PrimeGraph
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
-from spectrum.tools.tools import doc_inherit
+from spectrum.tools.tools import doc_inherit, ObjectCache
 
 
 __author__ = 'Daniel Lytkin'
@@ -27,24 +27,6 @@ _CACHE = True  # whether group caching is enabled
 
 # whether to surround group name with \operatorname{} in str_latex()
 #LATEX_OPERATORNAME = True
-
-if _CACHE:
-    class GroupCache(type):
-        """Metaclass for cached group classes. It adds __call__ method to class
-        objects, which is called before creating any instances, and searches the
-        cache for the group first.
-        """
-        cache = dict()
-
-        def __call__(cls, *args):
-            # this is called before creating any instances
-            key = (cls.__name__, args)
-            instance = GroupCache.cache.get(key)
-            if instance is None:
-                instance = type.__call__(cls, *args)
-                GroupCache.cache[key] = instance
-            return instance
-
 
 class Field(object):
     """Finite field.
@@ -71,13 +53,16 @@ class Field(object):
             self._order = self._base ** self._pow
 
     @property
-    def order(self): return self._order
+    def order(self):
+        return self._order
 
     @property
-    def char(self): return self._base
+    def char(self):
+        return self._base
 
     @property
-    def pow(self): return self._pow
+    def pow(self):
+        return self._pow
 
     def __str__(self):
         if self._pow == 1:
@@ -103,6 +88,11 @@ class Group(object):
         """Returns group order."""
         raise NotImplementedError()
 
+    def _hs_str(self):
+        """Returns haskell representation
+        """
+        raise NotImplementedError()
+
     def prime_graph(self):
         """Returns prime graph the group.
         """
@@ -121,6 +111,8 @@ class SporadicGroup(Group):
               'M11': 'M_{11}', 'J4': 'J_4', 'M12': 'M_{12}', 'J2': 'J_{2}',
               "2F4(2)'": "{}^2F_4(2)'", 'J3': 'J_3', 'Fi23': 'Fi_{23}',
               'Fi22': 'Fi_{22}'}
+
+    _hs = {"2F4(2)'": "TwoF42'", "O'N": "ON"}
 
 
     def __init__(self, name):
@@ -141,6 +133,9 @@ class SporadicGroup(Group):
     def str_latex(self):
         return SporadicGroup._latex.get(self._name, self._name)
 
+    def _hs_str(self):
+        return "Sporadic " + SporadicGroup._hs.get(self._name, self._name)
+
     @staticmethod
     def all_groups():
         """Returns all sporadic_spectra group names."""
@@ -151,7 +146,7 @@ class AlternatingGroup(Group):
     """AlternatingGroup(n) represents alternating group of degree n
     """
     if _CACHE:
-        __metaclass__ = GroupCache
+        __metaclass__ = ObjectCache
 
     def __init__(self, degree):
         super(AlternatingGroup, self).__init__()
@@ -185,6 +180,9 @@ class AlternatingGroup(Group):
     def str_latex(self):
         return str(self)
 
+    def _hs_str(self):
+        return "Alternating {{degree={}}}".format(self._degree)
+
 
 class ClassicalGroup(Group):
     """Usage:
@@ -193,7 +191,7 @@ class ClassicalGroup(Group):
     ClassicalGroup("PSp", 14, 2, 5)
     """
     if _CACHE:
-        __metaclass__ = GroupCache
+        __metaclass__ = ObjectCache
 
     _groups = (
         'PGL', 'PGU', 'Omega', 'Omega+', 'POmega+', 'Omega-', 'POmega-', 'SL',
@@ -219,7 +217,7 @@ class ClassicalGroup(Group):
 
     # constraints for field order
     _field_constraints = {'SO': Constraints(min=3,
-        primality=numeric.PRIME_POWER, parity=-1)}
+                                            primality=numeric.PRIME_POWER, parity=-1)}
 
     def __init__(self, name, dimension, *field):
         super(ClassicalGroup, self).__init__()
@@ -240,6 +238,9 @@ class ClassicalGroup(Group):
             dim = "{" + dim + "}"
         return "{}_{}({})".format(name, dim, self._field.order)
 
+    def _hs_str(self):
+        return super(ClassicalGroup, self)._hs_str()
+
     @staticmethod
     def types():
         return ClassicalGroup._groups
@@ -259,7 +260,7 @@ class ClassicalGroup(Group):
     def order(self):
         if self._order is None:
             func = orders.classical_orders.get(self._name,
-                lambda *arg: Integer())
+                                               lambda *arg: Integer())
             self._order = func(self._dim, self._field)
         return self._order
 
@@ -268,7 +269,7 @@ class ClassicalGroup(Group):
         """Returns constraints on field for specified kind of groups
         """
         return ClassicalGroup._field_constraints.get(name, Constraints(min=2,
-            primality=numeric.PRIME_POWER))
+                                                                       primality=numeric.PRIME_POWER))
 
     @staticmethod
     def dim_constraints(name):
@@ -279,7 +280,7 @@ class ClassicalGroup(Group):
 
 class ExceptionalGroup(Group):
     if _CACHE:
-        __metaclass__ = GroupCache
+        __metaclass__ = ObjectCache
 
     _groups = (
         "E6", "2E6", "E7", "E8", "F4", "2F4", "G2", "2G2", "2B2", "3D4",)
@@ -323,7 +324,7 @@ class ExceptionalGroup(Group):
     def order(self):
         if self._order is None:
             func = orders.exceptional_orders.get(self._name,
-                lambda *arg: Integer())
+                                                 lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
 

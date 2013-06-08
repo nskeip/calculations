@@ -70,7 +70,7 @@ def _symplectic_spectrum_odd_c(n, field):
     a1 = SemisimpleElements(q, n)
     # (2)
     a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
-        lambda k: p ** k)
+                       lambda k: p ** k)
     # (3)
     k = numeric.get_exponent(2 * n - 1, p)
     a3 = [] if k is None else [2 * p * (2 * n - 1)]
@@ -88,7 +88,7 @@ def _symplectic_spectrum_even_c(n, field):
     a2 = (2 * elem for elem in SemisimpleElements(q, n - 1))
     # (3)
     a3 = MixedElements(q, n, lambda k: 2 ** (k - 1) + 1,
-        lambda k: 2 ** (k + 1))
+                       lambda k: 2 ** (k + 1))
     # (4)
     k = numeric.get_exponent(n - 1, 2)
     a4 = [] if k is None else [(n - 1) * 4]
@@ -117,7 +117,7 @@ def _projective_symplectic_spectrum_odd_c(n, field):
     a2 = SemisimpleElements(q, n, min_length=2)
     # (3)
     a3 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
-        lambda k: p ** k)
+                       lambda k: p ** k)
     # (4)
     k = numeric.get_exponent(2 * n - 1, p)
     a4 = [] if k is None else [p * (2 * n - 1)]
@@ -154,7 +154,7 @@ def _omega_spectrum_odd_c(n, field):
         k += 1
         # (4)
     a4 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
-        lambda k: p ** k, min_length=2)
+                       lambda k: p ** k, min_length=2)
     # (5)
     k = numeric.get_exponent(2 * n - 1, p)
     a5 = [] if k is None else [p * (2 * n - 1)]
@@ -219,7 +219,7 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     a1 = SemisimpleElements(q, n, parity=sign)
     # (2)
     a2 = MixedElements(q, n, lambda k: 2 ** (k - 1) + 2,
-        lambda k: 2 ** (k + 1))
+                       lambda k: 2 ** (k + 1))
     # (3)
     a3 = (2 * elem for elem in SemisimpleElements(q, n - 2))
     # (4)
@@ -233,11 +233,11 @@ def _omega_pm_spectrum_even_c(n, field, sign):
     for ni in FullBoundedSets(n - 3):
         if len(ni) % 2 != signMod: continue
         a5.append(4 * SpectraElement(q=q, partition=[1] + ni,
-            signs=[-1] + [1] * len(ni)))
+                                     signs=[-1] + [1] * len(ni)))
         # (6)
     a6 = (elem.lcm(
         SpectraElement(4, q, [1], [1])) for elem in SemisimpleElements(q, n - 3
-        , parity=sign))
+        , parity=-sign))
     # (7)
     k = numeric.get_exponent(n - 2, 2)
     a7 = [] if k is None else [4 * (n - 2)]
@@ -325,7 +325,7 @@ def _special_orthogonal_odd_c_spectrum(n, field):
     a1 = SemisimpleElements(q, n)
     # (2)
     a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 1) // 2,
-        lambda k: p ** k)
+                       lambda k: p ** k)
     # (3)
     k = numeric.get_exponent(2 * n - 1, p)
     a3 = [] if k is None else [p * (2 * n - 1)]
@@ -343,7 +343,7 @@ def _special_orthogonal_pm_spectrum(sign):
         a1 = SemisimpleElements(q, n, parity=e)
         # (2)
         a2 = MixedElements(q, n, lambda k: (p ** (k - 1) + 3) // 2,
-            lambda k: p ** k)
+                           lambda k: p ** k)
         # (3)
         a3 = []
         for elem in SemisimpleElements(q, n - 2, parity=e):
@@ -371,7 +371,7 @@ def _projective_general_linear_spectrum(sign):
         a2 = SemisimpleElements(q, n, min_length=2, sign=e)
         # (3)
         a3 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
-            lambda k: p ** k, sign=e)
+                           lambda k: p ** k, sign=e)
         # (4)
         k = numeric.get_exponent(n - 1, p)
         a4 = [] if k is None else [p * (n - 1)]
@@ -403,7 +403,7 @@ def _special_linear_spectrum(sign):
             k += 1
             # (4)
         a4 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
-            lambda k: p ** k, min_length=2, sign=e)
+                           lambda k: p ** k, min_length=2, sign=e)
         # (5)
         k = numeric.get_exponent(n - 1, p)
         a5 = [] if k is None else [p * (n - 1) * d]
@@ -445,7 +445,7 @@ def _projective_special_linear_spectrum(sign):
             k += 1
             # (5)
         a5 = MixedElements(q, n, lambda k: p ** (k - 1) + 1,
-            lambda k: p ** k, min_length=2, sign=e)
+                           lambda k: p ** k, min_length=2, sign=e)
         # (6)
         k = numeric.get_exponent(n - 1, p)
         a6 = [] if k is None else [p * (n - 1)]
@@ -471,7 +471,7 @@ classical_spectra = {
     "SU": _special_linear_spectrum(-1),
     "PSL": _projective_special_linear_spectrum(1),
     "PSU": _projective_special_linear_spectrum(-1),
-    }
+}
 
 
 def _g2_spectrum(field):
@@ -516,4 +516,4 @@ exceptional_spectra = {
     "G2": _g2_spectrum,
     "2G2": _2g2_spectrum,
     "2B2": _2b2_spectrum,
-    }
+}

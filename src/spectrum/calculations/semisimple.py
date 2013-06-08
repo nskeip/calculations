@@ -24,6 +24,7 @@ __author__ = 'Daniel Lytkin'
 
 _CACHE = True
 
+
 class SpectraElement(long):
     """Special long extension for spectra elements. It contains information on
     how it was calculated. If 'verbose' is False, creates long, without any
@@ -38,7 +39,7 @@ class SpectraElement(long):
             signs = []
         class_ = SpectraElement if verbose else long
         return long.__new__(class_, quotient * reduce(numeric.lcm,
-            (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
+                                                      (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
     def __init__(self, quotient=1, q=0, partition=None, signs=None,
                  verbose=True):
@@ -73,7 +74,7 @@ class SpectraElement(long):
         sign = lambda e: "+" if e > 0 else "-"
         power = lambda k: "^" + str(k) if k > 1 else ""
         element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
-            sign(ei))
+                                                    sign(ei))
         elements = ", ".join(
             element(ni, ei) for (ni, ei) in sorted(
                 zip(self._partition, self._signs)))
@@ -96,7 +97,7 @@ class SpectraElement(long):
             return template.format(k)
 
         element = lambda ni, ei: "{}{} {} 1".format(self._q, power(ni),
-            sign(ei))
+                                                    sign(ei))
         elements = ", ".join(
             element(ni, ei) for (ni, ei) in sorted(
                 zip(self._partition, self._signs), reverse=True))
@@ -114,8 +115,8 @@ class SpectraElement(long):
         elem = long.__new__(SpectraElement, numeric.lcm(self, other))
         quotient = self._quotient * other._quotient
         elem.__init__(quotient=quotient, q=self._q,
-            partition=list(self._partition) + list(other._partition),
-            signs=list(self._signs) + list(other._signs))
+                      partition=list(self._partition) + list(other._partition),
+                      signs=list(self._signs) + list(other._signs))
         return elem
 
     def __mul__(self, other):
@@ -123,7 +124,7 @@ class SpectraElement(long):
         """
         elem = long.__new__(SpectraElement, long(self) * other)
         elem.__init__(quotient=self._quotient * other, q=self._q,
-            partition=self._partition, signs=self._signs)
+                      partition=self._partition, signs=self._signs)
         return elem
 
     def __rmul__(self, other):
@@ -151,6 +152,7 @@ class SemisimpleElements(object):
         self._parity = parity
         self._sign = sign
         self._verbose = verbose
+        self._stored = None
 
     def _with_sign_generator(self):
         """Generates semisimple element with specified sign
@@ -167,7 +169,7 @@ class SemisimpleElements(object):
             if len(ni) + n - sum(ni) < self._min_length:
                 continue
             yield SpectraElement(q=q, partition=ni, signs=map(f, ni),
-                verbose=self._verbose)
+                                 verbose=self._verbose)
 
     def _with_parity_generator(self):
         """Generates semisimple elements with even or odd number of pluses"""
@@ -178,7 +180,7 @@ class SemisimpleElements(object):
             plusPartitions = FullBoundedSets(pluses)
             if pluses > 0:
                 plusPartitions = itertools.chain(plusPartitions,
-                    (partition + [1] for partition in FullBoundedSets(pluses - 1)))
+                                                 (partition + [1] for partition in FullBoundedSets(pluses - 1)))
             for plusPartition in plusPartitions:
                 minuses = n - pluses
                 if not len(plusPartition) % 2 == plusesMod:
@@ -187,13 +189,13 @@ class SemisimpleElements(object):
                 for minusPartition in MaximalBoundedSets(minuses):
                     rest = n - sum(plusPartition) - sum(minusPartition)
                     if len(plusPartition) + len(
-                        minusPartition) + rest < self._min_length:
+                            minusPartition) + rest < self._min_length:
                         continue
                     minusPart = minusPartition if minuses else []
                     yield SpectraElement(q=q,
-                        partition=plusPart + minusPart,
-                        signs=[1] * len(plusPart) + [-1] * len(minusPart),
-                        verbose=self._verbose)
+                                         partition=plusPart + minusPart,
+                                         signs=[1] * len(plusPart) + [-1] * len(minusPart),
+                                         verbose=self._verbose)
 
     def _general_generator(self):
         """Generates all semisimple elements"""
@@ -211,20 +213,29 @@ class SemisimpleElements(object):
                     if length + rest < self._min_length:
                         continue
                     rPart = rPartition if right else []
-                    yield SpectraElement(q=q, partition=lPart + rPart,
-                        signs=[-1] * len(lPart) + [1] * len(rPart),
-                        verbose=self._verbose)
-                    yield SpectraElement(q=q, partition=lPart + rPart,
-                        signs=[1] * len(lPart) +
-                              [-1] * len(rPart),
-                        verbose=self._verbose)
+                    yield self._store_and_return(
+                        SpectraElement(q=q, partition=lPart + rPart, signs=[-1] * len(lPart) + [1] * len(rPart),
+                                       verbose=self._verbose))
+                    yield self._store_and_return(
+                        SpectraElement(q=q, partition=lPart + rPart,
+                                       signs=[1] * len(lPart) +
+                                             [-1] * len(rPart),
+                                       verbose=self._verbose))
 
     def __iter__(self):
+        if self._stored is not None:
+            return iter(self._stored)
         if self._sign:
             return self._with_sign_generator()
         if self._parity:
             return self._with_parity_generator()
         return self._general_generator()
+
+    def _store_and_return(self, element):
+        if self._stored is None:
+            self._stored = []
+        self._stored.append(element)
+        return element
 
 
 class MixedElements(object):
@@ -248,8 +259,8 @@ class MixedElements(object):
             toPart = self._n - self._f(k)
             if toPart <= 0: break
             for elem in SemisimpleElements(self._q, toPart,
-                min_length=self._min_length, parity=self._parity,
-                sign=self._sign):
+                                           min_length=self._min_length, parity=self._parity,
+                                           sign=self._sign):
                 yield elem * self._g(k)
             k += 1
 
