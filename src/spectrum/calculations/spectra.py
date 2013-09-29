@@ -397,7 +397,8 @@ def _special_linear_spectrum(sign):
         d = gcd(n, q - e)
         while True:
             n1 = n - p ** (k - 1) - 1
-            if n1 < 1: break
+            if n1 < 1:
+                break
             eps = 1 if n1 % 2 == 0 else e
             a3.append(p ** k * (q ** n1 - eps) / gcd(d, n1))
             k += 1
@@ -439,7 +440,8 @@ def _projective_special_linear_spectrum(sign):
         k = 1
         while True:
             n1 = n - p ** (k - 1) - 1
-            if n1 < 1: break
+            if n1 < 1:
+                break
             eps = 1 if n1 % 2 == 0 else e
             a4.append(p ** k * (q ** n1 - eps) / d)
             k += 1
@@ -511,9 +513,57 @@ def _2g2_spectrum(field):
     return [9, 6, (q + 1) // 2, q - 1, q - sq + 1, q + sq + 1]
 
 
+def _e6_spectrum(sign):
+    e = sign
+
+    def spectrum(field):
+        q = field.order
+        p = field.char
+        d = gcd(3, q - e)
+        # (1)
+        a1 = [(q ** 6 - 1) // d, (q ** 6 + e * q ** 3 + 1) // d, (q * q + e * q + 1) * (q ** 4 - q * q + 1) // d,
+              (q - e) * (q * q + 1) * (q ** 3 + e) // d, (q * q - 1) * (q ** 4 + 1) // d, (q + e) * (q ** 5 - e) // d,
+              q ** 5 - e]
+        # (2)
+        a2 = [
+            p * x for x in
+            [(q ** 6 - 1) // (d * (q - e)), (q ** 5 - e) // d, q ** 4 - 1, (q ** 3 - e) * (q + e),
+             (q - e) * (q ** 3 + e) // d]
+        ]
+        # (3)
+        pA2 = 4 if p == 2 else p
+        a3 = [
+            pA2 * x for x in
+            [(q ** 3 - e) * (q + e) // d, (q ** 4 + q * q + 1) // d, (q ** 4 - 1) // d]
+        ]
+        # (4)
+        pA3 = p * p if p in (2, 3) else p
+        a4 = [
+            pA3 * x for x in
+            [(q * q + 1) * (q - e) // d, q ** q - 1]
+        ]
+        # (5)
+        pD4 = 8 if p == 2 else p * p if p in (3, 5) else p
+        a5 = [
+            pD4 * x for x in
+            [q - e, (q * q - 1) // d, (q * q + e * q + 1) // d]
+        ]
+        # (6)
+        pD5 = 8 if p == 2 else p * p if p in (3, 5, 7) else p
+        a6 = [pD5 * (q - e) // d]
+        # (7)
+        pE6 = 16 if p == 2 else 27 if p == 3 else p * p if p in (5, 7, 11) else p
+        a7 = [pE6]
+        return itertools.chain(a1, a2, a3, a4, a5, a6, a7)
+
+    return spectrum
+
+
 exceptional_spectra = {
     "2F4": _2f4_spectrum,
     "G2": _g2_spectrum,
     "2G2": _2g2_spectrum,
     "2B2": _2b2_spectrum,
+    "E6": _e6_spectrum(1),
+    "2E6": _e6_spectrum(-1)
 }

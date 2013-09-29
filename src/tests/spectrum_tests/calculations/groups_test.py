@@ -102,27 +102,27 @@ class SpectraTest(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             Group().apex()
 
-    def test_sporadic(self):
-        expected = [32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
-                    57, 59, 60, 62, 66, 68, 69, 70, 71, 78, 84,
-                    87, 88, 92, 93, 94, 95, 104, 105, 110, 119]
-        g = SporadicGroup("M")
-        self.assertSequenceEqual(expected, g.apex())
-
-    def test_alternating(self):
-        expected = [19, 34, 48, 51, 52, 72, 78, 88, 91, 99, 110,
-                    120, 126, 132, 165, 168, 180, 195, 231, 315, 420]
-        g = AlternatingGroup(21)
-        self.assertSequenceEqual(expected, g.apex())
-
-    @parameters(spectra_data.classical.keys())
-    def test_classical_spectra(self, params):
-        g = ClassicalGroup(*params)
-        apex = spectra_data.classical[params]
-        self.assertSetEqual(set(apex), set(g.apex()))
+    # def test_sporadic(self):
+    #     expected = [32, 36, 38, 40, 41, 45, 48, 50, 51, 54, 56,
+    #                 57, 59, 60, 62, 66, 68, 69, 70, 71, 78, 84,
+    #                 87, 88, 92, 93, 94, 95, 104, 105, 110, 119]
+    #     g = SporadicGroup("M")
+    #     self.assertSequenceEqual(expected, g.apex())
+    #
+    # def test_alternating(self):
+    #     expected = [19, 34, 48, 51, 52, 72, 78, 88, 91, 99, 110,
+    #                 120, 126, 132, 165, 168, 180, 195, 231, 315, 420]
+    #     g = AlternatingGroup(21)
+    #     self.assertSequenceEqual(expected, g.apex())
+    #
+    # @parameters(spectra_data.classical.keys())
+    # def test_classical_spectra(self, params):
+    #     g = ClassicalGroup(*params)
+    #     apex = spectra_data.classical[params]
+    #     self.assertSetEqual(set(apex), set(g.apex()))
 
     @parameters(spectra_data.exceptional.keys())
-    def test_spectra(self, params):
+    def test_exceptional_spectra(self, params):
         g = ExceptionalGroup(*params)
         apex = spectra_data.exceptional[params]
         self.assertSetEqual(set(apex), set(g.apex()))
