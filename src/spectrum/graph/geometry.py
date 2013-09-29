@@ -78,5 +78,6 @@ class Point(tuple):
     def identity(self):
         """Returns the vector divided by its length
         """
-        return self / (self.square() ** 0.5)
+        square = self.square()
+        return self / (square ** 0.5) if square else Point()
 
