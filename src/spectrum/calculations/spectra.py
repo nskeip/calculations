@@ -315,8 +315,8 @@ def _projective_omega_pm_spectrum(sign):
         q = field.order
         p = field.char
         # if gcd(4, q^n-e) != 4, then POmega = Omega
-        b = n % 2 == 1 and q % 4 == 3  # true iff gcd(4, q^n+1)=4
-        if not ((b and e == -1) or q % 2 == 1):
+        b = (q % 4 == 3 and n % 2 == 1) if e == -1 else (q % 4 == 1)  # true iff gcd(4, q^n-e)=4
+        if not b:
             return _omega_pm_spectrum(e)(n * 2, field)
 
         nk = lambda k: (p ** (k - 1) + 3) // 2
