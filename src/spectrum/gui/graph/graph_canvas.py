@@ -217,8 +217,9 @@ class GraphCanvas(Canvas, object):
     """
 
     def __init__(self, master, layout, margin=20, **kw):
-        Canvas.__init__(self, master, width=layout.size.x + 2 * margin,
-            height=layout.size.y + 2 * margin, **kw)
+        Canvas.__init__(self, master,
+                        width=int(layout.size.x + 2 * margin),
+                        height=int(layout.size.y + 2 * margin), **kw)
 
         self.__margin = margin
 
