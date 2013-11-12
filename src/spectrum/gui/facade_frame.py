@@ -56,7 +56,7 @@ class Facade(Frame):
         self._show_graph_button.forget()
         # TODO: add different layouts and other options
         graph = self._group.prime_graph()
-        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph))
+        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph), caption="Prime Graph")
         self._graph_canvas.pack(expand=True, fill='both')
 
         self._graph_canvas.vertex_label_mode = self.getvar(

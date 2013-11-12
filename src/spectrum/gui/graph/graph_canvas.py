@@ -219,7 +219,7 @@ class GraphCanvas(Canvas, object):
     """This is a canvas with an ability to draw graphs.
     """
 
-    def __init__(self, master, layout, margin=20, **kw):
+    def __init__(self, master, layout, margin=20, caption=None, **kw):
         Canvas.__init__(self, master,
                         width=int(layout.size.x + 2 * margin),
                         height=int(layout.size.y + 2 * margin), **kw)
@@ -234,6 +234,8 @@ class GraphCanvas(Canvas, object):
         self._create_vertex_shape = (lambda vertex:
                                      shapes.create_default_shape(self, vertex))
         self.update()
+
+        self._caption = self.create_caption(caption) if caption else None
 
         # self._translate = (0, 0)
 
@@ -255,7 +257,14 @@ class GraphCanvas(Canvas, object):
         self._picked_vertex_state.add_listener(createListener())
 
         # handle resize
-        self.bind("<Configure>", lambda event: self._update_layout_size())
+        self.bind("<Configure>", lambda event: self._on_configure())
+
+    def create_caption(self, caption_text):
+        import tkFont
+        font = tkFont.Font(family='Helvetica', size=28)
+        label_id = self.create_text(0, 0, text=caption_text, fill='#888888', font=font, anchor='sw')
+        self.tag_lower(label_id)
+        return label_id
 
     @property
     def vertex_label_mode(self):
@@ -267,12 +276,14 @@ class GraphCanvas(Canvas, object):
             self._vertex_label_mode = value
             self.update_labels_locations()
 
-    def _update_layout_size(self):
+    def _on_configure(self):
         """Updates layout space size so that it fits the canvas. Called on
         every change of canvas size.
         """
         self._layout.size = Point(self.winfo_width() - 2 * self.__margin,
                                   self.winfo_height() - 2 * self.__margin)
+        if self._caption:
+            self.coords(self._caption, 10, self.winfo_height() - 10)
 
     @property
     def vertices(self):
@@ -291,8 +302,7 @@ class GraphCanvas(Canvas, object):
         no object. If multiple objects match, returns highest one.
         """
         try:
-            return self.find_overlapping(point.x, point.y, point.x, point.y)[
-                -1]
+            return self.find_overlapping(point.x, point.y, point.x, point.y)[-1]
         except IndexError:
             return None
 
