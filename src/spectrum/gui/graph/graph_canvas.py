@@ -62,7 +62,7 @@ class PickedState(Observable):
     def get_picked(self):
         """Returns set of all picked items
         """
-        return self._picked#.copy()
+        return self._picked  # .copy()
 
 
 class MousePlugin(object):
@@ -91,7 +91,7 @@ class MousePlugin(object):
                 if picked:
                     for vertex in picked:
                         self._canvas.move_vertex(vertex,
-                            Point(event.x, event.y) - self._click)
+                                                 Point(event.x, event.y) - self._click)
                     self._click = Point(event.x, event.y)
             else:
                 x0, x1 = graph.ordered_pair(self._selection.x, event.x)
@@ -106,7 +106,7 @@ class MousePlugin(object):
             self._click_id = id
             vertex = self._canvas._get_vertex_by_shape_id(id)
             if (not self._picked_state.is_picked(vertex) and
-                not event.state & 1):
+                    not event.state & 1):
                 self._picked_state.clear()
             self._picked_state.pick(vertex)
         else:
@@ -141,7 +141,7 @@ class IterationsPlugin(object):
 
     def _step(self):
         self._canvas.layout.step()
-        self._canvas.reset() # TODO: temp
+        self._canvas.reset()  # TODO: temp
         self._event_id = self._canvas.after(self.time_step, self._step)
 
     def iterate(self, times):
@@ -203,13 +203,16 @@ class Edge(object):
         self._shape.add_tag("edge")
 
     @property
-    def shape(self): return self._shape
+    def shape(self):
+        return self._shape
 
     @property
-    def start(self): return self._start
+    def start(self):
+        return self._start
 
     @property
-    def end(self): return self._end
+    def end(self):
+        return self._end
 
 
 class GraphCanvas(Canvas, object):
@@ -232,7 +235,6 @@ class GraphCanvas(Canvas, object):
                                      shapes.create_default_shape(self, vertex))
         self.update()
 
-
         # self._translate = (0, 0)
 
         self._mouse_plugin = MousePlugin().apply(self)
@@ -248,14 +250,12 @@ class GraphCanvas(Canvas, object):
                 vertex.shape.set_selection(picked)
                 layout.set_lock(layout.graph.index(vertex.value), picked)
 
-
             return listener
 
         self._picked_vertex_state.add_listener(createListener())
 
         # handle resize
         self.bind("<Configure>", lambda event: self._update_layout_size())
-
 
     @property
     def vertex_label_mode(self):
@@ -272,7 +272,7 @@ class GraphCanvas(Canvas, object):
         every change of canvas size.
         """
         self._layout.size = Point(self.winfo_width() - 2 * self.__margin,
-            self.winfo_height() - 2 * self.__margin)
+                                  self.winfo_height() - 2 * self.__margin)
 
     @property
     def vertices(self):
@@ -292,7 +292,7 @@ class GraphCanvas(Canvas, object):
         """
         try:
             return self.find_overlapping(point.x, point.y, point.x, point.y)[
-                   -1]
+                -1]
         except IndexError:
             return None
 
@@ -319,8 +319,8 @@ class GraphCanvas(Canvas, object):
         start = self._vertices[start_index]
         end = self._vertices[end_index]
         edge = Edge(start, end, EdgeShape(self,
-            self.get_vertex_location(start),
-            self.get_vertex_location(end)))
+                                          self.get_vertex_location(start),
+                                          self.get_vertex_location(end)))
         start.incident.add(edge)
         end.incident.add(edge)
         self.tag_raise("vertex", edge.shape.id)
@@ -457,4 +457,3 @@ class GraphCanvas(Canvas, object):
     def graph(self):
         """Returns current graph in container"""
         return self._layout.graph
-
