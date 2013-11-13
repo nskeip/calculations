@@ -15,7 +15,6 @@ Copyright 2012 Daniel Lytkin.
 
 """
 from partition import Partitions
-from spectrum.calculations.graphs import PrimeGraph
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit, ObjectCache
@@ -27,6 +26,7 @@ _CACHE = True  # whether group caching is enabled
 
 # whether to surround group name with \operatorname{} in str_latex()
 #LATEX_OPERATORNAME = True
+
 
 class Field(object):
     """Finite field.
@@ -74,9 +74,6 @@ class Group(object):
     """Abstract class for finite groups.
     """
 
-    def __init__(self):
-        self._prime_graph = None
-
     def apex(self):
         """Returns apex of the group, which is the set of its element orders
         with all divisors filtered out.
@@ -93,13 +90,6 @@ class Group(object):
         """
         raise NotImplementedError()
 
-    def prime_graph(self):
-        """Returns prime graph the group.
-        """
-        if self._prime_graph is None:
-            self._prime_graph = PrimeGraph(self.apex())
-        return self._prime_graph
-
 
 class SporadicGroup(Group):
     _groups = ('M11', 'M12', 'J1', 'M22', 'J2', 'M23', "2F4(2)'", 'HS', 'J3',
@@ -113,7 +103,6 @@ class SporadicGroup(Group):
               'Fi22': 'Fi_{22}'}
 
     _hs = {"2F4(2)'": "TwoF42'", "O'N": "ON"}
-
 
     def __init__(self, name):
         super(SporadicGroup, self).__init__()
@@ -327,4 +316,3 @@ class ExceptionalGroup(Group):
                                                  lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
-

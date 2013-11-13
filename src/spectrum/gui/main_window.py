@@ -15,14 +15,21 @@ Copyright 2012 Daniel Lytkin.
 
 """
 from Tkinter import Frame, PanedWindow, Button, Menu, Toplevel
+from collections import OrderedDict
+from spectrum.calculations import graphs
 from spectrum.gui.facade_frame import Facade
 from spectrum.gui.group_select import GroupSelect
-from spectrum.gui.gui_elements import FrameWithCloseButton, CheckBox
+from spectrum.gui.gui_elements import FrameWithCloseButton, CheckBox, OptionList
 
 __author__ = 'Daniel Lytkin'
 
 
 class MainWindow(Frame):
+    GRAPH_TYPES = OrderedDict([
+        ("Prime Graph", graphs.PrimeGraph),
+        ("Fast Graph", graphs.FastGraph)
+    ])
+
     def __init__(self, **kw):
         Frame.__init__(self, **kw)
         self.winfo_toplevel().minsize(width=600, height=400)
@@ -35,8 +42,7 @@ class MainWindow(Frame):
         self._init_menu()
 
     def _init_components(self):
-        self._panes = PanedWindow(self, orient='horizontal',
-            sashrelief="raised")
+        self._panes = PanedWindow(self, orient='horizontal', sashrelief="raised")
         self._panes.pack(expand=True, fill='both')
 
         self._left_pane = Frame(self._panes)
@@ -47,10 +53,12 @@ class MainWindow(Frame):
         self._group_select = GroupSelect(self._left_pane)
         self._group_select.pack(expand=True, fill='x')
 
-        self._show_graph_checkbutton = CheckBox(self._left_pane,
-            text='Show graph')
+        self._show_graph_checkbutton = CheckBox(self._left_pane, text='Show graph')
         self._show_graph_checkbutton.select()
         self._show_graph_checkbutton.pack()
+
+        self._graph_type = OptionList(self._left_pane, values=MainWindow.GRAPH_TYPES.keys())
+        self._graph_type.pack()
 
         self._go_button = Button(self._left_pane, text='Go', command=self._go)
         self._go_button.pack()
@@ -71,13 +79,10 @@ class MainWindow(Frame):
         graph_view = Menu(view, tearoff=0)
         view.add_cascade(label="View graphs", menu=graph_view)
 
-        graph_view.add_radiobutton(label="Only one", value="onlyone",
-            variable="graphframeview")
+        graph_view.add_radiobutton(variable="graphframeview", label="Only one", value="onlyone")
         #        graph_view.add_radiobutton(label="In a row", value="row",
         #            variable=graph_view_var)
-        graph_view.add_radiobutton(label="In separate window", value="window",
-            variable="graphframeview")
-
+        graph_view.add_radiobutton(variable="graphframeview", label="In separate window", value="window")
 
     def _go(self):
         view = self.getvar("graphframeview")
@@ -91,8 +96,11 @@ class MainWindow(Frame):
         else:
             container = Toplevel()
 
+        graph_class = MainWindow.GRAPH_TYPES[self._graph_type.variable.get()]
+
         facade = Facade(container, self._group_select.selected_group,
-            show_graph=self._show_graph_checkbutton.is_selected())
+                        show_graph=self._show_graph_checkbutton.is_selected(),
+                        graph_class=graph_class)
 
         facade.pack(expand=True, fill='both')
 

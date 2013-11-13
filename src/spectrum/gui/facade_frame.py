@@ -29,16 +29,21 @@ class Facade(Frame):
     """This is a Frame that contains group info, group order, apex and prime
     graph.
     """
-
-    def __init__(self, parent, group, show_graph=True, **kw):
+    def __init__(self, parent, group, show_graph=True, graph_class=None, **kw):
+        """
+        Parameters:
+            show_graph: whether to create and show graph instantly or provide a button to do that lately
+            graph_factory: callable accepting one argument - the Group instance and returning Graph instance. Note that
+                __str__ method of the callable is used in the UI.
+        """
         Frame.__init__(self, parent, **kw)
         self._group = group
         #        self._show_apex = True
         self._show_graph = show_graph
+        self._graph_class = graph_class
         self._init_variables()
         self._init_menu()
         self._init_components()
-
 
     @property
     def group(self):
@@ -55,8 +60,9 @@ class Facade(Frame):
     def _show_graph_canvas(self):
         self._show_graph_button.forget()
         # TODO: add different layouts and other options
-        graph = self._group.prime_graph()
-        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph), caption="Prime Graph")
+        graph_class = self._graph_class
+        graph = graph_class(self._group)
+        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph), caption=str(graph_class))
         self._graph_canvas.pack(expand=True, fill='both')
 
         self._graph_canvas.vertex_label_mode = self.getvar(
@@ -68,8 +74,7 @@ class Facade(Frame):
         self.update_layout()
 
     def _init_components(self):
-        self._panes = PanedWindow(self, orient='horizontal',
-            sashrelief='raised')
+        self._panes = PanedWindow(self, orient='horizontal', sashrelief='raised')
         self._panes.pack(expand=True, fill='both')
 
         self._left_pane = Frame(self._panes, padx=2, pady=2)
@@ -88,20 +93,19 @@ class Facade(Frame):
         group_order_pane = LabelFrame(self._left_pane, text="Order")
         group_order_pane.pack(fill='x')
 
-        self._group_order = IntegerContainer(group_order_pane,
-            integer=self._group.order())
+        self._group_order = IntegerContainer(group_order_pane, integer=self._group.order())
         self._group_order.pack(expand=True, fill='both')
 
         # apex
         self._apex_pane = LabelFrame(self._left_pane, text="Apex")
         self._apex_pane.pack(expand=True, fill='both')
 
-        self._apex_container = ApexListContainer(self._apex_pane,
-            apex=self._group.apex())
+        self._apex_container = ApexListContainer(self._apex_pane, apex=self._group.apex())
         self._apex_container.pack(expand=True, fill='both')
 
+        # this is a button that show up instead of graph canvas if we uncheck 'Show graph' checkbox.
         self._show_graph_button = Button(self._right_pane, text='Show graph',
-            command=self._show_graph_canvas)
+                                         command=self._show_graph_canvas)
         self._graph_canvas = None
         if self._show_graph:
             self._show_graph_canvas()
@@ -119,7 +123,7 @@ class Facade(Frame):
 
         local_name = set_default_var(self, "vertexlabelposition")
         tools.trace_variable(self, local_name, "w",
-            self._change_vertex_label_position)
+                             self._change_vertex_label_position)
 
     def _change_vertex_label_position(self, name, *arg):
         # override default value
@@ -127,8 +131,9 @@ class Facade(Frame):
         if self._graph_canvas is not None:
             self._graph_canvas.vertex_label_mode = self.getvar(name)
 
-
     def _init_menu(self):
+        """Init menu bar content.
+        """
         toplevel = self.winfo_toplevel()
         if toplevel['menu']:
             self._menu = self.nametowidget(name=toplevel['menu'])
@@ -140,18 +145,14 @@ class Facade(Frame):
         self._menu.add_cascade(label="Graph", menu=graph_options)
         self._menu_index = self._menu.index("end")
 
-        vertex_label_position = Menu(graph_options, tearoff=0)
-        graph_options.add_cascade(label="Label position",
-            menu=vertex_label_position)
+        vertex_label_position_menu = Menu(graph_options, tearoff=0)
+        graph_options.add_cascade(label="Label position", menu=vertex_label_position_menu)
 
-        vertexlabelposition_var = self.winfo_name() + ".vertexlabelposition"
-        vertex_label_position.add_radiobutton(label="Auto", value="auto",
-            variable=vertexlabelposition_var)
-        vertex_label_position.add_radiobutton(label="Center", value="center",
-            variable=vertexlabelposition_var)
+        menu_var = self.winfo_name() + ".vertexlabelposition"
+        vertex_label_position_menu.add_radiobutton(variable=menu_var, label="Auto", value="auto")
+        vertex_label_position_menu.add_radiobutton(variable=menu_var, label="Center", value="center")
 
-        graph_options.add_command(label="Save graph...",
-            command=self.call_graph_save_dialog)
+        graph_options.add_command(label="Save graph...", command=self.call_graph_save_dialog)
 
         self.bind("<Destroy>", self.__destroy_menu)
 
@@ -164,12 +165,11 @@ class Facade(Frame):
 
     def call_graph_save_dialog(self):
         file_name = tkFileDialog.asksaveasfilename(defaultextension='.ps',
-            filetypes=[('PostScript', '.ps')], parent=self.winfo_toplevel(),
-            title="Save graph as image")
+                                                   filetypes=[('PostScript', '.ps')], parent=self.winfo_toplevel(),
+                                                   title="Save graph as image")
         if file_name:
-            with codecs.open(file_name, 'w', encoding='utf-8') as file:
-                file.write(self._graph_canvas.postscript())
-
+            with codecs.open(file_name, 'w', encoding='utf-8') as f:
+                f.write(self._graph_canvas.postscript())
 
     def update_layout(self):
         try:

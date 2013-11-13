@@ -21,19 +21,32 @@ from spectrum.graph.graph import Graph
 
 __author__ = 'Daniel Lytkin'
 
+
 class PrimeGraph(Graph):
-    def __init__(self, spectrum):
+    class __metaclass__(type):
+        """Provide a metaclass in order to override class-level str method"""
+        def __str__(self):
+            return 'Prime Graph'
+
+    def __init__(self, group):
         Graph.__init__(self)
-        for elem in spectrum:
+        apex = group.apex()
+        for elem in apex:
             factors = Integer(elem).factorize().keys()
             self.add_vertices(factors)
             self.add_edges(itertools.combinations(factors, 2))
 
 
 class FastGraph(Graph):
-    def __init__(self, spectrum):
+    class __metaclass__(type):
+        """Provide a metaclass in order to override class-level str method"""
+        def __str__(self):
+            return 'Fast Graph'
+
+    def __init__(self, group):
         Graph.__init__(self)
-        for elem in spectrum:
+        apex = group.apex()
+        for elem in apex:
             self._add_element(elem)
 
     def _add_element(self, a):
@@ -47,7 +60,8 @@ class FastGraph(Graph):
         for i in range(l):
             b = self._vertices[i]
             d = numeric.gcd(a, b)
-            if d == 1: continue
+            if d == 1:
+                continue
             bd = numeric.prime_part(b, d)
             if bd == 1:
                 self._vertices[i] = d
@@ -62,9 +76,9 @@ class FastGraph(Graph):
                 neighbors.append(dIndex)
 
             a = numeric.prime_part(a, d)
-            if a == 1: break
+            if a == 1:
+                break
         if a > 1:
             index = self._add_vertex(a)
             for neighbor in neighbors:
                 self._set_adjacency(index, neighbor, True)
-
