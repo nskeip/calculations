@@ -16,7 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup
-from spectrum.tools.tools import StringViewFormatter
+from spectrum.tools.tools import MultiModeStringFormatter
 
 __author__ = 'Daniel Lytkin'
 
@@ -129,10 +129,9 @@ def symplectic_2_gcd(n):
 #    return max_elements(group.apex(), num_elements=num_elements)
 #
 #
-def max_orders_wrapped(group,
-                       mode=StringViewFormatter.VERBOSE):
-    format = lambda elem: StringViewFormatter(elem, mode=mode)
-    return map(format, maximal_orders(group))
+def max_orders_wrapped(group):
+    extend = lambda elem: MultiModeStringFormatter.mixin_to(elem, mode='verbose')
+    return map(extend, maximal_orders(group))
 
 #
 #
@@ -151,7 +150,7 @@ def print_max_elems():
         print "{}:".format(group).ljust(12),
         print "n = {} = {}".format(dimension, dim_expansion).ljust(30)
         print
-        for elem in max_orders_wrapped(group, StringViewFormatter.VERBOSE):
+        for elem in max_orders_wrapped(group):
             print str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
                 elem.object.partition, reverse=True)
         print

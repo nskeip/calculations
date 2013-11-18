@@ -48,6 +48,8 @@ class FastGraph(Graph):
         apex = group.apex()
         for elem in apex:
             self._add_element(elem)
+        for i, vertex in enumerate(self._vertices):
+            self._vertices[i] = Integer(vertex)
 
     def _add_element(self, a):
         """Add new spectrum element

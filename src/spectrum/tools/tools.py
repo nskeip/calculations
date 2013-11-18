@@ -22,6 +22,7 @@ __author__ = 'Daniel Lytkin'
 
 IS_MAC = platform.system() == "Darwin"
 
+
 class ObjectCache(type):
     """Metaclass for cache-enabled classes. It adds __call__ method to class
     objects, which is called before creating any instances, and searches the
@@ -98,54 +99,42 @@ class DocInherit(object):
 doc_inherit = DocInherit
 
 
-class StringViewFormatter(object):
-    """This class wraps Integer, SpectraElement, Group, Field etc. instances
-    and provides some string formatting methods (Factorized view, LaTeX view
-    etc.)
-    Modes:
-        NORMAL - regular str(object)
-        VERBOSE - factorised for integer, lcm for spectra element etc
-        LATEX - latex-compatible text
-        MIXED - 'NORMAL = VERBOSE'
+def mixin(instance, new_class):
+    instance.__class__ = type(
+        '{}_with_{}'.format(instance.__class__.__name__, new_class.__name__),
+        (instance.__class__, new_class),
+        {}
+    )
+
+
+class MultiModeStringFormatter:
+    """This class is intended to mixin to objects that support multiple string representations, e.g. normal or
+    factorized representations for Integer.
+    Common modes are:
+        'normal': default representation
+        'latex': LaTeX-suitable representation
+        'verbose': verbose representation, that is factorized for Integer, LCM-expanded for semisimple etc
+        'mixed': combination of normal and verbose in form '<normal> = <verbose>'
     """
-    NORMAL = 0
-    VERBOSE = 1
-    LATEX = 2
-    MIXED = 3
-
-    def __init__(self, object_, mode=0):
-        self._object = object_
-        self.mode = mode
-
-        self._modes = {0: self.str_normal,
-                       1: self.str_verbose,
-                       2: self.str_latex,
-                       3: self.str_mixed}
-
-    @property
-    def object(self):
-        return self._object
-
-    def str_normal(self):
-        return str(self._object)
-
-    def str_verbose(self):
-        try:
-            return self._object.str_verbose()
-        except AttributeError:
-            return str(self._object)
-
-    def str_latex(self):
-        try:
-            return self._object.str_latex()
-        except AttributeError:
-            return str(self._object)
-
-    def str_mixed(self):
-        return self.str_normal() + " = " + self.str_verbose()
+    @classmethod
+    def mixin_to(cls, instance, mode='normal'):
+        if not isinstance(instance, MultiModeStringFormatter):
+            instance._original_str = instance.__str__
+            mixin(instance, cls)
+            instance.__class__.__str__ = MultiModeStringFormatter.__str__
+        instance.str_mode = mode
+        return instance
 
     def __str__(self):
-        return self._modes[self.mode]()
+        mode = self.str_mode
+
+        if mode == 'normal':
+            return self._original_str()
+        elif mode == 'mixed':
+            return '{normal} = {verbose}'.format(normal=self._original_str(), verbose=self.str_verbose())
+        else:
+            method = getattr(self, 'str_{mode}'.format(mode=mode), self._original_str)
+            return method()
 
 
 def trace_variable(widget, var_name, mode, callback):

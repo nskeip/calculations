@@ -20,7 +20,7 @@ import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
 from spectrum.calculations.semisimple import SpectraElement
 from spectrum.tools import pyperclip, tools
-from spectrum.tools.tools import StringViewFormatter
+from spectrum.tools.tools import MultiModeStringFormatter
 
 __author__ = 'Daniel Lytkin'
 
@@ -64,7 +64,7 @@ class ApexList(Listbox):
     def _copy_selected_latex(self):
         def elem_latex(index):
             e = self._apex[index]
-            if e.mode == StringViewFormatter.NORMAL:
+            if e.str_mode == 'normal':
                 return e.str_normal()
             return e.str_latex()
 
@@ -96,7 +96,7 @@ class ApexList(Listbox):
         """
         prev_selection = self.curselection()
         for index in indices:
-            self._apex[index].mode = StringViewFormatter.MIXED
+            self._apex[index].str_mode = 'mixed'
             self._update_text(index)
         for index in prev_selection:
             self.selection_set(index)
@@ -111,7 +111,7 @@ class ApexList(Listbox):
         """Resets every element back to plain integer view
         """
         for index in range(len(self._apex)):
-            self._apex[index].mode = StringViewFormatter.NORMAL
+            self._apex[index].str_mode = 'normal'
             self._update_text(index)
 
     def set_apex(self, apex):
@@ -119,12 +119,12 @@ class ApexList(Listbox):
         """
 
         def transform_number(number):
-            if type(number) in (SpectraElement, Integer):
-                return StringViewFormatter(number)
-            return StringViewFormatter(Integer(number))
+            if type(number) not in (SpectraElement, Integer):
+                number = Integer(number)
+            return MultiModeStringFormatter.mixin_to(number)
 
         self._apex = [transform_number(number) for number in apex]
-        self._apex.sort(key=lambda e: e.object, reverse=True)
+        self._apex.sort(reverse=True)
         self.delete(0, "END")
         self.insert(0, *self._apex)
 
@@ -272,7 +272,7 @@ class CheckBox(Checkbutton):
         return bool(self._var.get())
 
 
-class IntegerView(Label):
+class IntegerView(Label, object):
     """This is the frame for displaying Integer with ability to factorize it.
     """
 
@@ -285,9 +285,8 @@ class IntegerView(Label):
         kw.setdefault('justify', 'left')
         self._var = StringVar()
         Label.__init__(self, parent, textvariable=self._var, **kw)
-        self._integer_view = StringViewFormatter(integer)
-        self._update_integer()
         self._factorization_enabled = False
+        self.integer = integer
         self.bind("<Configure>", self._update_width)
 
         self._init_menu()
@@ -305,38 +304,35 @@ class IntegerView(Label):
         self._menu.post(event.x_root, event.y_root)
 
     def _copy(self):
-        pyperclip.setcb(str(self._integer_view))
+        pyperclip.setcb(str(self._integer))
 
     def _copy_latex(self):
         if self._factorization_enabled:
-            cb = self._integer_view.str_latex()
+            cb = self._integer.str_latex()
         else:
-            cb = self._integer_view.str_normal()
+            cb = self._integer.str_normal()
         pyperclip.setcb(cb)
 
     def _update_width(self, event):
         self['wraplength'] = self.winfo_width() - 10
 
     def _update_integer(self):
-        self._var.set(self._integer_view)
+        self._var.set(str(self._integer))
 
     @property
     def integer(self):
-        return self._integer_view.object
+        return self._integer
 
     @integer.setter
     def integer(self, value):
-        self._integer_view = StringViewFormatter(value)
+        self._integer = MultiModeStringFormatter.mixin_to(value)
         if self._factorization_enabled:
-            self._integer_view.mode = StringViewFormatter.VERBOSE
+            self._integer.str_mode = 'verbose'
         self._update_integer()
 
     def toggle_factorization(self, value):
         self._factorization_enabled = value
-        if value:
-            self._integer_view.mode = StringViewFormatter.VERBOSE
-        else:
-            self._integer_view.mode = StringViewFormatter.NORMAL
+        self._integer.str_mode = 'verbose' if value else 'normal'
         self._update_integer()
 
 
