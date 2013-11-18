@@ -387,14 +387,17 @@ class GraphCanvas(Canvas, object):
 
         vertex_index = self.graph.index(vertex.value)
         vertex_location = self.get_vertex_location(vertex)
-        if self._vertex_label_mode == "auto":
+        if self._vertex_label_mode == 'auto':
             label_vector = self._layout.get_label_vector(vertex_index)
             label_radius = self._get_shape_radius(vertex.label_id)
             distance = label_radius + vertex.shape.radius
             label_location = vertex_location + distance * label_vector
-        else: #center
+        elif self._vertex_label_mode == 'center':
             label_location = vertex_location
-            #noinspection PyArgumentList
+        else:
+            raise ValueError('Invalid vertex label mode: {}'.format(self._vertex_label_mode))
+
+        #noinspection PyArgumentList
         self.coords(vertex.label_id, *label_location)
         self.tag_raise(vertex.label_id, vertex.shape.id)
 
