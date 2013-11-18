@@ -18,6 +18,7 @@ import itertools
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.graph.graph import Graph
+from spectrum.tools.tools import MultiModeStringFormatter
 
 __author__ = 'Daniel Lytkin'
 
@@ -49,7 +50,9 @@ class FastGraph(Graph):
         for elem in apex:
             self._add_element(elem)
         for i, vertex in enumerate(self._vertices):
-            self._vertices[i] = Integer(vertex)
+            instance = MultiModeStringFormatter.mixin_to(Integer(vertex))
+            instance.str_mode = 'verbose'
+            self._vertices[i] = instance
 
     def _add_element(self, a):
         """Add new spectrum element
