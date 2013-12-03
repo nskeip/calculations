@@ -1,6 +1,0 @@
-The project is still in pre-alpha state.
-
-Run src/main.pyw to see the shit.
-
-The whole project is covered with unit-tests, except for gui.
-Use tests/run_all_tests.py to run them all.
