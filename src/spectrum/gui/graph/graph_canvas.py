@@ -30,6 +30,18 @@ TRANSLATING = 1
 SELECTION_KW = {"outline": "#aaaaff"}
 
 
+GROUP_COLORS = [
+    '#d88686',
+    '#8789d3',
+    '#86cebd',
+    '#ceb086',
+    '#c2cc86',
+    '#6794ff',
+    '#1efa64',
+    '#006666'
+]
+
+
 class PickedState(Observable):
     """'picked'/'not picked' state of graph vertices
     """
@@ -51,7 +63,8 @@ class PickedState(Observable):
             self._picked.add(item)
         else:
             self._picked.remove(item)
-            # fire state changed event:
+
+        # fire state changed event:
         self.notify(item)
 
     def is_picked(self, item):
@@ -454,6 +467,9 @@ class GraphCanvas(Canvas, object):
                 return vertex
         return None
 
+    def get_vertex(self, value):
+        return self._vertices[value]
+
     @property
     def layout(self):
         """Returns layout instance
@@ -470,3 +486,16 @@ class GraphCanvas(Canvas, object):
     def graph(self):
         """Returns current graph in container"""
         return self._layout.graph
+
+    def color_vertex_groups(self, groups):
+        colored = []
+        if groups is not None:
+            for index, group in enumerate(groups):
+                color = GROUP_COLORS[index % len(GROUP_COLORS)]
+                for value in group:
+                    vertex = self._vertices[value]
+                    vertex.shape.configure(fill=color)
+                    colored.append(value)
+        for value, vertex in self._vertices.iteritems():
+            if value not in colored:
+                vertex.shape.configure(fill='white')

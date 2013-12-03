@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, PanedWindow, Button, Menu, Toplevel
+from Tkinter import Frame, PanedWindow, Button, Menu, Toplevel, LabelFrame, Label
 from collections import OrderedDict
 from spectrum.calculations import graphs
 from spectrum.gui.facade_frame import Facade
@@ -45,7 +45,7 @@ class MainWindow(Frame):
         self._panes = PanedWindow(self, orient='horizontal', sashrelief="raised")
         self._panes.pack(expand=True, fill='both')
 
-        self._left_pane = Frame(self._panes)
+        self._left_pane = Frame(self._panes, padx=10, pady=5)
         self._right_pane = PanedWindow(self._panes)
         self._panes.add(self._left_pane, sticky='n')
         self._panes.add(self._right_pane)
@@ -53,12 +53,24 @@ class MainWindow(Frame):
         self._group_select = GroupSelect(self._left_pane)
         self._group_select.pack(expand=True, fill='x')
 
-        self._show_graph_checkbutton = CheckBox(self._left_pane, text='Show graph')
-        self._show_graph_checkbutton.select()
-        self._show_graph_checkbutton.pack()
+        # spacer
+        Frame(self._left_pane, height=10).pack()
 
-        self._graph_type = OptionList(self._left_pane, values=MainWindow.GRAPH_TYPES.keys())
-        self._graph_type.pack()
+        graph_controls = LabelFrame(self._left_pane, text="Graph options", padx=10, pady=5)
+        graph_controls.columnconfigure(1, weight=1)
+        graph_controls.pack(expand=True, fill='x')
+
+        self._show_graph_checkbutton = CheckBox(graph_controls, text='Show graph')
+        self._show_graph_checkbutton.select()
+        self._show_graph_checkbutton.grid(row=0, columnspan=2, sticky='w')
+
+        Label(graph_controls, text='Algorithm').grid(row=1, sticky='w')
+        self._graph_type = OptionList(graph_controls, values=MainWindow.GRAPH_TYPES.keys())
+        self._graph_type.config(width=15)
+        self._graph_type.grid(row=1, column=1, sticky='we')
+
+        # spacer
+        Frame(self._left_pane, height=10).pack()
 
         self._go_button = Button(self._left_pane, text='Go', command=self._go)
         self._go_button.pack()
@@ -103,15 +115,3 @@ class MainWindow(Frame):
                         graph_class=graph_class)
 
         facade.pack(expand=True, fill='both')
-
-
-
-
-
-
-
-
-
-
-
-

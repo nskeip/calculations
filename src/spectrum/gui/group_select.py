@@ -36,52 +36,50 @@ class GroupSelect(Frame):
 
     def _init_components(self):
         # group type selection (alternating, classical, sporadic, exceptional)
-        group_type_frame = LabelFrame(self, text="Group type")
-        group_type_frame.pack(expand=True, fill='x', padx=10, pady=5)
+        group_type_frame = LabelFrame(self, text="Group type", padx=10, pady=5)
+        group_type_frame.pack(expand=True, fill='x')
 
         # group type radio buttons (Alternating, Classical etc.)
         self._group_type = StringVar()
         self._type_radio_buttons = dict()
-        for type in ("Alternating", "Classical", "Exceptional", "Sporadic"):
-            self._type_radio_buttons[type] = Radiobutton(group_type_frame,
-                variable=self._group_type, value=type, text=type)
-            self._type_radio_buttons[type].pack(anchor='nw', padx=10)
+        for group_type in ("Alternating", "Classical", "Exceptional", "Sporadic"):
+            radiobutton = Radiobutton(group_type_frame, variable=self._group_type, value=group_type, text=group_type)
+            radiobutton.pack(anchor='nw')
+            self._type_radio_buttons[group_type] = radiobutton
 
         # set group type selection handler
-        self._group_type.trace("w",
-            lambda n, i, m: self._group_type_selection())
+        self._group_type.trace("w", lambda n, i, m: self._group_type_selection())
 
-        # parameters for each group (degree for alternating, field and
-        # dimension for classical etc.
-        group_params_frame = LabelFrame(self, text="Parameters")
-        group_params_frame.pack(expand=True, fill='x', padx=10, pady=5)
+        # spacer
+        Frame(self, height=10).pack()
+
+        # parameters for each group (degree for alternating, field and dimension for classical etc.)
+        # notice that we do not pack LabelFrame contents. We do that in _group_type_selection method instead.
+        group_params_frame = LabelFrame(self, text="Parameters", padx=10, pady=5)
+        group_params_frame.pack(expand=True, fill='x')
 
         # alternating
         self._alt_params = Frame(group_params_frame)
         self._alt_params.columnconfigure(1, weight=1)
         Label(self._alt_params, text="Degree").grid(sticky='w')
-        self._alt_degree = NumberBox(self._alt_params,
-            constraints=Constraints(min=5))
+        self._alt_degree = NumberBox(self._alt_params, constraints=Constraints(min=5))
         self._alt_degree.grid(row=0, column=1, sticky='we')
 
         # classical
         self._clas_params = Frame(group_params_frame)
         self._clas_params.columnconfigure(1, weight=1)
+
         Label(self._clas_params, text="Type").grid(row=0, sticky='w')
-        self._clas_type = OptionList(self._clas_params,
-            values=ClassicalGroup.types())
-
-        self._clas_type.variable.trace("w",
-            lambda n, i, m: self._classical_group_type_selection())
-
+        self._clas_type = OptionList(self._clas_params, values=ClassicalGroup.types())
+        self._clas_type.variable.trace("w", lambda n, i, m: self._classical_group_type_selection())
         self._clas_type.grid(row=0, column=1, sticky='we')
 
         Label(self._clas_params, text="Dimension").grid(row=1, sticky='w')
         self._clas_dim = NumberBox(self._clas_params)
         self._clas_dim.grid(row=1, column=1, sticky='we')
+
         Label(self._clas_params, text="Field order").grid(row=2, sticky='w')
-        self._clas_field = NumberBox(self._clas_params,
-            constraints=Constraints(primality=numeric.PRIME_POWER))
+        self._clas_field = NumberBox(self._clas_params, constraints=Constraints(primality=numeric.PRIME_POWER))
         self._clas_field.grid(row=2, column=1, sticky='we')
 
         self._classical_group_type_selection()
@@ -89,27 +87,23 @@ class GroupSelect(Frame):
         # exceptional
         self._ex_params = Frame(group_params_frame)
         self._ex_params.columnconfigure(1, weight=1)
+
         Label(self._ex_params, text="Type").grid(row=0, sticky='w')
-        self._ex_type = OptionList(self._ex_params,
-            values=ExceptionalGroup.types())
+        self._ex_type = OptionList(self._ex_params, values=ExceptionalGroup.types())
         self._ex_type.setvar(value=ExceptionalGroup.types()[0])
         self._ex_type.grid(row=0, column=1, sticky='we')
+
         Label(self._ex_params, text="Field order").grid(row=1, sticky='w')
-        self._ex_field = NumberBox(self._ex_params,
-            constraints=Constraints(primality=numeric.PRIME_POWER))
+        self._ex_field = NumberBox(self._ex_params, constraints=Constraints(primality=numeric.PRIME_POWER))
         self._ex_field.grid(row=1, column=1, sticky='we')
 
         # sporadic
         self._spor_params = Frame(group_params_frame)
         self._spor_params.columnconfigure(1, weight=1)
-        Label(self._spor_params, text="Group").grid(row=0, sticky='w')
-        self._sporadic_group = OptionList(self._spor_params,
-            values=SporadicGroup.all_groups())
-        self._sporadic_group.grid(row=0, column=1, sticky='we')
 
-        # pack params frames
-        for child_frame in group_params_frame.winfo_children():
-            child_frame.pack(expand=True, fill='x', padx=10)
+        Label(self._spor_params, text="Group").grid(row=0, sticky='w')
+        self._sporadic_group = OptionList(self._spor_params, values=SporadicGroup.all_groups())
+        self._sporadic_group.grid(row=0, column=1, sticky='we')
 
     @property
     def selected_group(self):
@@ -122,13 +116,12 @@ class GroupSelect(Frame):
             self._clas_dim.refresh_input()
             self._clas_field.refresh_input()
             return ClassicalGroup(self._clas_type.variable.get(),
-                int(self._clas_dim.get()), int(self._clas_field.get()))
+                                  int(self._clas_dim.get()), int(self._clas_field.get()))
         if self._group_type.get() == "Sporadic":
             return SporadicGroup(self._sporadic_group.variable.get())
         if self._group_type.get() == "Exceptional":
             self._ex_field.refresh_input()
-            return ExceptionalGroup(self._ex_type.variable.get(),
-                int(self._ex_field.get()))
+            return ExceptionalGroup(self._ex_type.variable.get(), int(self._ex_field.get()))
 
     def _group_type_selection(self):
         """Process the change of selected group type
@@ -136,18 +129,17 @@ class GroupSelect(Frame):
 
         def set_visible(widget, visible):
             if visible:
-                widget.pack(expand=True, fill='both', padx=10, anchor='nw')
+                widget.pack(expand=True, fill='both')
             else:
                 widget.forget()
 
-        type = self._group_type.get()
-        set_visible(self._alt_params, type == "Alternating")
-        set_visible(self._clas_params, type == "Classical")
-        set_visible(self._spor_params, type == "Sporadic")
-        set_visible(self._ex_params, type == "Exceptional")
+        group_type = self._group_type.get()
+        set_visible(self._alt_params, group_type == "Alternating")
+        set_visible(self._clas_params, group_type == "Classical")
+        set_visible(self._spor_params, group_type == "Sporadic")
+        set_visible(self._ex_params, group_type == "Exceptional")
 
     def _classical_group_type_selection(self):
         name = self._clas_type.variable.get()
         self._clas_dim.set_constraints(ClassicalGroup.dim_constraints(name))
-        self._clas_field.set_constraints(
-            ClassicalGroup.field_constraints(name))
+        self._clas_field.set_constraints(ClassicalGroup.field_constraints(name))

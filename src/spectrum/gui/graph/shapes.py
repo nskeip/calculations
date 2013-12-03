@@ -18,6 +18,7 @@ from spectrum.graph.geometry import Point
 
 __author__ = 'Daniel Lytkin'
 
+
 class Shape(object):
     """Abstract class representing shapes on the canvas
     """
@@ -72,9 +73,9 @@ class VertexShape(Shape):
     def set_selection(self, selected):
         """Sets whether this vertex is selected or not."""
         if selected:
-            self.configure(fill="blue")
+            self.configure(outline="#444444", width=3)
         else:
-            self.configure(fill="white")
+            self.configure(outline="black", width=1)
 
 
 class CircleShape(VertexShape):
@@ -86,8 +87,7 @@ class CircleShape(VertexShape):
         r = radius
         self._radius = radius
         x, y = location.x, location.y
-        self._id = canvas.create_oval(x - r, y - r, x + r, y + r, fill="white",
-            **kw)
+        self._id = canvas.create_oval(x - r, y - r, x + r, y + r, fill="white", **kw)
 
 
 def create_default_shape(canvas, vertex):

@@ -16,6 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 __author__ = 'Daniel Lytkin'
 
+
 def ordered_pair(a, b):
     """Returns (a, b) if a < b and (b, a) otherwise
     """
@@ -76,12 +77,12 @@ class Graph(object):
     def _add_vertex(self, vertex):
         """Add new vertex to graph and return its index
         """
-        vIndex = self.index(vertex)
-        if vIndex is None:
+        v_index = self.index(vertex)
+        if v_index is None:
             self._add_no_check(vertex)
             return len(self._vertices) - 1
         else:
-            return vIndex
+            return v_index
 
     def add_vertex(self, vertex):
         """Adds new vertex to graph
@@ -132,20 +133,19 @@ class Graph(object):
 
         """
         # adjacency of new vertex with all other vertices:
-        newRow = (list(self._adjacency[index]) +
+        new_row = (list(self._adjacency[index]) +
                   [True] +
                   [self._adjacency[j][index]
                    for j in xrange(index + 1, len(self._adjacency))])
-        vIndex = self.index(value)
-        if vIndex is None:
-            self._adjacency.append(newRow)
+        v_index = self.index(value)
+        if v_index is None:
+            self._adjacency.append(new_row)
             self._vertices.append(value)
             return len(self._adjacency) - 1
         else:
             for i in xrange(len(self._adjacency)):
-                if i != vIndex and newRow[i]:
-                    self._set_adjacency(vIndex, i, True)
-
+                if i != v_index and new_row[i]:
+                    self._set_adjacency(v_index, i, True)
 
     def adjacent(self, index1, index2):
         """Returns true iff vertices with indices index1 and index2 are
@@ -164,29 +164,30 @@ class Graph(object):
     def _max_cocliques_between_indices(self, indices):
         """Searches for largest cocliques among vertices with specified indices
         """
-        if len(indices) == 1: return [list(indices)]
+        if len(indices) == 1:
+            return [list(indices)]
 
-        max = 0
-        cocliques = []
+        limit = 0
+        cocliques = [[]]
 
-        for j in xrange(len(indices) - max - 1):
+        for j in xrange(len(indices) - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
-            t = filter(lambda x: (x > i and self._adjacency[x][i] == False),
-                indices)
-            if len(t) < max: continue
-            nextCocliques = self._max_cocliques_between_indices(t)
-            for coclique in nextCocliques:
-                if len(coclique) < max: continue
-                if len(coclique) > max:
+            t = filter(lambda x: (x > i and not self._adjacency[x][i]), indices)
+            if len(t) < limit:
+                continue
+            next_cocliques = self._max_cocliques_between_indices(t)
+            for coclique in next_cocliques:
+                if len(coclique) < limit:
+                    continue
+                if len(coclique) > limit:
                     # found larger coclique, delete old ones
                     cocliques = []
-                    max = len(coclique)
+                    limit = len(coclique)
                 coclique.insert(0, i)
                 cocliques.append(coclique)
 
         return cocliques
-
 
     def max_cocliques(self):
         """Returns set of cocliques of maximal size (slow)

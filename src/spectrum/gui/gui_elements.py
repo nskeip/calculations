@@ -14,7 +14,8 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar, LabelFrame
+from Tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
+                     LabelFrame)
 import re
 import tkFont
 from spectrum.calculations.numeric import Integer, Constraints
@@ -25,6 +26,38 @@ from spectrum.tools.tools import MultiModeStringFormatter
 __author__ = 'Daniel Lytkin'
 
 _non_decimal = re.compile('[^\d]+')
+
+
+class ListContainer(Frame):
+    """This is a container for Listbox. Provides scrollbars
+    """
+
+    def __init__(self, parent, scroll_x=True, scroll_y=True, **kw):
+        Frame.__init__(self, parent, **kw)
+        self._scroll_x = scroll_x
+        self._scroll_y = scroll_y
+
+    def set_listbox(self, listbox):
+        self._listbox = listbox
+        self._init_components()
+
+    def _init_components(self):
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        # add listbox
+        self._listbox.grid(row=0, column=0, sticky='nesw')
+
+        # add horizontal scrollbar
+        if self._scroll_x:
+            scrollbar_x = Scrollbar(self, command=self._listbox.xview, orient='horizontal')
+            scrollbar_x.grid(row=1, column=0, sticky='ews')
+            self._listbox['xscrollcommand'] = scrollbar_x.set
+
+        if self._scroll_y:
+            scrollbar_y = Scrollbar(self, command=self._listbox.yview)
+            scrollbar_y.grid(row=0, column=1, sticky='nse')
+            self._listbox['yscrollcommand'] = scrollbar_y.set
 
 
 class ApexList(Listbox):
@@ -145,20 +178,18 @@ class ApexListContainer(Frame):
         self.rowconfigure(0, weight=1)
 
         # upper pane contains apex list
-        upper_pane = Frame(self)
-        upper_pane.columnconfigure(0, weight=1)
-        upper_pane.rowconfigure(0, weight=1)
-
+        upper_pane = ListContainer(self)
         self.apex_list = ApexList(upper_pane, self._apex)
-        self.apex_list.grid(row=0, column=0, sticky='nesw')
+        upper_pane.set_listbox(self.apex_list)
 
-        self._scrollbar_x = Scrollbar(upper_pane, command=self.apex_list.xview,
-                                      orient='horizontal')
-        self._scrollbar_x.grid(row=1, column=0, sticky='ews')
-        self.apex_list['xscrollcommand'] = self._scrollbar_x.set
-        self._scrollbar_y = Scrollbar(upper_pane, command=self.apex_list.yview)
-        self._scrollbar_y.grid(row=0, column=1, sticky='nse')
-        self.apex_list['yscrollcommand'] = self._scrollbar_y.set
+        # buttons pane contain
+        buttons_pane = Frame(self)
+
+        self._expand_button = Button(buttons_pane, text="Expand All", command=self.apex_list.expand_all)
+        self._expand_button.pack(side='left', expand=True, fill='x')
+
+        self._reset_button = Button(buttons_pane, text="Collapse All", command=self.apex_list.reset)
+        self._reset_button.pack()
 
         # panel with number search box
         search_pane = LabelFrame(self, text="Find number")
@@ -176,18 +207,9 @@ class ApexListContainer(Frame):
         search_number_button = Button(search_pane, text="Find", command=self._find_number)
         search_number_button.pack()
 
-        # buttons pane contain
-        buttons_pane = Frame(self)
-
-        self._expand_button = Button(buttons_pane, text="Expand All", command=self.apex_list.expand_all)
-        self._expand_button.pack(side='left', expand=True, fill='x')
-
-        self._reset_button = Button(buttons_pane, text="Collapse All", command=self.apex_list.reset)
-        self._reset_button.pack()
-
         upper_pane.grid(sticky='nesw')
-        search_pane.grid(row=1, sticky='nesw')
-        buttons_pane.grid(row=2, sticky='nesw')
+        buttons_pane.grid(row=1, sticky='nesw')
+        search_pane.grid(row=2, sticky='nesw')
 
     def _find_number(self, *_):
         self._reset_search_box_alert()

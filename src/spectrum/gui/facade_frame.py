@@ -14,12 +14,12 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError
+from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox
 import codecs
 import tkFileDialog
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
-from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer
+from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer, ListContainer
 from spectrum.tools import tools
 
 __author__ = 'Daniel Lytkin'
@@ -61,8 +61,8 @@ class Facade(Frame):
         self._show_graph_button.forget()
         # TODO: add different layouts and other options
         graph_class = self._graph_class
-        graph = graph_class(self._group)
-        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(graph), caption=str(graph_class))
+        self.graph = graph_class(self._group)
+        self._graph_canvas = GraphCanvas(self._right_pane, SpringLayout(self.graph), caption=str(graph_class))
         self._graph_canvas.pack(expand=True, fill='both')
 
         self._graph_canvas.vertex_label_mode = self.getvar(
@@ -79,29 +79,42 @@ class Facade(Frame):
 
         self._left_pane = Frame(self._panes, padx=2, pady=2)
         self._right_pane = Frame(self._panes)
-        self._panes.add(self._left_pane, width=200)
+        self._panes.add(self._left_pane, width=250)
         self._panes.add(self._right_pane)
 
         # group name
-        group_name_pane = LabelFrame(self._left_pane, text="Group")
+        group_name_pane = LabelFrame(self._left_pane, text="Group", padx=10, pady=5)
         group_name_pane.pack(fill='x')
 
         self._group_name = GroupNameLabel(group_name_pane, self._group)
         self._group_name.pack(expand=True, fill='both')
 
         # group order
-        group_order_pane = LabelFrame(self._left_pane, text="Order")
+        group_order_pane = LabelFrame(self._left_pane, text="Order", padx=10, pady=5)
         group_order_pane.pack(fill='x')
 
         self._group_order = IntegerContainer(group_order_pane, integer=self._group.order())
         self._group_order.pack(expand=True, fill='both')
 
         # apex
-        self._apex_pane = LabelFrame(self._left_pane, text="Apex")
+        self._apex_pane = LabelFrame(self._left_pane, text="Apex", padx=10, pady=5)
         self._apex_pane.pack(expand=True, fill='both')
 
         self._apex_container = ApexListContainer(self._apex_pane, apex=self._group.apex())
         self._apex_container.pack(expand=True, fill='both')
+
+        # graph controls
+        cocliques_frame = LabelFrame(self._left_pane, text="Cocliques", padx=10, pady=5)
+        cocliques_frame.pack(fill='x')
+
+        self._cocliques_button = Button(cocliques_frame, text="Calculate", command=self._show_cocliques)
+        self._cocliques_button.pack(anchor='nw')
+
+        self._cocliques_container = ListContainer(cocliques_frame)
+        self._cocliques_list = Listbox(self._cocliques_container)
+        self._cocliques_container.set_listbox(self._cocliques_list)
+
+        # Button(graph_controls, text='Group equivalent vertices').pack(anchor='nw')
 
         # this is a button that show up instead of graph canvas if we uncheck 'Show graph' checkbox.
         self._show_graph_button = Button(self._right_pane, text='Show graph',
@@ -162,6 +175,24 @@ class Facade(Frame):
             self._menu.delete(self._menu_index)
         except TclError:
             pass
+
+    def _show_cocliques(self):
+        cocliques = self.graph.max_cocliques()
+
+        def select_coclique(*_):
+            index = next(iter(self._cocliques_list.curselection()), None)
+            if index is not None:
+                selected = cocliques[int(index)]
+                pick_state = self._graph_canvas.picked_vertex_state
+                pick_state.clear()
+                for value in selected:
+                    pick_state.pick(self._graph_canvas.get_vertex(value))
+
+        self._cocliques_list.insert(0, *[', '.join(map(str, coclique)) for coclique in cocliques])
+        self._cocliques_list.bind("<Double-Button-1>", select_coclique)
+
+        self._cocliques_button.forget()
+        self._cocliques_container.pack(expand=True, fill='both')
 
     def call_graph_save_dialog(self):
         file_name = tkFileDialog.asksaveasfilename(defaultextension='.ps',
