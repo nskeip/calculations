@@ -111,17 +111,17 @@ class GroupSelect(Frame):
         """
         if self._group_type.get() == "Alternating":
             self._alt_degree.refresh_input()
-            return AlternatingGroup(int(self._alt_degree.get()))
+            return AlternatingGroup(self._alt_degree.get_number())
         if self._group_type.get() == "Classical":
             self._clas_dim.refresh_input()
             self._clas_field.refresh_input()
             return ClassicalGroup(self._clas_type.variable.get(),
-                                  int(self._clas_dim.get()), int(self._clas_field.get()))
+                                  self._clas_dim.get_number(), self._clas_field.get_number())
         if self._group_type.get() == "Sporadic":
             return SporadicGroup(self._sporadic_group.variable.get())
         if self._group_type.get() == "Exceptional":
             self._ex_field.refresh_input()
-            return ExceptionalGroup(self._ex_type.variable.get(), int(self._ex_field.get()))
+            return ExceptionalGroup(self._ex_type.variable.get(), self._ex_field.get_number())
 
     def _group_type_selection(self):
         """Process the change of selected group type

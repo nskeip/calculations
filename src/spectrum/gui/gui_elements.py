@@ -16,8 +16,11 @@ Copyright 2012 Daniel Lytkin.
 """
 from Tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
                      LabelFrame)
+import ast
 import re
+import string
 import tkFont
+import math
 from spectrum.calculations.numeric import Integer, Constraints
 from spectrum.calculations.semisimple import SpectraElement
 from spectrum.tools import pyperclip, tools
@@ -25,7 +28,7 @@ from spectrum.tools.tools import MultiModeStringFormatter
 
 __author__ = 'Daniel Lytkin'
 
-_non_decimal = re.compile('[^\d]+')
+_expression_symbols = string.digits + ' ()*^+-'
 
 
 class ListContainer(Frame):
@@ -107,12 +110,13 @@ class ApexList(Listbox):
         """Return list of indices of currently selected items."""
         return [int(index) for index in Listbox.curselection(self)]
 
-    def select_by_divisor(self, divisor):
+    def select_by_divisor(self, divisor=None):
         """Selects and entries divisible by 'divisor'."""
         self.selection_clear(0, 'end')
-        for index, number in enumerate(self._apex):
-            if number.object % divisor == 0:
-                self.selection_set(index)
+        if divisor:
+            for index, number in enumerate(self._apex):
+                if number % divisor == 0:
+                    self.selection_set(index)
 
     def _update_text(self, index):
         self.delete(index)
@@ -194,7 +198,7 @@ class ApexListContainer(Frame):
         # panel with number search box
         search_pane = LabelFrame(self, text="Find number")
 
-        self._search_box = NumberBox(search_pane, constraints=Constraints(min=1))
+        self._search_box = NumberBox(search_pane, allow_expression=True, constraints=Constraints(min=1))
         self._search_box.pack(side='left', expand=True, fill='x')
 
         self._search_box_initial_bg = self._search_box['bg']
@@ -216,7 +220,8 @@ class ApexListContainer(Frame):
 
         # select numbers divisible by input number
         self._search_box.refresh_input()
-        self.apex_list.select_by_divisor(int(self._search_box.get()))
+        number = self._search_box.get_number()
+        self.apex_list.select_by_divisor(number if not math.isnan(number) else None)
 
         # if no numbers selected, paint background of search box to red
         if not self.apex_list.curselection():
@@ -232,10 +237,12 @@ class NumberBox(Entry):
     even or odd numbers.
     """
 
-    def __init__(self, parent, text_variable=None, constraints=None, **kw):
+    def __init__(self, parent, text_variable=None, allow_expression=False, constraints=None, **kw):
         self._var = text_variable or StringVar()
+        self._allow_expression = allow_expression
         self._constraints = constraints or Constraints()
         self._var.set(1)
+        self._number = 1
         self.refresh_input()
 
         Entry.__init__(self, parent, textvariable=self._var, width=10, **kw)
@@ -246,16 +253,28 @@ class NumberBox(Entry):
         self.refresh_input()
 
     def refresh_input(self):
-        # remove any non-decimal character
-        input = int(_non_decimal.sub('', self._var.get()))
-        value = input
+        if self._allow_expression:
+            filtered = filter(lambda c: c in _expression_symbols, self._var.get())
+            try:
+                value = eval(filtered.replace('^', '**'))
+            except Exception:
+                value = float('nan')
+            self._number = value
+            self._var.set(filtered)
+        else:
+            # remove any non-decimal character
+            value = int(filter(lambda c: c in string.digits, self._var.get()))
 
-        value = self._constraints.closest_valid(value)
+            value = self._constraints.closest_valid(value)
 
-        #if input != value:
-        # changed
-        self._var.set(str(value))
+            self._number = value
 
+            #if input != value:
+            # changed
+            self._var.set(str(value))
+
+    def get_number(self):
+        return self._number
 
     @property
     def variable(self):
