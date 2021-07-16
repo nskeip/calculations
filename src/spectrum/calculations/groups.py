@@ -161,7 +161,7 @@ class AlternatingGroup(Group):
         if self._order is None:
             # n!/2
             self._order = numeric.prod(xrange(3, self._degree + 1))
-        return self._order
+        return Integer(self._order)
 
     def __str__(self):
         return "Alt({})".format(self._degree)
