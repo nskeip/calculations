@@ -49,10 +49,12 @@ class FastGraph(Graph):
         apex = group.apex()
         for elem in apex:
             self._add_element(elem)
-        for i, vertex in enumerate(self._vertices):
-            instance = MultiModeStringFormatter.mixin_to(Integer(vertex))
-            instance.str_mode = 'verbose'
-            self._vertices[i] = instance
+
+        # TODO: should be moved from model to a view
+        # for i, vertex in enumerate(self._vertices):
+        #     instance = MultiModeStringFormatter.mixin_to(Integer(vertex))
+        #     instance.str_mode = 'verbose'
+        #     self._vertices[i] = instance
 
     def _add_element(self, a):
         """Add new spectrum element

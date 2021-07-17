@@ -16,6 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 import unittest
 from spectrum.calculations.graphs import FastGraph, PrimeGraph
+from spectrum.calculations.groups import Group
 
 __author__ = 'Daniel Lytkin'
 
@@ -26,12 +27,19 @@ class GraphsTest(unittest.TestCase):
         self.assertSequenceEqual(v1, v2)
         self.assertSetEqual(set(e1), set(e2))
 
+    @staticmethod
+    def _make_group_with_specified_apex(apex):
+        class GroupWithSpecifiedApex(Group):
+            def apex(self):
+                return apex
+        return GroupWithSpecifiedApex()
+
     def test_fast_graph(self):
         apex = [27, 59040, 65520, 531432, 1594320, 1771440, 1790880, 2391480,
                 14348904, 16120104, 43046720, 43578080, 47829680, 48419360,
                 53733680, 64570080, 193710244, 217625044, 217924025]
 
-        g = FastGraph(apex)
+        g = FastGraph(self._make_group_with_specified_apex(apex))
 
         expectedVertices = [3, 4, 5, 41, 73, 91, 1181, 3281, 7381, 532171,
                             597871]
@@ -45,7 +53,7 @@ class GraphsTest(unittest.TestCase):
             g.as_sparse_graph())
 
     def test_prime_graph(self):
-        g = PrimeGraph([72, 90, 240, 246, 328, 410, 728, 730])
+        g = PrimeGraph(self._make_group_with_specified_apex([72, 90, 240, 246, 328, 410, 728, 730]))
 
         expectedVertices = [2, 3, 5, 7, 13, 41, 73]
         expectedEdges = [(2, 3), (2, 5), (2, 7), (2, 13), (2, 41),
