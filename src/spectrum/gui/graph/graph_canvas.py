@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 from Tkinter import Canvas
+
 from shapes import EdgeShape
 from spectrum.graph import graph
 from spectrum.graph.geometry import Point

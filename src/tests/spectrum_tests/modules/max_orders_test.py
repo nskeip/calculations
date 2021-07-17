@@ -15,10 +15,12 @@ Copyright 2012 Daniel Lytkin.
    
 """
 import unittest
+
+from spectrum_tests.parametric import parametrized, parameters
+
 from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup
 from spectrum.modules import max_orders
-from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 

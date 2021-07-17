@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets

@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+
 from spectrum.modules.max_divisors import first_primes, primes_less_than, is_prime
 
 __author__ = 'Daniel Lytkin'

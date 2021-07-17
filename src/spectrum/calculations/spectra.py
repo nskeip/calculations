@@ -22,6 +22,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import gcd, lcm
 from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement

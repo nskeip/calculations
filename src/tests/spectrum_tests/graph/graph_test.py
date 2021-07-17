@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+
 from spectrum.graph.graph import Graph, full_graph
 
 __author__ = 'Daniel Lytkin'

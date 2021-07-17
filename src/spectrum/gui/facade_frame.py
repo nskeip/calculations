@@ -14,9 +14,10 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox
 import codecs
 import tkFileDialog
+from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox
+
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
 from spectrum.gui.gui_elements import GroupNameLabel, IntegerContainer, ApexListContainer, ListContainer

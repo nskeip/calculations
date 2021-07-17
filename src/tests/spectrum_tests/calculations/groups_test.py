@@ -15,9 +15,11 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
-from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
+
 from spectrum_tests.calculations import orders_data, spectra_data
 from spectrum_tests.parametric import parametrized, parameters
+
+from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
 
 __author__ = 'Daniel Lytkin'
 
