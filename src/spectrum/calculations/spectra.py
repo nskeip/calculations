@@ -210,7 +210,9 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     n //= 2
     q = field.order
     p = field.char
-    nk = lambda k: (p ** (k - 1) + 3) // 2
+
+    def nk(k):
+        return (p ** (k - 1) + 3) // 2
 
     # (1)
     a1 = [(q ** n - sign) // 2]
