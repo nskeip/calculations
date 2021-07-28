@@ -227,9 +227,15 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
         n_k = nk(k)
         if n_k >= n:
             break
-        dk = gcd(4, q ** n_k - sign) // 2
-        a3.append(p ** k * lcm(dk, (q ** (n - n_k) + 1) // dk))
-        a3.append(p ** k * lcm(dk, (q ** (n - n_k) - 1) // dk))
+        for delta in [1, -1]:
+            dk = gcd(4, q ** n_k - sign * delta) // 2
+            a3.append(
+                p ** k *
+                lcm(
+                    dk,
+                    (q**(n - n_k) - delta) // dk
+                )
+            )
         k += 1
 
     # (4)
