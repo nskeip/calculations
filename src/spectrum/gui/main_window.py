@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, PanedWindow, Button, Menu, Toplevel, LabelFrame, Label
+from tkinter import Frame, PanedWindow, Button, Menu, Toplevel, LabelFrame, Label
 from collections import OrderedDict
 
 from spectrum.calculations import graphs

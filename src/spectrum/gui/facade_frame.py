@@ -15,8 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import codecs
-import tkFileDialog
-from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox
+from tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox, filedialog
 
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
@@ -196,7 +195,7 @@ class Facade(Frame):
         self._cocliques_container.pack(expand=True, fill='both')
 
     def call_graph_save_dialog(self):
-        file_name = tkFileDialog.asksaveasfilename(defaultextension='.ps',
+        file_name = filedialog.asksaveasfilename(defaultextension='.ps',
                                                    filetypes=[('PostScript', '.ps')], parent=self.winfo_toplevel(),
                                                    title="Save graph as image")
         if file_name:

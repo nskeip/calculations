@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Canvas
+from tkinter import Canvas
 
 from shapes import EdgeShape
 from spectrum.graph import graph
@@ -274,8 +274,8 @@ class GraphCanvas(Canvas, object):
         self.bind("<Configure>", lambda event: self._on_configure())
 
     def create_caption(self, caption_text):
-        import tkFont
-        font = tkFont.Font(family='Helvetica', size=28)
+        from tkinter.font import Font
+        font = Font(family='Helvetica', size=28)
         label_id = self.create_text(0, 0, text=caption_text, fill='#888888', font=font, anchor='sw')
         self.tag_lower(label_id)
         return label_id

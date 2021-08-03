@@ -16,9 +16,9 @@ Copyright 2012 Daniel Lytkin.
 """
 import math
 import string
-import tkFont
-from Tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
+from tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
                      LabelFrame)
+from tkinter.font import Font
 
 from spectrum.calculations.numeric import Integer, Constraints
 from spectrum.calculations.semisimple import SpectraElement
@@ -401,7 +401,7 @@ class GroupNameLabel(Label):
         self._group = group
         kw['text'] = str(group)
         #        kw.setdefault('anchor', 'w')
-        kw.setdefault('font', tkFont.Font(size=20))
+        kw.setdefault('font', Font(size=20))
         Label.__init__(self, parent, **kw)
         self._init_menu()
 

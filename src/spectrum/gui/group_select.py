@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
+from tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
 
 from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup, SporadicGroup, AlternatingGroup, ExceptionalGroup
