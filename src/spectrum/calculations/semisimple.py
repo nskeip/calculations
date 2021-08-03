@@ -26,10 +26,10 @@ __author__ = 'Daniel Lytkin'
 _CACHE = True
 
 
-class SpectraElement(long):
-    """Special long extension for spectra elements. It contains information on
-    how it was calculated. If 'verbose' is False, creates long, without any
-    additional info
+class SpectraElement(int):
+    """Special int extension for spectra elements. It contains information on
+    how it was calculated. If 'verbose' is False, creates int, without any
+    additional info.
     """
 
     def __new__(cls, quotient=1, q=0, partition=None, signs=None,
@@ -38,9 +38,9 @@ class SpectraElement(long):
             partition = []
         if signs is None:
             signs = []
-        class_ = SpectraElement if verbose else long
-        return long.__new__(class_, quotient * reduce(numeric.lcm,
-                                                      (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
+        class_ = SpectraElement if verbose else int
+        return int.__new__(class_, quotient * reduce(numeric.lcm,
+                                                     (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
     def __init__(self, quotient=1, q=0, partition=None, signs=None,
                  verbose=True):
@@ -113,7 +113,7 @@ class SpectraElement(long):
         """Returns lcm of this and other. 'q' must be the same. Quotients are
         multiplied.
         """
-        elem = long.__new__(SpectraElement, numeric.lcm(self, other))
+        elem = int.__new__(SpectraElement, numeric.lcm(self, other))
         quotient = self._quotient * other._quotient
         elem.__init__(quotient=quotient, q=self._q,
                       partition=list(self._partition) + list(other._partition),
@@ -123,7 +123,7 @@ class SpectraElement(long):
     def __mul__(self, other):
         """Multiplies quotient by integer
         """
-        elem = long.__new__(SpectraElement, long(self) * other)
+        elem = int.__new__(SpectraElement, int(self) * other)
         elem.__init__(quotient=self._quotient * other, q=self._q,
                       partition=self._partition, signs=self._signs)
         return elem

@@ -328,7 +328,7 @@ class Integer(object):
             self._int = 1
             self._factors = Counter()
         elif len(args) == 1:
-            if isinstance(args[0], int) or isinstance(args[0], long):
+            if isinstance(args[0], int):
                 self._int = args[0]
                 self._factors = Counter({args[0]: 1})
             elif isinstance(args[0], Integer):
@@ -340,7 +340,7 @@ class Integer(object):
         else:
             self._factors = Counter()
             for arg in args:
-                if type(arg) in (int, long):
+                if type(arg) is int:
                     self._factors[arg] += 1
                 else:
                     if arg[1]: self._factors[arg[0]] += arg[1]
