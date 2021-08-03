@@ -262,7 +262,7 @@ class NumberBox(Entry):
             self._var.set(filtered)
         else:
             # remove any non-decimal character
-            value = int(filter(lambda c: c in string.digits, self._var.get()))
+            value = int(''.join(filter(lambda c: c in string.digits, self._var.get())))
 
             value = self._constraints.closest_valid(value)
 
