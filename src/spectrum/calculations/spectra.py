@@ -22,6 +22,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import gcd, lcm
 from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement
@@ -209,7 +210,9 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     n //= 2
     q = field.order
     p = field.char
-    nk = lambda k: (p ** (k - 1) + 3) // 2
+
+    def nk(k):
+        return (p ** (k - 1) + 3) // 2
 
     # (1)
     a1 = [(q ** n - sign) // 2]
@@ -224,9 +227,15 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
         n_k = nk(k)
         if n_k >= n:
             break
-        dk = gcd(4, q ** n_k - sign) // 2
-        a3.append(p ** k * lcm(dk, (q ** (n - n_k) + 1) // dk))
-        a3.append(p ** k * lcm(dk, (q ** (n - n_k) - 1) // dk))
+        for delta in [1, -1]:
+            dk = gcd(4, q ** n_k - sign * delta) // 2
+            a3.append(
+                p ** k *
+                lcm(
+                    dk,
+                    (q**(n - n_k) - delta) // dk
+                )
+            )
         k += 1
 
     # (4)

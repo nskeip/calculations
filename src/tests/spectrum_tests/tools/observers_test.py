@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+
 from spectrum.tools.observers import Observable
 
 __author__ = 'Daniel Lytkin'

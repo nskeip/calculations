@@ -14,10 +14,12 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-import unittest
 import itertools
-from spectrum.calculations.numeric import *
+import unittest
+
 from spectrum_tests.parametric import parametrized, parameters
+
+from spectrum.calculations.numeric import *
 
 __author__ = 'Daniel Lytkin'
 

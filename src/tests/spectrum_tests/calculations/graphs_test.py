@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+
 from spectrum.calculations.graphs import FastGraph, PrimeGraph
 from spectrum.calculations.groups import Group
 

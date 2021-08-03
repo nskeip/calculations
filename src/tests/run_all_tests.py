@@ -14,8 +14,8 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-import unittest
 import sys
+import unittest
 
 __author__ = 'Daniel Lytkin'
 

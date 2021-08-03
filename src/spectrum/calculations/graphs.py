@@ -15,10 +15,10 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.graph.graph import Graph
-from spectrum.tools.tools import MultiModeStringFormatter
 
 __author__ = 'Daniel Lytkin'
 

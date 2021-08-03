@@ -14,9 +14,9 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from collections import Counter
-import operator
 import math
+import operator
+from collections import Counter
 
 __author__ = 'Daniel Lytkin'
 

@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import unittest
+
 from spectrum.graph.geometry import Point
 from spectrum.graph.graph import Graph
 from spectrum.graph.layout import Layout

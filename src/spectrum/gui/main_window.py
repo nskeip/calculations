@@ -16,6 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 from Tkinter import Frame, PanedWindow, Button, Menu, Toplevel, LabelFrame, Label
 from collections import OrderedDict
+
 from spectrum.calculations import graphs
 from spectrum.gui.facade_frame import Facade
 from spectrum.gui.group_select import GroupSelect

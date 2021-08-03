@@ -16,6 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 import math
 import random
+
 from spectrum.graph.geometry import Point
 
 __author__ = 'Daniel Lytkin'
