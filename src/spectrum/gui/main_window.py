@@ -66,7 +66,7 @@ class MainWindow(Frame):
         self._show_graph_checkbutton.grid(row=0, columnspan=2, sticky='w')
 
         Label(graph_controls, text='Algorithm').grid(row=1, sticky='w')
-        self._graph_type = OptionList(graph_controls, values=MainWindow.GRAPH_TYPES.keys())
+        self._graph_type = OptionList(graph_controls, values=tuple(MainWindow.GRAPH_TYPES.keys()))
         self._graph_type.config(width=15)
         self._graph_type.grid(row=1, column=1, sticky='we')
 
