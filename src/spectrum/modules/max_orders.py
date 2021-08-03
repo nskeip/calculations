@@ -147,13 +147,14 @@ def print_max_elems():
         group = ClassicalGroup("Omega+", 2 * dimension, 4)
         dim_expansion = " + ".join(
             [str(x) for x in numeric.binary_expansion(dimension)])
-        print "{}:".format(group).ljust(12),
-        print "n = {} = {}".format(dimension, dim_expansion).ljust(30)
-        print
+        print("{}:".format(group).ljust(12))
+        print("n = {} = {}".format(dimension, dim_expansion).ljust(30))
+        print()
+
         for elem in max_orders_wrapped(group):
-            print str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
-                elem.object.partition, reverse=True)
-        print
+            print(str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
+                elem.object.partition, reverse=True))
+        print()
 
 #print_max_elems()
 #
@@ -178,7 +179,7 @@ def print_max_elems():
 #        group = ClassicalGroup("Sp", 2 * dimension, 2)
 #        if is_max_order_semisimple(group):
 #            partition = " + ".join(numeric.binary_expansion(dimension))
-#            print "{}: n = {} = {}".format(group, dimension, partition)
-#            #print "\t" + StringViewFormatter(max_order).str_mixed()
+#            print("{}: n = {} = {}".format(group, dimension, partition))
+#            #print("\t" + StringViewFormatter(max_order).str_mixed())
 
 
