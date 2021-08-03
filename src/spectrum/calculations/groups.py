@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from partition import Partitions
+from .partition import Partitions
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit, ObjectCache
