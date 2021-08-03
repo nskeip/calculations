@@ -21,6 +21,8 @@ from collections import Counter
 __author__ = 'Daniel Lytkin'
 
 # Module providing methods to calculate GCD and LCM etc.
+from functools import reduce
+
 
 def gcd(a, b):
     """Calculates greatest common divisor of two numbers.

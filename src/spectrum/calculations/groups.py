@@ -14,6 +14,8 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
+from functools import reduce
+
 from .partition import Partitions
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer

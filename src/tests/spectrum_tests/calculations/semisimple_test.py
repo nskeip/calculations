@@ -16,6 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 import itertools
 import unittest
+from functools import reduce
 
 from spectrum_tests.parametric import parameters, parametrized
 

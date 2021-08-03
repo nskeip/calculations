@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+from functools import reduce
 
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
