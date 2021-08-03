@@ -124,7 +124,7 @@ class ApexList(Listbox):
     def reprint(self):
         """Updates list elements' text
         """
-        for i in xrange(len(self._apex)):
+        for i in range(len(self._apex)):
             self._update_text(i)
 
     def expand(self, indices=None):

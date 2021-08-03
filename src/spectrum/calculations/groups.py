@@ -160,7 +160,7 @@ class AlternatingGroup(Group):
     def order(self):
         if self._order is None:
             # n!/2
-            self._order = numeric.prod(xrange(3, self._degree + 1))
+            self._order = numeric.prod(range(3, self._degree + 1))
         return Integer(self._order)
 
     def __str__(self):

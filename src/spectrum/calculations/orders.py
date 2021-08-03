@@ -58,7 +58,7 @@ def _symplectic_order(n, field):
     q = field.order
     return (Integer({field.char: field.pow * n * n}) *
             prod((Integer(q ** i - 1) *
-                  Integer(q ** i + 1) for i in xrange(1, n + 1))))
+                  Integer(q ** i + 1) for i in range(1, n + 1))))
 
 
 def _projective_symplectic_order(n, field):
@@ -79,7 +79,7 @@ def _omega_pm_order(sign):
         o = (Integer({field.char: field.pow * n * (n - 1)}) *
              Integer(q ** n - e) *
              prod((Integer(q ** i - 1) *
-                   Integer(q ** i + 1) for i in xrange(1, n))))
+                   Integer(q ** i + 1) for i in range(1, n))))
         if field.char != 2:
             o.div_by_prime(2)
         return o
@@ -114,7 +114,7 @@ def _special_orthogonal_order(sign):
         q = field.order
         n //= 2
         part = prod((Integer(q ** k - 1) *
-                     Integer(q ** k + 1) for k in xrange(1, n)))
+                     Integer(q ** k + 1) for k in range(1, n)))
         if not e:
             return (part * Integer({field.char: field.pow * n * n}) *
                     Integer(q ** n - 1) * Integer(q ** n + 1))
@@ -129,22 +129,22 @@ def _special_orthogonal_order(sign):
 def _projective_general_linear_order(n, field):
     q = field.order
     return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
-            prod((Integer(q ** i - 1) for i in xrange(2, n + 1))))
+            prod((Integer(q ** i - 1) for i in range(2, n + 1))))
 
 
 def _projective_general_unitary_order(n, field):
     q = field.order
     return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
             prod((Integer(q ** i - 1) *
-                  Integer(q ** i + 1) for i in xrange(1, n // 2 + 1))) *
-            prod((Integer(q ** (2 * i + 1) + 1)) for i in xrange(1,
+                  Integer(q ** i + 1) for i in range(1, n // 2 + 1))) *
+            prod((Integer(q ** (2 * i + 1) + 1)) for i in range(1,
                 (n + 1) // 2)))
 
 
 def _projective_special_linear_order(n, field):
     q = field.order
     return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
-            prod((Integer(q ** i - 1) for i in xrange(3, n + 1))) *
+            prod((Integer(q ** i - 1) for i in range(3, n + 1))) *
             Integer(q + 1) * Integer((q - 1) // gcd(n, q - 1)))
 
 
@@ -152,8 +152,8 @@ def _projective_special_unitary_order(n, field):
     q = field.order
     return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
             prod((Integer(q ** i - 1) *
-                  Integer(q ** i + 1) for i in xrange(2, n // 2 + 1))) *
-            prod((Integer(q ** (2 * i + 1) + 1)) for i in xrange(1,
+                  Integer(q ** i + 1) for i in range(2, n // 2 + 1))) *
+            prod((Integer(q ** (2 * i + 1) + 1)) for i in range(1,
                 (n + 1) // 2)) *
             Integer(q - 1) * Integer((q + 1) // gcd(n, q + 1)))
 

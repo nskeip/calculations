@@ -177,7 +177,7 @@ class SemisimpleElements(object):
         q = self._q
         n = self._n
         plusesMod = 0 if self._parity == 1 else 1
-        for pluses in xrange(plusesMod, n + 1):
+        for pluses in range(plusesMod, n + 1):
             plusPartitions = FullBoundedSets(pluses)
             if pluses > 0:
                 plusPartitions = itertools.chain(plusPartitions,
@@ -202,7 +202,7 @@ class SemisimpleElements(object):
         """Generates all semisimple elements"""
         q = self._q
         n = self._n
-        for left in xrange((n + 2) // 2):
+        for left in range((n + 2) // 2):
             right = n - left
             leftPartitions = MaximalBoundedSets(left)
             for lPartition in leftPartitions:

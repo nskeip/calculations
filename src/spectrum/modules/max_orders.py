@@ -143,7 +143,7 @@ def max_orders_wrapped(group):
 #
 #
 def print_max_elems():
-    for dimension in xrange(4, 36):
+    for dimension in range(4, 36):
         group = ClassicalGroup("Omega+", 2 * dimension, 4)
         dim_expansion = " + ".join(
             [str(x) for x in numeric.binary_expansion(dimension)])
@@ -174,7 +174,7 @@ def print_max_elems():
 #
 #
 #def print_groups_with_semisimple_max_element():
-#    for dimension in xrange(2, 40):
+#    for dimension in range(2, 40):
 #        group = ClassicalGroup("Sp", 2 * dimension, 2)
 #        if is_max_order_semisimple(group):
 #            partition = " + ".join(numeric.binary_expansion(dimension))

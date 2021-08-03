@@ -159,7 +159,7 @@ class IterationsPlugin(object):
         self._event_id = self._canvas.after(self.time_step, self._step)
 
     def iterate(self, times):
-        for i in xrange(times):
+        for i in range(times):
             self._canvas.layout.step()
         self._canvas.reset()
 

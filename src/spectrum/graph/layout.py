@@ -173,11 +173,11 @@ class SpringLayout(Layout):
         """Calculates position of vertices after a lapse of `time_step' after
         last position.
         """
-        for vertex in xrange(len(self._graph.vertices)):
+        for vertex in range(len(self._graph.vertices)):
             force = Point()
 
             # repulsion between vertices
-            for other in xrange(len(self._graph.vertices)):
+            for other in range(len(self._graph.vertices)):
                 if other == vertex: continue
                 force += self._repulsion_force(vertex, other)
 

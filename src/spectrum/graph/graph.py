@@ -66,8 +66,8 @@ class Graph(object):
         """Returns list o graph's edges.
         """
         edges = list()
-        for i in xrange(len(self._adjacency)):
-            for j in xrange(len(self._adjacency[i])):
+        for i in range(len(self._adjacency)):
+            for j in range(len(self._adjacency[i])):
                 if self._adjacency[i][j]:
                     edges.append(
                         ordered_pair(self._vertices[i], self._vertices[j]))
@@ -118,10 +118,10 @@ class Graph(object):
         """Returns indices of neighbors of vertex with specified index.
         """
         neighbors = []
-        for i in xrange(index):
+        for i in range(index):
             if self._adjacency[index][i]:
                 neighbors.append(i)
-        for j in xrange(index + 1, len(self._adjacency)):
+        for j in range(index + 1, len(self._adjacency)):
             if self._adjacency[j][index]:
                 neighbors.append(j)
         return neighbors
@@ -136,14 +136,14 @@ class Graph(object):
         new_row = (list(self._adjacency[index]) +
                   [True] +
                   [self._adjacency[j][index]
-                   for j in xrange(index + 1, len(self._adjacency))])
+                   for j in range(index + 1, len(self._adjacency))])
         v_index = self.index(value)
         if v_index is None:
             self._adjacency.append(new_row)
             self._vertices.append(value)
             return len(self._adjacency) - 1
         else:
-            for i in xrange(len(self._adjacency)):
+            for i in range(len(self._adjacency)):
                 if i != v_index and new_row[i]:
                     self._set_adjacency(v_index, i, True)
 
@@ -170,7 +170,7 @@ class Graph(object):
         limit = 0
         cocliques = [[]]
 
-        for j in xrange(len(indices) - limit - 1):
+        for j in range(len(indices) - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
             t = filter(lambda x: (x > i and not self._adjacency[x][i]), indices)
@@ -202,7 +202,7 @@ def full_graph(n):
     """Creates full graph on n vertices
     """
     g = Graph()
-    for i in xrange(n):
+    for i in range(n):
         g._vertices.append(i)
         g._adjacency.append([True] * len(g._adjacency))
     return g

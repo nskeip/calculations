@@ -335,7 +335,7 @@ def _projective_omega_pm_spectrum(sign):
 
         # (2)
         a2 = []
-        for n1 in xrange(1, n):
+        for n1 in range(1, n):
             for e1 in [-1, 1]:
                 a = q ** n1 - e1
                 b = q ** (n - n1) - e * e1
@@ -538,7 +538,7 @@ def _projective_special_linear_spectrum(sign):
         # (2)
         a2 = []
         eps = lambda s: 1 if s % 2 == 0 else e
-        for n1 in xrange(1, (n + 2) // 2):
+        for n1 in range(1, (n + 2) // 2):
             pair = (n1, n - n1)
             signs = (-eps(n1), -eps(n - n1))
             a2.append(lcm(q ** pair[0] + signs[0], q ** pair[1] + signs[1]) //
