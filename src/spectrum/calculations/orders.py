@@ -128,13 +128,13 @@ def _special_orthogonal_order(sign):
 
 def _projective_general_linear_order(n, field):
     q = field.order
-    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+    return (Integer({field.char: field.pow * (n * (n - 1) // 2)}) *
             prod((Integer(q ** i - 1) for i in range(2, n + 1))))
 
 
 def _projective_general_unitary_order(n, field):
     q = field.order
-    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+    return (Integer({field.char: field.pow * (n * (n - 1) // 2)}) *
             prod((Integer(q ** i - 1) *
                   Integer(q ** i + 1) for i in range(1, n // 2 + 1))) *
             prod((Integer(q ** (2 * i + 1) + 1)) for i in range(1,
@@ -143,14 +143,14 @@ def _projective_general_unitary_order(n, field):
 
 def _projective_special_linear_order(n, field):
     q = field.order
-    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+    return (Integer({field.char: field.pow * (n * (n - 1) // 2)}) *
             prod((Integer(q ** i - 1) for i in range(3, n + 1))) *
             Integer(q + 1) * Integer((q - 1) // gcd(n, q - 1)))
 
 
 def _projective_special_unitary_order(n, field):
     q = field.order
-    return (Integer({field.char: field.pow * (n * (n - 1) / 2)}) *
+    return (Integer({field.char: field.pow * (n * (n - 1) // 2)}) *
             prod((Integer(q ** i - 1) *
                   Integer(q ** i + 1) for i in range(2, n // 2 + 1))) *
             prod((Integer(q ** (2 * i + 1) + 1)) for i in range(1,
