@@ -56,7 +56,6 @@ class SpectraElement(int):
         self._q = q
         self._partition = partition
         self._signs = signs
-        super(SpectraElement, self).__init__(self)
 
     @property
     def quotient(self):
