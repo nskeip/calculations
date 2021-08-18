@@ -427,11 +427,10 @@ class Integer(object):
         """Returns factorized string representation
         """
         self.factorize()
-        factors = self._factors.items()
-        factors.sort(key=lambda x: x[0])
+        factors_keys = sorted(self._factors.keys())
         power = lambda k: "^" + str(k) if k > 1 else ""
         factor_power_str = lambda f, p: "{}{}".format(f, power(p))
-        return " * ".join(factor_power_str(f, p) for f, p in factors)
+        return " * ".join(factor_power_str(f, self._factors[f]) for f in factors_keys)
 
     def str_verbose(self):
         """Same as str_factorised
