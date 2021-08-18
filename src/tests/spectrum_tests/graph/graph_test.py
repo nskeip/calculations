@@ -71,7 +71,7 @@ class GraphTest(unittest.TestCase):
         g = Graph(vertices)
         g.add_edges(edges)
 
-        cocliques = g.max_cocliques()
+        cocliques = [list(cc) for cc in g.max_cocliques()]
         expected = [[0, 2, 4], [0, 3, 4], [3, 4, 5]]
         self.assertSequenceEqual(expected, cocliques)
 

@@ -174,7 +174,7 @@ class Graph(object):
         for j in range(len_indices - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
-            t = filter(lambda x: (x > i and not self._adjacency[x][i]), indices)
+            t = list(filter(lambda x: (x > i and not self._adjacency[x][i]), indices))
             len_t = sum(1 for _ in t)
             if len_t < limit:
                 continue
@@ -194,8 +194,9 @@ class Graph(object):
     def max_cocliques(self):
         """Returns set of cocliques of maximal size (slow)
         """
+        # TODO: iterator-based version?
         cocliquesIndices = self._max_cocliques_between_indices(
-            range(len(self._adjacency)))
+            list(range(len(self._adjacency))))
         return [map(lambda i: self._vertices[i], coclique)
                 for coclique in cocliquesIndices]
 
