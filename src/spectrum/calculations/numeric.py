@@ -354,10 +354,14 @@ class Integer(object):
     def __int__(self):
         return self._int
 
+    @staticmethod
+    def _cmp(a, b):
+        return (a > b) - (a < b)
+
     def __cmp__(self, other):
         if isinstance(other, Integer):
-            return cmp(self._int, other._int)
-        return cmp(self._int, other)
+            return self._cmp(self._int, other._int)
+        return self._cmp(self._int, other)
 
     def copy(self):
         copy = Integer()
