@@ -164,17 +164,19 @@ class Graph(object):
     def _max_cocliques_between_indices(self, indices):
         """Searches for largest cocliques among vertices with specified indices
         """
-        if len(indices) == 1:
+        if sum(1 for _ in indices) == 1:
             return [list(indices)]
 
         limit = 0
         cocliques = [[]]
+        len_indices = sum(1 for _ in indices)
 
-        for j in range(len(indices) - limit - 1):
+        for j in range(len_indices - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
             t = filter(lambda x: (x > i and not self._adjacency[x][i]), indices)
-            if len(t) < limit:
+            len_t = sum(1 for _ in t)
+            if len_t < limit:
                 continue
             next_cocliques = self._max_cocliques_between_indices(t)
             for coclique in next_cocliques:

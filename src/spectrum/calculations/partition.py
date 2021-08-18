@@ -36,7 +36,7 @@ class Partitions(object):
         transposed = []
         i = 0
         while True:
-            counter = len(filter(lambda x: x - i > 0, partition))
+            counter = sum(1 for _ in filter(lambda x: x - i > 0, partition))
             if counter:
                 transposed.append(counter)
                 i += 1
