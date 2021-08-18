@@ -159,8 +159,7 @@ class ApexList(Listbox):
                 number = Integer(number)
             return MultiModeStringFormatter.mixin_to(number)
 
-        self._apex = [transform_number(number) for number in apex]
-        self._apex.sort(reverse=True)
+        self._apex = [transform_number(number) for number in sorted(apex, reverse=True)]
         self.delete(0, "END")
         self.insert(0, *self._apex)
 
