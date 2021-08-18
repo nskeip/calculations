@@ -479,7 +479,7 @@ class Integer(object):
     def factorize(self):
         """Factorize all not factorized divisors
         """
-        for x in self._factors.keys():
+        for x in list(self._factors.keys()):  # list creates a copy
             self._factorize_divisor(x)
         return self._factors
 
