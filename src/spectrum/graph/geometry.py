@@ -59,7 +59,7 @@ class Point(tuple):
     def __rmul__(self, other):
         return self * other
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return Point(self[0] / other, self[1] / other)
 
     def __neg__(self):
