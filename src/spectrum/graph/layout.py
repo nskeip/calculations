@@ -52,7 +52,7 @@ class Layout(object):
     def __getitem__(self, vertex):
         """Returns coordinates for specified vertex.
         """
-        if not self.__locations.has_key(vertex):
+        if vertex not in self.__locations:
             self.__locations[vertex] = self._defaultLocation
         return self.__locations[vertex]
 
