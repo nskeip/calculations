@@ -469,7 +469,7 @@ class Integer(object):
         p = self._factors[divisor]
         del self._factors[divisor]
         if not p: return
-        for key, value in _factorize_number(divisor).iteritems():
+        for key, value in _factorize_number(divisor).items():
             self._factors[key] += value * p
 
     def factorize(self):
