@@ -380,7 +380,7 @@ class Integer(object):
         if isinstance(other, Integer):
             self._factors += other._factors
             self._int *= other._int
-        elif isinstance(other, int) or isinstance(other, long):
+        elif isinstance(other, int):
             self._factors[other] += 1
             self._int *= other
         return self
@@ -391,7 +391,7 @@ class Integer(object):
             ret = Integer()
             ret._factors = other._factors + self._factors
             ret._int = other._int * self._int
-        elif isinstance(other, int) or isinstance(other, long):
+        elif isinstance(other, int):
             ret = self.copy()
             ret._factors[other] += 1
             ret._int *= other
