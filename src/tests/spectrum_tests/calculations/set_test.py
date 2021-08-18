@@ -16,10 +16,9 @@ Copyright 2012 Daniel Lytkin.
 """
 import unittest
 
-from spectrum_tests.parametric import parameters, parametrized
-
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.set import BoundedSets, MaximalBoundedSets, FullBoundedSets
+from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
 
@@ -58,7 +57,7 @@ class SetTest(unittest.TestCase):
         """
         sets = list(MaximalBoundedSets(n))
         expected = self.filterContained(list(BoundedSets(n)))
-        self.assertSequenceEqual(expected, sets)
+        self.assertSequenceEqual(list(expected), sets)
 
     @parameters(range(2, 20))
     def test_containing_partitions(self, n):
@@ -85,4 +84,4 @@ class SetTest(unittest.TestCase):
     def test_full_sets(self, n):
         sets = list(FullBoundedSets(n))
         expected = filter(lambda x: sum(x) == n, BoundedSets(n))
-        self.assertSequenceEqual(expected, sets)
+        self.assertSequenceEqual(list(expected), sets)
