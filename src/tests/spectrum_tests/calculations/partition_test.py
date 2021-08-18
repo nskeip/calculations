@@ -53,7 +53,7 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, allPartitions)
 
     @parameters(
-        filter(lambda (n, k): n > k, itertools.combinations(range(1, 10), 2)))
+        filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2)))
     def test_first_fixed_length_partition(self, params):
         n, k = params
         p = Partitions(n, length=k).__iter__().next()
@@ -67,7 +67,7 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, p)
 
     @parameters(
-        filter(lambda (n, k): n > k, itertools.combinations(range(1, 10), 2)))
+        filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2)))
     def test_length(self, params):
         # self.maxDiff = None
         n, k = params
