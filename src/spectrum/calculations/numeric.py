@@ -358,6 +358,13 @@ class Integer(object):
     def _cmp(a, b):
         return (a > b) - (a < b)
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Integer):
+            return int(self) == int(other)
+        elif isinstance(other, int):
+            return int(self) == other
+        return super().__eq__(other)
+
     def __cmp__(self, other):
         if isinstance(other, Integer):
             return self._cmp(self._int, other._int)
