@@ -473,7 +473,7 @@ class Integer(object):
         del self._factors[divisor]
         if not p: return
         for key, value in _factorize_number(divisor).items():
-            self._factors[key] += value * p
+            self._factors[int(key)] += value * p
 
     def factorize(self):
         """Factorize all not factorized divisors
