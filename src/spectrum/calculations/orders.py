@@ -14,7 +14,9 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from spectrum.calculations.numeric import Integer, gcd, prod
+from math import gcd
+
+from spectrum.calculations.numeric import Integer, prod
 
 __author__ = 'Daniel Lytkin'
 

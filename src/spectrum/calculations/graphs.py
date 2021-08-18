@@ -15,6 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+import math
 
 from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
@@ -66,7 +67,7 @@ class FastGraph(Graph):
         l = len(self._vertices)
         for i in range(l):
             b = self._vertices[i]
-            d = numeric.gcd(a, b)
+            d = math.gcd(a, b)
             if d == 1:
                 continue
             bd = numeric.prime_part(b, d)

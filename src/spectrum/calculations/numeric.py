@@ -20,34 +20,8 @@ from collections import Counter
 
 __author__ = 'Daniel Lytkin'
 
-# Module providing methods to calculate GCD and LCM etc.
+# Module providing methods to calculate some number theoretic values.
 from functools import reduce
-
-
-def gcd(a, b):
-    """Calculates greatest common divisor of two numbers.
-
-    Args:
-        a, b: Integers
-
-    Returns:
-        GCD(a, b)
-    """
-    while b:
-        a, b = b, a % b
-    return a
-
-
-def lcm(a, b):
-    """Calculates least common multiple of two numbers.
-
-    Args:
-        a, b: Integers
-
-    Returns:
-        LCM(a, b)
-    """
-    return a / gcd(a, b) * b
 
 
 def prime_part(n, b):
@@ -62,7 +36,7 @@ def prime_part(n, b):
         Greatest divisor of n which is relatively prime to d.
     """
     while True:
-        d = gcd(n, b)
+        d = math.gcd(n, b)
         if d <= 1: break
         n //= d
     return n
