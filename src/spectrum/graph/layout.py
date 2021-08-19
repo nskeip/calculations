@@ -73,7 +73,7 @@ class Layout(object):
     def update(self):
         """Remove deleted vertices
         """
-        deleted_vertices = (self.__locations.viewkeys() -
+        deleted_vertices = (self.__locations.keys() -
                             set(range(len(self._graph.vertices))))
         for vertex in deleted_vertices:
             del self.__locations[vertex]

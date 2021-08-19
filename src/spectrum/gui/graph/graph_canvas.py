@@ -16,11 +16,11 @@ Copyright 2012 Daniel Lytkin.
 """
 from tkinter import Canvas
 
-from .shapes import EdgeShape
 from spectrum.graph import graph
 from spectrum.graph.geometry import Point
 from spectrum.gui.graph import shapes
 from spectrum.tools.observers import Observable
+from .shapes import EdgeShape
 
 __author__ = 'Daniel Lytkin'
 
@@ -354,7 +354,7 @@ class GraphCanvas(Canvas, object):
         """
         self.layout.update()
         graph_vertices = set(self.graph.vertices)
-        local_vertices = self._vertices.viewkeys()
+        local_vertices = self._vertices.keys()
         # deleted vertices:
         for value in local_vertices - graph_vertices:
             del self._vertices[value]
