@@ -463,7 +463,7 @@ class GraphCanvas(Canvas, object):
         return Point(x - margin, y - margin)
 
     def _get_vertex_by_shape_id(self, id):
-        for vertex in self._vertices.itervalues():
+        for vertex in self._vertices.values():
             if vertex.shape.id == id:
                 return vertex
         return None

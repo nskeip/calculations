@@ -222,7 +222,7 @@ class SpringLayout(Layout):
             self.set_unlocked_location(vertex, Point(fx(p.x), fy(p.y)))
 
     def total_kinetic_energy(self):
-        return sum((v.square() for v in self._velocities.itervalues()))
+        return sum((v.square() for v in self._velocities.values()))
 
 
 
