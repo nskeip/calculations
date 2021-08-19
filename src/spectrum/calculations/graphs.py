@@ -24,12 +24,13 @@ from spectrum.graph.graph import Graph
 __author__ = 'Daniel Lytkin'
 
 
-class PrimeGraph(Graph):
-    class __metaclass__(type):
-        """Provide a metaclass in order to override class-level str method"""
-        def __str__(self):
-            return 'Prime Graph'
+class PrimeGraphMeta(type):
+    """Provide a metaclass in order to override class-level str method"""
+    def __str__(self):
+        return 'Prime Graph'
 
+
+class PrimeGraph(Graph, metaclass=PrimeGraphMeta):
     def __init__(self, group):
         Graph.__init__(self)
         apex = group.apex()
@@ -39,12 +40,13 @@ class PrimeGraph(Graph):
             self.add_edges(itertools.combinations(factors, 2))
 
 
-class FastGraph(Graph):
-    class __metaclass__(type):
-        """Provide a metaclass in order to override class-level str method"""
-        def __str__(self):
-            return 'Fast Graph'
+class FastGraphMeta(type):
+    """Provide a metaclass in order to override class-level str method"""
+    def __str__(self):
+        return 'Fast Graph'
 
+
+class FastGraph(Graph, metaclass=FastGraphMeta):
     def __init__(self, group):
         Graph.__init__(self)
         apex = group.apex()
