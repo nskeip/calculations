@@ -41,7 +41,7 @@ class Facade(Frame):
         #        self._show_apex = True
         self._show_graph = show_graph
         self._graph_class = graph_class
-        self._init_variables()
+        # self._init_variables()  # TODO: fix vertex label automatic positioning
         self._init_menu()
         self._init_components()
 
