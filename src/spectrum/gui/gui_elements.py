@@ -252,7 +252,7 @@ class NumberBox(Entry):
 
     def refresh_input(self):
         if self._allow_expression:
-            filtered = filter(lambda c: c in _expression_symbols, self._var.get())
+            filtered = ''.join(filter(lambda c: c in _expression_symbols, self._var.get()))
             try:
                 value = eval(filtered.replace('^', '**'))
             except Exception:
