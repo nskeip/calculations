@@ -126,7 +126,7 @@ class Facade(Frame):
             self._show_graph_button.pack()
 
     def _init_variables(self):
-        def set_default_var(self, name):
+        def set_default_var(name):
             """Sets widget-specific var with same value as root.
             """
             default_var = self.getvar(name)
@@ -134,7 +134,7 @@ class Facade(Frame):
             self.setvar(local_var_name, default_var)
             return local_var_name
 
-        local_name = set_default_var(self, "vertexlabelposition")
+        local_name = set_default_var("vertexlabelposition")
         tools.trace_variable(self, local_name, "w",
                              self._change_vertex_label_position)
 
