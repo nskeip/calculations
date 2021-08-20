@@ -46,7 +46,7 @@ class Partitions(object):
 
     @staticmethod
     def _slope(seq):
-        return map(lambda x, y: x - y, seq, seq[1:] + [0])
+        return list(map(lambda x, y: x - y, seq, seq[1:] + [0]))
 
     def _isValid(self, seq):
         return all(func(seq) for func in self._validators)

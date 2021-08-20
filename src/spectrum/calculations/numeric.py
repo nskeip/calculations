@@ -422,7 +422,7 @@ class Integer(object):
         """Returns factorized latex representation
         """
         self.factorize()
-        factors = self._factors.items()
+        factors = list(self._factors.items())
         factors.sort(key=lambda x: x[0])
 
         def power(k):
@@ -435,7 +435,7 @@ class Integer(object):
         return " \cdot ".join(factor_power_str(f, p) for f, p in factors)
 
     def div_by_prime(self, prime):
-        for factor in self._factors.keys():
+        for factor in list(self._factors.keys()):
             if factor % prime == 0:
                 p = self._factors[factor]
                 del self._factors[factor]

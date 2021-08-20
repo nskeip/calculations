@@ -174,7 +174,7 @@ class Graph(object):
         for j in range(len_indices - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
-            t = list(filter(lambda x: (x > i and not self._adjacency[x][i]), indices))
+            t = [x for x in indices if (x > i and not self._adjacency[x][i])]
             len_t = sum(1 for _ in t)
             if len_t < limit:
                 continue
@@ -197,7 +197,7 @@ class Graph(object):
         # TODO: iterator-based version?
         cocliquesIndices = self._max_cocliques_between_indices(
             list(range(len(self._adjacency))))
-        return [map(lambda i: self._vertices[i], coclique)
+        return [[self._vertices[i] for i in coclique]
                 for coclique in cocliquesIndices]
 
 

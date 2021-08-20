@@ -35,7 +35,7 @@ def maximal_orders(group, num_elements=1):
 
 @parametrized
 class MaxOrdersTest(unittest.TestCase):
-    @parameters(range(3, 26))
+    @parameters(list(range(3, 26)))
     def test_symplectic(self, n):
         group = ClassicalGroup("Sp", 2 * n, 2)
         max_elems = max_orders.maximal_orders(group)
@@ -43,7 +43,7 @@ class MaxOrdersTest(unittest.TestCase):
         self.assertEqual(max_elems[0], max_elems_2[0])
         self.assertEqual(max_elems[1], max_elems_2[1])
 
-    @parameters(range(3, 100))
+    @parameters(list(range(3, 100)))
     def test_symplectic_gcd(self, n):
         max_elems = max_orders.symplectic_2(n)
         expected = math.gcd(*max_elems)

@@ -131,7 +131,7 @@ def symplectic_2_gcd(n):
 #
 def max_orders_wrapped(group):
     extend = lambda elem: MultiModeStringFormatter.mixin_to(elem, mode='verbose')
-    return map(extend, maximal_orders(group))
+    return list(map(extend, maximal_orders(group)))
 
 #
 #
@@ -147,13 +147,13 @@ def print_max_elems():
         group = ClassicalGroup("Omega+", 2 * dimension, 4)
         dim_expansion = " + ".join(
             [str(x) for x in numeric.binary_expansion(dimension)])
-        print("{}:".format(group).ljust(12))
-        print("n = {} = {}".format(dimension, dim_expansion).ljust(30))
+        print(("{}:".format(group).ljust(12)))
+        print(("n = {} = {}".format(dimension, dim_expansion).ljust(30)))
         print()
 
         for elem in max_orders_wrapped(group):
-            print(str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
-                elem.object.partition, reverse=True))
+            print((str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
+                elem.object.partition, reverse=True)))
         print()
 
 #print_max_elems()

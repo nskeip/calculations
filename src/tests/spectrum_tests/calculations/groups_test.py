@@ -16,10 +16,9 @@ Copyright 2012 Daniel Lytkin.
 """
 import unittest
 
+from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
 from spectrum_tests.calculations import orders_data, spectra_data
 from spectrum_tests.parametric import parametrized, parameters
-
-from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
 
 __author__ = 'Daniel Lytkin'
 
@@ -82,13 +81,13 @@ class OrdersTest(unittest.TestCase):
         g = AlternatingGroup(15)
         self.assertEqual(expected, g.order())
 
-    @parameters(orders_data.classical_orders_data.keys())
+    @parameters(list(orders_data.classical_orders_data.keys()))
     def test_classical_orders(self, params):
         g = ClassicalGroup(*params)
         order = orders_data.classical_orders_data[params]
         self.assertEqual(order, g.order())
 
-    @parameters(orders_data.exceptional_orders_data.keys())
+    @parameters(list(orders_data.exceptional_orders_data.keys()))
     def test_exceptional_orders(self, params):
         g = ExceptionalGroup(*params)
         order = orders_data.exceptional_orders_data[params]
@@ -123,7 +122,7 @@ class SpectraTest(unittest.TestCase):
     #     apex = spectra_data.classical[params]
     #     self.assertSetEqual(set(apex), set(g.apex()))
 
-    @parameters(spectra_data.exceptional.keys())
+    @parameters(list(spectra_data.exceptional.keys()))
     def test_exceptional_spectra(self, params):
         g = ExceptionalGroup(*params)
         apex = spectra_data.exceptional[params]

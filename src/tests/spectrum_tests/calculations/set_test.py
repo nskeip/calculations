@@ -29,7 +29,7 @@ class SetTest(unittest.TestCase):
         """
         Returns only those sets, that are not contained in any other set
         """
-        return filter(lambda x: not any(set(x) < set(y) for y in sets), sets)
+        return [x for x in sets if not any(set(x) < set(y) for y in sets)]
 
     def test_next_bounded_set(self):
         expected = [4, 3, 2, 1]
@@ -50,7 +50,7 @@ class SetTest(unittest.TestCase):
             [3], [2, 1], [2], [1]]
         self.assertSequenceEqual(expected, sets)
 
-    @parameters(range(2, 20))
+    @parameters(list(range(2, 20)))
     def test_maximal_sets(self, n):
         """
         Maximal sets are exactly the sets that are not contained in any other
@@ -59,7 +59,7 @@ class SetTest(unittest.TestCase):
         expected = self.filterContained(list(BoundedSets(n)))
         self.assertSequenceEqual(list(expected), sets)
 
-    @parameters(range(2, 20))
+    @parameters(list(range(2, 20)))
     def test_containing_partitions(self, n):
         """
         Every partition must have the set of its parts contained in some
@@ -80,8 +80,8 @@ class SetTest(unittest.TestCase):
         sets = list(BoundedSets(0))
         self.assertSequenceEqual([[]], sets)
 
-    @parameters(range(2, 20))
+    @parameters(list(range(2, 20)))
     def test_full_sets(self, n):
         sets = list(FullBoundedSets(n))
-        expected = filter(lambda x: sum(x) == n, BoundedSets(n))
+        expected = [x for x in BoundedSets(n) if sum(x) == n]
         self.assertSequenceEqual(list(expected), sets)

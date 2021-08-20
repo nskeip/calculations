@@ -65,7 +65,7 @@ class GraphTest(unittest.TestCase):
             g.as_sparse_graph())
 
     def test_max_cocliques(self):
-        vertices = range(6)
+        vertices = list(range(6))
         edges = [(0, 1), (0, 5), (1, 2), (1, 3),
             (1, 4), (1, 5), (2, 3), (2, 5)]
         g = Graph(vertices)
@@ -78,19 +78,19 @@ class GraphTest(unittest.TestCase):
     def test_full_graph(self):
         g = full_graph(4)
 
-        expectedVertices = range(4)
+        expectedVertices = list(range(4))
         expectedEdges = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
         self.assertSparseGraphEqual((expectedVertices, expectedEdges),
             g.as_sparse_graph())
 
     def test_adjacent(self):
-        g = Graph(range(3))
+        g = Graph(list(range(3)))
         g.add_edge(0, 1)
         self.assertTrue(g.adjacent(0, 1))
         self.assertFalse(g.adjacent(1, 2))
 
     def test_neighbors(self):
-        g = Graph(range(5))
+        g = Graph(list(range(5)))
         edges = [(0, 1), (0, 3), (0, 4), (1, 2), (2, 3), (2, 4)]
         g.add_edges(edges)
 

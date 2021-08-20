@@ -303,7 +303,7 @@ class GraphCanvas(Canvas, object):
     def vertices(self):
         """Returns set of vertices on the canvas.
         """
-        return self._vertices.viewvalues()
+        return self._vertices.values()
 
     @property
     def picked_vertex_state(self):
@@ -447,7 +447,7 @@ class GraphCanvas(Canvas, object):
     def _move_edge(self, edge, start, end):
         new = start.x, start.y, end.x, end.y
         current = self.coords(edge.shape.id)
-        self.coords(edge.shape.id, *map(lambda x, y: x + y, current, new))
+        self.coords(edge.shape.id, *list(map(lambda x, y: x + y, current, new)))
 
     def _convert_layout_location(self, location):
         """Converts layout coordinates to canvas coordinates
@@ -497,6 +497,6 @@ class GraphCanvas(Canvas, object):
                     vertex = self._vertices[value]
                     vertex.shape.configure(fill=color)
                     colored.append(value)
-        for value, vertex in self._vertices.iteritems():
+        for value, vertex in self._vertices.items():
             if value not in colored:
                 vertex.shape.configure(fill='white')

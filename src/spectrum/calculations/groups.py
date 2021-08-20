@@ -153,7 +153,7 @@ class AlternatingGroup(Group):
     def apex(self):
         if self._apex is None:
             n = self._degree
-            partitions = filter(lambda x: (len(x) + n) % 2 == 0, Partitions(n))
+            partitions = [x for x in Partitions(n) if (len(x) + n) % 2 == 0]
             self._apex = numeric.sort_and_filter(
                 [reduce(math.lcm, partition) for partition in partitions])
         return self._apex

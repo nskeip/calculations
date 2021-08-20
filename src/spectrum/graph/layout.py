@@ -91,7 +91,7 @@ class Layout(object):
         default = Point(0, 1)
         edgeVec = lambda neighbor: (self[vertex] - self[neighbor]).identity()
         return reduce(lambda x, y: x + y,
-            map(edgeVec, self._graph.neighbors(vertex)), default).identity()
+            list(map(edgeVec, self._graph.neighbors(vertex))), default).identity()
 
 
 class RandomLayout(Layout):
@@ -103,7 +103,7 @@ class RandomLayout(Layout):
         self.reset()
 
     def __getitem__(self, vertex):
-        if not self.__locations.has_key(vertex):
+        if vertex not in self.__locations:
             self.set_unlocked_location(vertex,
                 Point(self.size.x * random.random(),
                     self.size.y * random.random()))
@@ -153,7 +153,7 @@ class SpringLayout(Layout):
                 Point(self.size.x * random.random(),
                     self.size.y * random.random()))
         self._velocities = dict.fromkeys(
-            range(len(self._graph.vertices)), Point())
+            list(range(len(self._graph.vertices))), Point())
 
 
     def _repulsion_force(self, vertex, other):

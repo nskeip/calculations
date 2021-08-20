@@ -169,7 +169,7 @@ class SemisimpleElements(object):
         for ni in BoundedSets(n):
             if len(ni) + n - sum(ni) < self._min_length:
                 continue
-            yield SpectraElement(q=q, partition=ni, signs=map(f, ni),
+            yield SpectraElement(q=q, partition=ni, signs=list(map(f, ni)),
                                  verbose=self._verbose)
 
     def _with_parity_generator(self):

@@ -73,7 +73,7 @@ def parameters(paramsList, naming=default_naming):
 def parametrized(testCase):
     """Test case class must be decorated with @parametrized for @parameters to work for its methods
     """
-    for attr in testCase.__dict__.copy().values():
+    for attr in list(testCase.__dict__.copy().values()):
         if not isinstance(attr, FunctionType) or not hasattr(attr, "_params"):
             continue
 

@@ -252,7 +252,7 @@ class NumberBox(Entry):
 
     def refresh_input(self):
         if self._allow_expression:
-            filtered = ''.join(filter(lambda c: c in _expression_symbols, self._var.get()))
+            filtered = ''.join([c for c in self._var.get() if c in _expression_symbols])
             try:
                 value = eval(filtered.replace('^', '**'))
             except Exception:
@@ -261,7 +261,7 @@ class NumberBox(Entry):
             self._var.set(filtered)
         else:
             # remove any non-decimal character
-            value = int(''.join(filter(lambda c: c in string.digits, self._var.get())))
+            value = int(''.join([c for c in self._var.get() if c in string.digits]))
 
             value = self._constraints.closest_valid(value)
 

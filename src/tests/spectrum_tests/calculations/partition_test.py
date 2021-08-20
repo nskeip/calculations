@@ -17,9 +17,8 @@ Copyright 2012 Daniel Lytkin.
 import itertools
 import unittest
 
-from spectrum_tests.parametric import parametrized, parameters
-
 from spectrum.calculations.partition import *
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
@@ -53,10 +52,10 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, allPartitions)
 
     @parameters(
-        filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2)))
+        list(filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2))))
     def test_first_fixed_length_partition(self, params):
         n, k = params
-        p = Partitions(n, length=k).__iter__().next()
+        p = next(Partitions(n, length=k).__iter__())
         expected = [n - k + 1] + [1] * (k - 1)
         self.assertSequenceEqual(p, expected)
 
@@ -67,12 +66,12 @@ class PartitionTest(unittest.TestCase):
         self.assertSequenceEqual(expected, p)
 
     @parameters(
-        filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2)))
+        list(filter(lambda pair: pair[0] > pair[1], itertools.combinations(range(1, 10), 2))))
     def test_length(self, params):
         # self.maxDiff = None
         n, k = params
         p = list(Partitions(n, length=k))
-        expected = filter(lambda x: len(x) == k, Partitions(n))
+        expected = [x for x in Partitions(n) if len(x) == k]
         self.assertSequenceEqual(expected, p)
 
     def test_invalid_length(self):
