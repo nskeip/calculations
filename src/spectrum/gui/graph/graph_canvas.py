@@ -79,7 +79,7 @@ class PickedState(Observable):
         return self._picked  # .copy()
 
 
-class MousePlugin(object):
+class MousePlugin:
     """Class responsible for all mouse manipulations with graph on canvas.
     """
 
@@ -142,7 +142,7 @@ class MousePlugin(object):
             self._selection = None
 
 
-class IterationsPlugin(object):
+class IterationsPlugin:
     """This plugin enables animation for iterable graph layouts
     """
 
@@ -170,7 +170,7 @@ class IterationsPlugin(object):
         self._canvas.after_cancel(self._event_id)
 
 
-class Vertex(object):
+class Vertex:
     """This class connects graph vertex with its shape on the canvas.
     """
 
@@ -206,7 +206,7 @@ class Vertex(object):
         return self._incident
 
 
-class Edge(object):
+class Edge:
     """This class connects graph edge with its shape on the canvas
     """
 

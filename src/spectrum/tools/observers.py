@@ -16,7 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 __author__ = 'Daniel Lytkin'
 
-class Observable(object):
+class Observable:
     """Observer. Listeners must be callable, taking one argument 'item', which is the changed item
     """
 

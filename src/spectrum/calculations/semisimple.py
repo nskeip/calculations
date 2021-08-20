@@ -132,7 +132,7 @@ class SpectraElement(int):
         return self * other
 
 
-class SemisimpleElements(object):
+class SemisimpleElements:
     """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for
     all partitions n_1 + ... + n_k = n.
     If `min_length' is set to t, then k >= t. Only min_length=1, 2 or 3 are supported.
@@ -239,7 +239,7 @@ class SemisimpleElements(object):
         return element
 
 
-class MixedElements(object):
+class MixedElements:
     """Generates elements of form g(k) * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
     for all k and partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """

@@ -294,7 +294,7 @@ def _factorize_number(number):
     return factors
 
 
-class Integer(object):
+class Integer:
     """Represents integer with methods to factorize.
     Usage: Integer(12345) for number 12345 or Integer((2,5), (3,2), 5, 7) for number 2^5 * 3^3 * 5 * 7
     """
@@ -472,7 +472,7 @@ class Integer(object):
 PRIME = 1
 PRIME_POWER = 2
 
-class Constraints(object):
+class Constraints:
     """Class representing numeric constraints, e.g. for dimension and
     characteristic of classical group. Minimal value must fit the constraints.
     """

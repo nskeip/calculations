@@ -22,7 +22,7 @@ from spectrum.graph.geometry import Point
 
 __author__ = 'Daniel Lytkin'
 
-class Layout(object):
+class Layout:
     """Basic abstract implementation of layout.
     Layout provides coordinates for vertices
     """

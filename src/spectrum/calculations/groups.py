@@ -30,7 +30,7 @@ _CACHE = True  # whether group caching is enabled
 #LATEX_OPERATORNAME = True
 
 
-class Field(object):
+class Field:
     """Finite field.
     Can be created as Field(order) or Field(base, pow) where base**pow is the
     order of the field. `order' must be a prime power, otherwise the wrong
@@ -72,7 +72,7 @@ class Field(object):
         return "F({}^{})".format(self._base, self._pow)
 
 
-class Group(object):
+class Group:
     """Abstract class for finite groups.
     """
 

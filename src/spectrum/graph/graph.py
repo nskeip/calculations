@@ -25,7 +25,7 @@ def ordered_pair(a, b):
     return a, b
 
 
-class Graph(object):
+class Graph:
     """Class representing graph. Vertices are indexed by numbers 0, 1, ...
     Values are stored in 'vertices' array.
     """

@@ -41,12 +41,12 @@ class ObjectCache(type):
         return instance
 
 
-class DocInherit(object):
+class DocInherit:
     """doc_inherit decorator
 
     Usage:
 
-    class Foo(object):
+    class Foo:
         def foo(self):
             "Frobber"
             pass

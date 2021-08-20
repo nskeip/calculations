@@ -17,7 +17,7 @@ Copyright 2012 Daniel Lytkin.
 __author__ = 'Daniel Lytkin'
 
 
-class BoundedSets(object):
+class BoundedSets:
     """Generates integer sets {n_1,...,n_k}, such that n_1+...+n_k <= n.
     """
 

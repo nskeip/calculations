@@ -16,7 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 __author__ = 'Daniel Lytkin'
 
-class Partitions(object):
+class Partitions:
     """Class providing iterator on partitions
     Required parameter:
         number - the number to partition
