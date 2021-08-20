@@ -84,13 +84,13 @@ class GraphTest(unittest.TestCase):
             g.as_sparse_graph())
 
     def test_adjacent(self):
-        g = Graph(list(range(3)))
+        g = Graph(range(3))
         g.add_edge(0, 1)
         self.assertTrue(g.adjacent(0, 1))
         self.assertFalse(g.adjacent(1, 2))
 
     def test_neighbors(self):
-        g = Graph(list(range(5)))
+        g = Graph(range(5))
         edges = [(0, 1), (0, 3), (0, 4), (1, 2), (2, 3), (2, 4)]
         g.add_edges(edges)
 
