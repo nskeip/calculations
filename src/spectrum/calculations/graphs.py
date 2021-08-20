@@ -35,7 +35,7 @@ class PrimeGraph(Graph, metaclass=PrimeGraphMeta):
         Graph.__init__(self)
         apex = group.apex()
         for elem in apex:
-            factors = list(Integer(elem).factorize().keys())
+            factors = Integer(elem).factorize().keys()
             self.add_vertices(factors)
             self.add_edges(itertools.combinations(factors, 2))
 
