@@ -22,7 +22,12 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+import typing
 from math import gcd, lcm
+from typing import Iterable
+
+if typing.TYPE_CHECKING:
+    from spectrum.calculations.groups import Field
 
 from spectrum.calculations import numeric
 from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement
@@ -65,7 +70,7 @@ sporadic_spectra = {
 #############################
 # SPECTRA OF CLASSICAL GROUPS
 #############################
-def _symplectic_spectrum_odd_c(n, field):
+def _symplectic_spectrum_odd_c(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of symplectic groups in odd characteristic.
     [1, Corollary 1]
     """
@@ -87,7 +92,7 @@ def _symplectic_spectrum_odd_c(n, field):
     return itertools.chain(a1, a2, a3)
 
 
-def _symplectic_spectrum_even_c(n, field):
+def _symplectic_spectrum_even_c(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of symplectic groups in characteristic 2.
     [2, Corollary 3]
     """
@@ -111,7 +116,7 @@ def _symplectic_spectrum_even_c(n, field):
     return itertools.chain(a1, a2, a3, a4)
 
 
-def _symplectic_spectrum(n, field):
+def _symplectic_spectrum(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of symplectic groups
     """
     if field.char == 2:
@@ -120,7 +125,7 @@ def _symplectic_spectrum(n, field):
         return _symplectic_spectrum_odd_c(n, field)
 
 
-def _projective_symplectic_spectrum_odd_c(n, field):
+def _projective_symplectic_spectrum_odd_c(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of projective symplectic groups in characteristic 2.
     [1, Corollary 2]
     """
@@ -145,7 +150,7 @@ def _projective_symplectic_spectrum_odd_c(n, field):
     return itertools.chain(a1, a2, a3, a4)
 
 
-def _projective_symplectic_spectrum(n, field):
+def _projective_symplectic_spectrum(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of projective symplectic group. Note that
     PSp(n, 2^k) = Sp(n, 2^k)
     """
@@ -155,7 +160,7 @@ def _projective_symplectic_spectrum(n, field):
         return _projective_symplectic_spectrum_odd_c(n, field)
 
 
-def _omega_spectrum_odd_c(n, field):
+def _omega_spectrum_odd_c(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of groups \Omega_{2n+1}(q) for odd q.
     [1, Corollary 6]
     """
@@ -192,7 +197,7 @@ def _omega_spectrum_odd_c(n, field):
     return itertools.chain(a1, a2, a3, a4, a5)
 
 
-def _omega_spectrum(n, field):
+def _omega_spectrum(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of Omega_{2n+1}(q)
     """
     if field.char == 2:
@@ -203,7 +208,7 @@ def _omega_spectrum(n, field):
         return _omega_spectrum_odd_c(n, field)
 
 
-def _omega_pm_spectrum_odd_c(n, field, sign):
+def _omega_pm_spectrum_odd_c(n: int, field: 'Field', sign: int) -> Iterable[int]:
     """Spectra of Omega^e_{2n}(q) for odd q.
     [1, Corollary 8]
     """
@@ -263,7 +268,7 @@ def _omega_pm_spectrum_odd_c(n, field, sign):
     return itertools.chain(a1, a2, a3, a4, a5, a6, a7, a8, a9)
 
 
-def _omega_pm_spectrum_even_c(n, field, sign):
+def _omega_pm_spectrum_even_c(n: int, field: 'Field', sign: int) -> Iterable[int]:
     """Spectra for groups \Omega^{\pm}(2^k).
     [1, Corollary 4]
     """
@@ -313,13 +318,13 @@ def _equal_two_part(a, b):
     return a % 2 == 1 and b % 2 == 1
 
 
-def _projective_omega_pm_spectrum(sign):
+def _projective_omega_pm_spectrum(sign: int):
     """Spectra of Omega^e_{2n}(q) for odd q.
     [1, Corollary 9]
     """
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         n //= 2
         q = field.order
         p = field.char
@@ -377,10 +382,10 @@ def _projective_omega_pm_spectrum(sign):
     return spectrum
 
 
-def _omega_pm_spectrum(sign):
+def _omega_pm_spectrum(sign: int):
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         if field.char == 2:
             return _omega_pm_spectrum_even_c(n, field, e)
         else:
@@ -389,7 +394,7 @@ def _omega_pm_spectrum(sign):
     return spectrum
 
 
-def _special_orthogonal_odd_c_spectrum(n, field):
+def _special_orthogonal_odd_c_spectrum(n: int, field: 'Field') -> Iterable[int]:
     """Spectra of groups SO_{2n+1}(q) for odd q.
     [1, Corollary 5]
     """
@@ -411,13 +416,13 @@ def _special_orthogonal_odd_c_spectrum(n, field):
     return itertools.chain(a1, a2, a3)
 
 
-def _special_orthogonal_pm_spectrum(sign):
+def _special_orthogonal_pm_spectrum(sign: int):
     """Spectra SO^e_{2n}(q) for odd q.
     [1, Corollary 7]
     """
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         n //= 2
         q = field.order
         p = field.char
@@ -445,13 +450,13 @@ def _special_orthogonal_pm_spectrum(sign):
 
 
 # PGL and PGU
-def _projective_general_linear_spectrum(sign):
+def _projective_general_linear_spectrum(sign: int):
     """Spectra of PGL and PGU groups.
     [2, Corollary 2]
     """
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         q = field.order
         p = field.char
 
@@ -475,13 +480,13 @@ def _projective_general_linear_spectrum(sign):
     return spectrum
 
 
-def _special_linear_spectrum(sign):
+def _special_linear_spectrum(sign: int):
     """Spectra of SL and SU groups.
         [2, Corollary 1]
     """
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         q = field.order
         p = field.char
 
@@ -520,13 +525,13 @@ def _special_linear_spectrum(sign):
     return spectrum
 
 
-def _projective_special_linear_spectrum(sign):
+def _projective_special_linear_spectrum(sign: int):
     """Spectra of PSL and PSU groups.
         [2, Corollary 3]
     """
     e = sign
 
-    def spectrum(n, field):
+    def spectrum(n: int, field: 'Field') -> Iterable[int]:
         q = field.order
         p = field.char
         d = gcd(n, q - e)
@@ -591,7 +596,7 @@ classical_spectra = {
 }
 
 
-def _g2_spectrum(field):
+def _g2_spectrum(field: 'Field') -> Iterable[int]:
     q = field.order
     p = field.char
     if p == 2:
@@ -604,7 +609,7 @@ def _g2_spectrum(field):
             q ** 2 + q + 1]
 
 
-def _2f4_spectrum(field):
+def _2f4_spectrum(field: 'Field') -> Iterable[int]:
     q = field.order
     sq = 2 ** ((field.pow + 1) // 2)
     ssq = 2 ** ((3 * field.pow + 1) // 2)
@@ -616,22 +621,22 @@ def _2f4_spectrum(field):
             q ** 2 + ssq + q + sq + 1]
 
 
-def _2b2_spectrum(field):
+def _2b2_spectrum(field: 'Field') -> Iterable[int]:
     q = field.order
     sq = 2 ** ((field.pow + 1) // 2)
     return [4, q - sq + 1, q + sq + 1, q - 1]
 
 
-def _2g2_spectrum(field):
+def _2g2_spectrum(field: 'Field') -> Iterable[int]:
     q = field.order
     sq = 3 ** ((field.pow + 1) // 2)
     return [9, 6, (q + 1) // 2, q - 1, q - sq + 1, q + sq + 1]
 
 
-def _e6_spectrum(sign):
+def _e6_spectrum(sign: int):
     e = sign
 
-    def spectrum(field):
+    def spectrum(field: 'Field') -> Iterable[int]:
         q = field.order
         p = field.char
         d = gcd(3, q - e)
@@ -674,11 +679,73 @@ def _e6_spectrum(sign):
     return spectrum
 
 
+def _e8_spectrum(field: 'Field') -> Iterable[int]:
+    """
+    [3, main theorem]
+    """
+    q = field.order
+    p = field.char
+
+    return [  # (1)
+        (q + 1) * (q**2 + q + 1) * (q**5 - 1),
+        (q - 1) * (q**2 - q + 1) * (q**5 + 1),
+
+        (q + 1) * (q ** 2 + 1) * (q ** 5 - 1),
+        (q - 1) * (q ** 2 + 1) * (q ** 5 + 1),
+
+        (q + 1) * (q ** 7 - 1),
+        (q - 1) * (q ** 7 + 1),
+
+        q ** 8 - 1,
+
+        (q + 1) * (q ** 3 - 1) * (q ** 4 + 1),
+        (q - 1) * (q ** 3 + 1) * (q ** 4 + 1),
+
+        (q ** 2 + 1) * (q ** 6 - 1),
+        (q ** 2 - 1) * (q ** 6 + 1),
+
+        (q ** 2 - 1) * (q ** 2 + q + 1) * (q ** 4 - q ** 2 + 1),
+        (q ** 2 - 1) * (q ** 2 - q + 1) * (q ** 4 - q ** 2 + 1),
+
+        (q ** 2 - 1) * (q ** 6 - q ** 3 + 1),
+        (q ** 2 - 1) * (q ** 6 + q ** 3 + 1),
+
+        (q ** 2 + q + 1) * (q ** 6 + q ** 3 + 1) / gcd(3, q - 1),
+        (q ** 2 - q + 1) * (q ** 6 - q ** 3 + 1) / gcd(3, q + 1),
+
+        q**8 + q**7 - q**5 - q**4 - q**3 + q + 1,
+        q**8 - q**7 + q**5 - q**4 + q**3 - q + 1,
+
+        q**8 - q**4 + 1,
+        q**8 - q**6 + q**4 - q**2 + 1,
+    ] + [  # (2)
+        p * x for x in [
+            (q ** 2 - q + 1) * (q ** 5 + 1),
+            (q ** 2 + q + 1) * (q ** 5 - 1),
+
+            (q + 1) * (q ** 6 - q ** 3 + 1),
+            (q - 1) * (q ** 6 + q ** 3 + 1),
+
+            q ** 7 + 1,
+            q ** 7 - 1,
+
+            (q ** 3 - 1) * (q ** 4 - q ** 2 - 1),
+            (q ** 3 + 1) * (q ** 4 - q ** 2 + 1),
+
+            (q ** 8 - 1) / ((q - 1) * gcd(2, q - 1)),
+            (q ** 8 - 1) / ((q + 1) * gcd(2, q - 1)),
+
+            q ** 6 + 1,
+        ]
+    ]
+
+
 exceptional_spectra = {
     '2F4': _2f4_spectrum,
     'G2': _g2_spectrum,
     '2G2': _2g2_spectrum,
     '2B2': _2b2_spectrum,
     'E6': _e6_spectrum(1),
-    '2E6': _e6_spectrum(-1)
+    '2E6': _e6_spectrum(-1),
+    'E8': _e8_spectrum,
 }
