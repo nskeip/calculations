@@ -572,22 +572,22 @@ def _projective_special_linear_spectrum(sign):
 
 
 classical_spectra = {
-    "Sp": _symplectic_spectrum,
-    "PSp": _projective_symplectic_spectrum,
-    "Omega": _omega_spectrum,
-    "Omega+": _omega_pm_spectrum(1),
-    "Omega-": _omega_pm_spectrum(-1),
-    "POmega+": _projective_omega_pm_spectrum(1),
-    "POmega-": _projective_omega_pm_spectrum(-1),
-    "SO": _special_orthogonal_odd_c_spectrum,
-    "SO+": _special_orthogonal_pm_spectrum(1),
-    "SO-": _special_orthogonal_pm_spectrum(-1),
-    "PGL": _projective_general_linear_spectrum(1),
-    "PGU": _projective_general_linear_spectrum(-1),
-    "SL": _special_linear_spectrum(1),
-    "SU": _special_linear_spectrum(-1),
-    "PSL": _projective_special_linear_spectrum(1),
-    "PSU": _projective_special_linear_spectrum(-1),
+    'Sp': _symplectic_spectrum,
+    'PSp': _projective_symplectic_spectrum,
+    'Omega': _omega_spectrum,
+    'Omega+': _omega_pm_spectrum(1),
+    'Omega-': _omega_pm_spectrum(-1),
+    'POmega+': _projective_omega_pm_spectrum(1),
+    'POmega-': _projective_omega_pm_spectrum(-1),
+    'SO': _special_orthogonal_odd_c_spectrum,
+    'SO+': _special_orthogonal_pm_spectrum(1),
+    'SO-': _special_orthogonal_pm_spectrum(-1),
+    'PGL': _projective_general_linear_spectrum(1),
+    'PGU': _projective_general_linear_spectrum(-1),
+    'SL': _special_linear_spectrum(1),
+    'SU': _special_linear_spectrum(-1),
+    'PSL': _projective_special_linear_spectrum(1),
+    'PSU': _projective_special_linear_spectrum(-1),
 }
 
 
@@ -675,10 +675,10 @@ def _e6_spectrum(sign):
 
 
 exceptional_spectra = {
-    "2F4": _2f4_spectrum,
-    "G2": _g2_spectrum,
-    "2G2": _2g2_spectrum,
-    "2B2": _2b2_spectrum,
-    "E6": _e6_spectrum(1),
-    "2E6": _e6_spectrum(-1)
+    '2F4': _2f4_spectrum,
+    'G2': _g2_spectrum,
+    '2G2': _2g2_spectrum,
+    '2B2': _2b2_spectrum,
+    'E6': _e6_spectrum(1),
+    '2E6': _e6_spectrum(-1)
 }
