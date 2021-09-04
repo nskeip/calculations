@@ -50,3 +50,7 @@ Running tests
 The whole project is covered with unit-tests, except for gui.
 Use `tests/run_all_tests.py` to run them all.
 
+Or you can use `pytest` and run the following command from `src/`:
+```
+python -m pytest
+```
