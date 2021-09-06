@@ -17,6 +17,7 @@ Copyright 2012 Daniel Lytkin.
 import unittest
 
 from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
+from spectrum.calculations.spectra.exceptional import RootSystem
 from spectrum_tests.calculations import orders_data, spectra_data
 from spectrum_tests.parametric import parametrized, parameters
 
@@ -127,3 +128,22 @@ class SpectraTest(unittest.TestCase):
         g = ExceptionalGroup(*params)
         apex = spectra_data.exceptional[params]
         self.assertSetEqual(set(apex), set(g.apex()))
+
+    def test_mh(self):
+        # maximal height of a root system
+        self.assertEqual(RootSystem('D', 6).mh(), 9)
+        self.assertEqual(RootSystem('E', 6).mh(), 11)
+
+    def test_p(self):
+        # if p is 2, then p(D_6) is 16, because 2^3 = 8 <= 9 < 16
+        self.assertEqual(RootSystem('D', 6).p(2), 16)
+
+        # by analogy:
+        self.assertEqual(RootSystem('D', 6).p(3), 27)
+
+        # if p is 5 or 7, then p(D_6) = p^2;
+        for p in (5, 7,):
+            self.assertEqual(RootSystem('D', 6).p(p), p**2)
+
+        # for all p > 7, it equals p
+        self.assertEqual(RootSystem('D', 8).p(101), 101)

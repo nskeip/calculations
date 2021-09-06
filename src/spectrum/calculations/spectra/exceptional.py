@@ -18,9 +18,10 @@ Copyright 2012 Daniel Lytkin.
 
 """
 
+import enum
 import itertools
 import typing
-from math import gcd
+from math import gcd, log, ceil
 from typing import Iterable
 
 if typing.TYPE_CHECKING:
@@ -110,6 +111,53 @@ def _e6_spectrum(sign: int):
     return spectrum
 
 
+class RootSystemType(enum.Enum):
+    A = 'A'
+    B = 'B'
+    C = 'C'
+    D = 'D'
+    E = 'E'
+    F = 'F'
+    G = 'G'
+
+
+class RootSystem:
+    root_system_type: RootSystemType
+
+    def __init__(self, root_system_type: typing.Union[str, RootSystemType], n: int):
+        self.root_system_type = RootSystemType(root_system_type)
+        self.n = n
+
+    def mh(self):
+        """
+        Maximal height of the root.
+        [3, table 1]
+        """
+        if self.root_system_type == RootSystemType.A:
+            return self.n
+        elif self.root_system_type in (RootSystemType.B, RootSystemType.C):
+            return 2 * self.n - 1
+        elif self.root_system_type == RootSystemType.D:
+            return 2 * self.n - 3
+        elif (self.root_system_type == RootSystemType.E and self.n == 6) or \
+                (self.root_system_type == RootSystemType.F and self.n == 4):
+            return 11
+        elif self.root_system_type == RootSystemType.E and self.n == 7:
+            return 17
+        elif self.root_system_type == RootSystemType.E and self.n == 8:
+            return 29
+        elif self.root_system_type == RootSystemType.G and self.n == 2:
+            return 5
+        else:
+            raise ValueError(f'Max height is not defined for {self.root_system_type.value}_{self.n}')
+
+    def p(self, p: int):
+        """
+        Least p power that is greater than n.
+        """
+        return p ** ceil(log(self.mh() + 1, p))
+
+
 def _e8_spectrum(field: 'Field') -> Iterable[int]:
     """
     [3, main theorem]
@@ -141,8 +189,8 @@ def _e8_spectrum(field: 'Field') -> Iterable[int]:
         (q ** 2 - 1) * (q ** 6 - q ** 3 + 1),
         (q ** 2 - 1) * (q ** 6 + q ** 3 + 1),
 
-        (q ** 2 + q + 1) * (q ** 6 + q ** 3 + 1) / gcd(3, q - 1),
-        (q ** 2 - q + 1) * (q ** 6 - q ** 3 + 1) / gcd(3, q + 1),
+        (q ** 2 + q + 1) * (q ** 6 + q ** 3 + 1) // gcd(3, q - 1),
+        (q ** 2 - q + 1) * (q ** 6 - q ** 3 + 1) // gcd(3, q + 1),
 
         q**8 + q**7 - q**5 - q**4 - q**3 + q + 1,
         q**8 - q**7 + q**5 - q**4 + q**3 - q + 1,
@@ -163,11 +211,82 @@ def _e8_spectrum(field: 'Field') -> Iterable[int]:
             (q ** 3 - 1) * (q ** 4 - q ** 2 - 1),
             (q ** 3 + 1) * (q ** 4 - q ** 2 + 1),
 
-            (q ** 8 - 1) / ((q - 1) * gcd(2, q - 1)),
-            (q ** 8 - 1) / ((q + 1) * gcd(2, q - 1)),
+            (q ** 8 - 1) // ((q - 1) * gcd(2, q - 1)),
+            (q ** 8 - 1) // ((q + 1) * gcd(2, q - 1)),
 
             q ** 6 + 1,
         ]
+    ] + [  # (3)
+        RootSystem('A', 2).p(p) * x for x in [
+            q ** 6 - 1,
+
+            q ** 6 + q ** 3 + 1,
+            q ** 6 - q ** 3 + 1,
+
+            (q ** 2 + q + 1) * (q ** 4 - q ** 2 + 1),
+            (q ** 2 - q + 1) * (q ** 4 - q ** 2 + 1),
+
+            (q ** 2 - q + 1) * (q ** 4 - 1),
+            (q ** 2 + q + 1) * (q ** 4 - 1),
+
+            (q ** 2 - 1) * (q ** 4 + 1),
+
+            (q + 1) * (q ** 5 - 1),
+            (q - 1) * (q ** 5 + 1),
+        ]
+    ] + [  # (4)
+        RootSystem('A', 3).p(p) * x for x in [
+            (q ** 5) - 1,
+            (q ** 5) + 1,
+
+            (q ** 4 + 1) * (q - 1),
+            (q ** 4 + 1) * (q + 1),
+
+            (q ** 3 - 1) * (q ** 2 + 1),
+            (q ** 3 + 1) * (q ** 2 + 1),
+        ]
+    ] + [  # (5)
+        RootSystem('A', 4).p(p) * x for x in [
+            (q ** 5 - 1) // (q - 1),
+            (q ** 5 + 1) // (q + 1),
+
+            q ** 4 - 1,
+        ]
+    ] + [  # (6)
+        RootSystem('A', 5).p(p) * x for x in [
+            (q ** 3 - 1) * (q + 1),
+            (q ** 3 + 1) * (q - 1),
+
+            q ** 4 + 1,
+
+            (q ** 4 - 1) // gcd(2, q - 1),
+
+            q ** 4 - q ** 2 + 1,
+        ]
+    ] + [  # (7)
+        RootSystem('D', 5).p(p) * x for x in [
+            (q ** 2 + 1) * (q - 1),
+            (q ** 2 + 1) * (q + 1),
+
+            q ** 3 - 1,
+            q ** 3 + 1,
+        ]
+    ] + [  # (8)
+        RootSystem('D', 6).p(p) * (q ** 2 + 1)
+    ] + [  # (9)
+        RootSystem('E', 6).p(p) * x for x in [
+            (q ** 2 - q + 1),
+            (q ** 2 + q + 1),
+
+            q ** 2 - 1,
+        ]
+    ] + [  # (10)
+        RootSystem('E', 7).p(p) * x for x in [
+            q - 1,
+            q + 1,
+        ]
+    ] + [  # (11)
+        RootSystem('E', 8).p(p)
     ]
 
 
