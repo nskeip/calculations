@@ -14,25 +14,9 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
+
+from .classical import classical_spectra
+from .exceptional import exceptional_spectra
+from .sporadic import sporadic_spectra
+
 __author__ = 'Daniel Lytkin'
-
-class Observable:
-    """Observer. Listeners must be callable, taking one argument 'item', which is the changed item
-    """
-
-    def __init__(self):
-        self.__listeners = []
-
-    def add_listener(self, listener):
-        self.__listeners.append(listener)
-
-    def remove_listener(self, listener):
-        self.__listeners.remove(listener)
-
-    @property
-    def listeners(self):
-        return self.__listeners
-
-    def notify(self, item):
-        for listener in self.__listeners:
-            listener(item)

@@ -14,11 +14,13 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from partition import Partitions
+import math
+from functools import reduce
+
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit, ObjectCache
-
+from .partition import Partitions
 
 __author__ = 'Daniel Lytkin'
 
@@ -28,7 +30,7 @@ _CACHE = True  # whether group caching is enabled
 #LATEX_OPERATORNAME = True
 
 
-class Field(object):
+class Field:
     """Finite field.
     Can be created as Field(order) or Field(base, pow) where base**pow is the
     order of the field. `order' must be a prime power, otherwise the wrong
@@ -70,7 +72,7 @@ class Field(object):
         return "F({}^{})".format(self._base, self._pow)
 
 
-class Group(object):
+class Group:
     """Abstract class for finite groups.
     """
 
@@ -151,16 +153,16 @@ class AlternatingGroup(Group):
     def apex(self):
         if self._apex is None:
             n = self._degree
-            partitions = filter(lambda x: (len(x) + n) % 2 == 0, Partitions(n))
+            partitions = [x for x in Partitions(n) if (len(x) + n) % 2 == 0]
             self._apex = numeric.sort_and_filter(
-                [reduce(numeric.lcm, partition) for partition in partitions])
+                [reduce(math.lcm, partition) for partition in partitions])
         return self._apex
 
     @doc_inherit
     def order(self):
         if self._order is None:
             # n!/2
-            self._order = numeric.prod(xrange(3, self._degree + 1))
+            self._order = numeric.prod(range(3, self._degree + 1))
         return Integer(self._order)
 
     def __str__(self):

@@ -131,7 +131,7 @@ def symplectic_2_gcd(n):
 #
 def max_orders_wrapped(group):
     extend = lambda elem: MultiModeStringFormatter.mixin_to(elem, mode='verbose')
-    return map(extend, maximal_orders(group))
+    return list(map(extend, maximal_orders(group)))
 
 #
 #
@@ -143,17 +143,18 @@ def max_orders_wrapped(group):
 #
 #
 def print_max_elems():
-    for dimension in xrange(4, 36):
+    for dimension in range(4, 36):
         group = ClassicalGroup("Omega+", 2 * dimension, 4)
         dim_expansion = " + ".join(
             [str(x) for x in numeric.binary_expansion(dimension)])
-        print "{}:".format(group).ljust(12),
-        print "n = {} = {}".format(dimension, dim_expansion).ljust(30)
-        print
+        print(("{}:".format(group).ljust(12)))
+        print(("n = {} = {}".format(dimension, dim_expansion).ljust(30)))
+        print()
+
         for elem in max_orders_wrapped(group):
-            print str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
-                elem.object.partition, reverse=True)
-        print
+            print((str(elem).ljust(len(str(elem)) + 5).rjust(60), sorted(
+                elem.object.partition, reverse=True)))
+        print()
 
 #print_max_elems()
 #
@@ -174,11 +175,11 @@ def print_max_elems():
 #
 #
 #def print_groups_with_semisimple_max_element():
-#    for dimension in xrange(2, 40):
+#    for dimension in range(2, 40):
 #        group = ClassicalGroup("Sp", 2 * dimension, 2)
 #        if is_max_order_semisimple(group):
 #            partition = " + ".join(numeric.binary_expansion(dimension))
-#            print "{}: n = {} = {}".format(group, dimension, partition)
-#            #print "\t" + StringViewFormatter(max_order).str_mixed()
+#            print("{}: n = {} = {}".format(group, dimension, partition))
+#            #print("\t" + StringViewFormatter(max_order).str_mixed())
 
 

@@ -16,12 +16,13 @@ Copyright 2012 Daniel Lytkin.
 """
 import math
 import random
+from functools import reduce
 
 from spectrum.graph.geometry import Point
 
 __author__ = 'Daniel Lytkin'
 
-class Layout(object):
+class Layout:
     """Basic abstract implementation of layout.
     Layout provides coordinates for vertices
     """
@@ -51,7 +52,7 @@ class Layout(object):
     def __getitem__(self, vertex):
         """Returns coordinates for specified vertex.
         """
-        if not self.__locations.has_key(vertex):
+        if vertex not in self.__locations:
             self.__locations[vertex] = self._defaultLocation
         return self.__locations[vertex]
 
@@ -72,7 +73,7 @@ class Layout(object):
     def update(self):
         """Remove deleted vertices
         """
-        deleted_vertices = (self.__locations.viewkeys() -
+        deleted_vertices = (self.__locations.keys() -
                             set(range(len(self._graph.vertices))))
         for vertex in deleted_vertices:
             del self.__locations[vertex]
@@ -90,7 +91,7 @@ class Layout(object):
         default = Point(0, 1)
         edgeVec = lambda neighbor: (self[vertex] - self[neighbor]).identity()
         return reduce(lambda x, y: x + y,
-            map(edgeVec, self._graph.neighbors(vertex)), default).identity()
+            list(map(edgeVec, self._graph.neighbors(vertex))), default).identity()
 
 
 class RandomLayout(Layout):
@@ -102,7 +103,7 @@ class RandomLayout(Layout):
         self.reset()
 
     def __getitem__(self, vertex):
-        if not self.__locations.has_key(vertex):
+        if vertex not in self.__locations:
             self.set_unlocked_location(vertex,
                 Point(self.size.x * random.random(),
                     self.size.y * random.random()))
@@ -152,7 +153,7 @@ class SpringLayout(Layout):
                 Point(self.size.x * random.random(),
                     self.size.y * random.random()))
         self._velocities = dict.fromkeys(
-            range(len(self._graph.vertices)), Point())
+            list(range(len(self._graph.vertices))), Point())
 
 
     def _repulsion_force(self, vertex, other):
@@ -173,11 +174,11 @@ class SpringLayout(Layout):
         """Calculates position of vertices after a lapse of `time_step' after
         last position.
         """
-        for vertex in xrange(len(self._graph.vertices)):
+        for vertex in range(len(self._graph.vertices)):
             force = Point()
 
             # repulsion between vertices
-            for other in xrange(len(self._graph.vertices)):
+            for other in range(len(self._graph.vertices)):
                 if other == vertex: continue
                 force += self._repulsion_force(vertex, other)
 
@@ -221,7 +222,7 @@ class SpringLayout(Layout):
             self.set_unlocked_location(vertex, Point(fx(p.x), fy(p.y)))
 
     def total_kinetic_energy(self):
-        return sum((v.square() for v in self._velocities.itervalues()))
+        return sum((v.square() for v in self._velocities.values()))
 
 
 

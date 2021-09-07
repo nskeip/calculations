@@ -16,7 +16,7 @@ Copyright 2012 Daniel Lytkin.
 """
 __author__ = 'Daniel Lytkin'
 
-class Partitions(object):
+class Partitions:
     """Class providing iterator on partitions
     Required parameter:
         number - the number to partition
@@ -36,7 +36,7 @@ class Partitions(object):
         transposed = []
         i = 0
         while True:
-            counter = len(filter(lambda x: x - i > 0, partition))
+            counter = sum(1 for _ in filter(lambda x: x - i > 0, partition))
             if counter:
                 transposed.append(counter)
                 i += 1
@@ -46,7 +46,7 @@ class Partitions(object):
 
     @staticmethod
     def _slope(seq):
-        return map(lambda x, y: x - y, seq, seq[1:] + [0])
+        return list(map(lambda x, y: x - y, seq, seq[1:] + [0]))
 
     def _isValid(self, seq):
         return all(func(seq) for func in self._validators)

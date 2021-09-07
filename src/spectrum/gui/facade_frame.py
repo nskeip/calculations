@@ -15,8 +15,7 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import codecs
-import tkFileDialog
-from Tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox
+from tkinter import Frame, PanedWindow, LabelFrame, Button, Menu, TclError, Listbox, filedialog
 
 from spectrum.graph.layout import SpringLayout
 from spectrum.gui.graph.graph_canvas import GraphCanvas, IterationsPlugin
@@ -42,7 +41,7 @@ class Facade(Frame):
         #        self._show_apex = True
         self._show_graph = show_graph
         self._graph_class = graph_class
-        self._init_variables()
+        # self._init_variables()  # TODO: fix vertex label automatic positioning
         self._init_menu()
         self._init_components()
 
@@ -127,7 +126,7 @@ class Facade(Frame):
             self._show_graph_button.pack()
 
     def _init_variables(self):
-        def set_default_var(self, name):
+        def set_default_var(name):
             """Sets widget-specific var with same value as root.
             """
             default_var = self.getvar(name)
@@ -135,7 +134,7 @@ class Facade(Frame):
             self.setvar(local_var_name, default_var)
             return local_var_name
 
-        local_name = set_default_var(self, "vertexlabelposition")
+        local_name = set_default_var("vertexlabelposition")
         tools.trace_variable(self, local_name, "w",
                              self._change_vertex_label_position)
 
@@ -196,7 +195,7 @@ class Facade(Frame):
         self._cocliques_container.pack(expand=True, fill='both')
 
     def call_graph_save_dialog(self):
-        file_name = tkFileDialog.asksaveasfilename(defaultextension='.ps',
+        file_name = filedialog.asksaveasfilename(defaultextension='.ps',
                                                    filetypes=[('PostScript', '.ps')], parent=self.winfo_toplevel(),
                                                    title="Save graph as image")
         if file_name:

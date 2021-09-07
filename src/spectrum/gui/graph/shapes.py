@@ -19,7 +19,7 @@ from spectrum.graph.geometry import Point
 __author__ = 'Daniel Lytkin'
 
 
-class Shape(object):
+class Shape:
     """Abstract class representing shapes on the canvas
     """
 

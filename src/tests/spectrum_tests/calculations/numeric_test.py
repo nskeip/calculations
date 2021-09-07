@@ -16,10 +16,10 @@ Copyright 2012 Daniel Lytkin.
 """
 import itertools
 import unittest
-
-from spectrum_tests.parametric import parametrized, parameters
+from math import gcd, lcm
 
 from spectrum.calculations.numeric import *
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
@@ -149,7 +149,7 @@ class NumericTest(unittest.TestCase):
                   (13, 13): 1,
                   (1, 42): 0
         }
-        for key, value in values.iteritems():
+        for key, value in values.items():
             self.assertTrue(get_exponent(*key) == value)
 
     def test_is_power_of_two(self):
@@ -162,7 +162,7 @@ class NumericTest(unittest.TestCase):
                   8: True,
                   1024: True,
                   2050: False}
-        for key, value in values.iteritems():
+        for key, value in values.items():
             self.assertEqual(value, is_power_of_two(key))
 
     def test_constraints(self):

@@ -15,8 +15,9 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
+import math
+from functools import reduce
 
-from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
 from spectrum.tools.tools import ObjectCache
@@ -26,10 +27,10 @@ __author__ = 'Daniel Lytkin'
 _CACHE = True
 
 
-class SpectraElement(long):
-    """Special long extension for spectra elements. It contains information on
-    how it was calculated. If 'verbose' is False, creates long, without any
-    additional info
+class SpectraElement(int):
+    """Special int extension for spectra elements. It contains information on
+    how it was calculated. If 'verbose' is False, creates int, without any
+    additional info.
     """
 
     def __new__(cls, quotient=1, q=0, partition=None, signs=None,
@@ -38,9 +39,9 @@ class SpectraElement(long):
             partition = []
         if signs is None:
             signs = []
-        class_ = SpectraElement if verbose else long
-        return long.__new__(class_, quotient * reduce(numeric.lcm,
-                                                      (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
+        class_ = SpectraElement if verbose else int
+        return int.__new__(class_, quotient * reduce(math.lcm,
+                                                     (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
     def __init__(self, quotient=1, q=0, partition=None, signs=None,
                  verbose=True):
@@ -55,7 +56,6 @@ class SpectraElement(long):
         self._q = q
         self._partition = partition
         self._signs = signs
-        super(SpectraElement, self).__init__(self)
 
     @property
     def quotient(self):
@@ -113,7 +113,7 @@ class SpectraElement(long):
         """Returns lcm of this and other. 'q' must be the same. Quotients are
         multiplied.
         """
-        elem = long.__new__(SpectraElement, numeric.lcm(self, other))
+        elem = int.__new__(SpectraElement, math.lcm(self, other))
         quotient = self._quotient * other._quotient
         elem.__init__(quotient=quotient, q=self._q,
                       partition=list(self._partition) + list(other._partition),
@@ -123,7 +123,7 @@ class SpectraElement(long):
     def __mul__(self, other):
         """Multiplies quotient by integer
         """
-        elem = long.__new__(SpectraElement, long(self) * other)
+        elem = int.__new__(SpectraElement, int(self) * other)
         elem.__init__(quotient=self._quotient * other, q=self._q,
                       partition=self._partition, signs=self._signs)
         return elem
@@ -132,7 +132,7 @@ class SpectraElement(long):
         return self * other
 
 
-class SemisimpleElements(object):
+class SemisimpleElements:
     """Generates elements of form LCM(q^{n_1} \pm 1, ..., q^{n_k} \pm 1) for
     all partitions n_1 + ... + n_k = n.
     If `min_length' is set to t, then k >= t. Only min_length=1, 2 or 3 are supported.
@@ -169,7 +169,7 @@ class SemisimpleElements(object):
         for ni in BoundedSets(n):
             if len(ni) + n - sum(ni) < self._min_length:
                 continue
-            yield SpectraElement(q=q, partition=ni, signs=map(f, ni),
+            yield SpectraElement(q=q, partition=ni, signs=list(map(f, ni)),
                                  verbose=self._verbose)
 
     def _with_parity_generator(self):
@@ -177,7 +177,7 @@ class SemisimpleElements(object):
         q = self._q
         n = self._n
         plusesMod = 0 if self._parity == 1 else 1
-        for pluses in xrange(plusesMod, n + 1):
+        for pluses in range(plusesMod, n + 1):
             plusPartitions = FullBoundedSets(pluses)
             if pluses > 0:
                 plusPartitions = itertools.chain(plusPartitions,
@@ -202,7 +202,7 @@ class SemisimpleElements(object):
         """Generates all semisimple elements"""
         q = self._q
         n = self._n
-        for left in xrange((n + 2) // 2):
+        for left in range((n + 2) // 2):
             right = n - left
             leftPartitions = MaximalBoundedSets(left)
             for lPartition in leftPartitions:
@@ -239,7 +239,7 @@ class SemisimpleElements(object):
         return element
 
 
-class MixedElements(object):
+class MixedElements:
     """Generates elements of form g(k) * LCM(q^{n_1} \pm 1, ..., q^{n_s} \pm 1)
     for all k and partitions f(k) + n_1 + ... + n_s = n, where k, s > 0.
     """

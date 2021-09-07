@@ -20,32 +20,8 @@ from collections import Counter
 
 __author__ = 'Daniel Lytkin'
 
-# Module providing methods to calculate GCD and LCM etc.
-
-def gcd(a, b):
-    """Calculates greatest common divisor of two numbers.
-
-    Args:
-        a, b: Integers
-
-    Returns:
-        GCD(a, b)
-    """
-    while b:
-        a, b = b, a % b
-    return a
-
-
-def lcm(a, b):
-    """Calculates least common multiple of two numbers.
-
-    Args:
-        a, b: Integers
-
-    Returns:
-        LCM(a, b)
-    """
-    return a / gcd(a, b) * b
+# Module providing methods to calculate some number theoretic values.
+from functools import reduce
 
 
 def prime_part(n, b):
@@ -60,7 +36,7 @@ def prime_part(n, b):
         Greatest divisor of n which is relatively prime to d.
     """
     while True:
-        d = gcd(n, b)
+        d = math.gcd(n, b)
         if d <= 1: break
         n //= d
     return n
@@ -123,7 +99,7 @@ def first_divisor(number):
     """
     if number % 2 == 0: return 2
     #primes = []
-    for j in xrange(1, int(math.sqrt(number)) // 2 + 1):
+    for j in range(1, int(math.sqrt(number)) // 2 + 1):
         i = 2 * j + 1
         if number % i == 0:
             return i
@@ -265,7 +241,7 @@ def next_odd_divisor(number, previous):
     """Returns next divisor greater than 'previous'.
     Number must not be divisible by any number <= previous.
     """
-    for j in xrange(previous // 2 + 1, int(math.sqrt(number)) // 2 + 1):
+    for j in range(previous // 2 + 1, int(math.sqrt(number)) // 2 + 1):
         i = 2 * j + 1
         if number % i == 0:
             return i
@@ -318,7 +294,7 @@ def _factorize_number(number):
     return factors
 
 
-class Integer(object):
+class Integer:
     """Represents integer with methods to factorize.
     Usage: Integer(12345) for number 12345 or Integer((2,5), (3,2), 5, 7) for number 2^5 * 3^3 * 5 * 7
     """
@@ -328,7 +304,7 @@ class Integer(object):
             self._int = 1
             self._factors = Counter()
         elif len(args) == 1:
-            if isinstance(args[0], int) or isinstance(args[0], long):
+            if isinstance(args[0], int):
                 self._int = args[0]
                 self._factors = Counter({args[0]: 1})
             elif isinstance(args[0], Integer):
@@ -340,7 +316,7 @@ class Integer(object):
         else:
             self._factors = Counter()
             for arg in args:
-                if type(arg) in (int, long):
+                if type(arg) is int:
                     self._factors[arg] += 1
                 else:
                     if arg[1]: self._factors[arg[0]] += arg[1]
@@ -352,10 +328,21 @@ class Integer(object):
     def __int__(self):
         return self._int
 
+    @staticmethod
+    def _cmp(a, b):
+        return (a > b) - (a < b)
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Integer):
+            return int(self) == int(other)
+        elif isinstance(other, int):
+            return int(self) == other
+        return super().__eq__(other)
+
     def __cmp__(self, other):
         if isinstance(other, Integer):
-            return cmp(self._int, other._int)
-        return cmp(self._int, other)
+            return self._cmp(self._int, other._int)
+        return self._cmp(self._int, other)
 
     def copy(self):
         copy = Integer()
@@ -367,7 +354,7 @@ class Integer(object):
         if isinstance(other, Integer):
             self._factors += other._factors
             self._int *= other._int
-        elif isinstance(other, int) or isinstance(other, long):
+        elif isinstance(other, int):
             self._factors[other] += 1
             self._int *= other
         return self
@@ -378,7 +365,7 @@ class Integer(object):
             ret = Integer()
             ret._factors = other._factors + self._factors
             ret._int = other._int * self._int
-        elif isinstance(other, int) or isinstance(other, long):
+        elif isinstance(other, int):
             ret = self.copy()
             ret._factors[other] += 1
             ret._int *= other
@@ -421,11 +408,10 @@ class Integer(object):
         """Returns factorized string representation
         """
         self.factorize()
-        factors = self._factors.items()
-        factors.sort(key=lambda x: x[0])
+        factors_keys = sorted(self._factors.keys())
         power = lambda k: "^" + str(k) if k > 1 else ""
         factor_power_str = lambda f, p: "{}{}".format(f, power(p))
-        return " * ".join(factor_power_str(f, p) for f, p in factors)
+        return " * ".join(factor_power_str(f, self._factors[f]) for f in factors_keys)
 
     def str_verbose(self):
         """Same as str_factorised
@@ -436,7 +422,7 @@ class Integer(object):
         """Returns factorized latex representation
         """
         self.factorize()
-        factors = self._factors.items()
+        factors = list(self._factors.items())
         factors.sort(key=lambda x: x[0])
 
         def power(k):
@@ -449,7 +435,7 @@ class Integer(object):
         return " \cdot ".join(factor_power_str(f, p) for f, p in factors)
 
     def div_by_prime(self, prime):
-        for factor in self._factors.keys():
+        for factor in list(self._factors.keys()):
             if factor % prime == 0:
                 p = self._factors[factor]
                 del self._factors[factor]
@@ -467,13 +453,13 @@ class Integer(object):
         p = self._factors[divisor]
         del self._factors[divisor]
         if not p: return
-        for key, value in _factorize_number(divisor).iteritems():
-            self._factors[key] += value * p
+        for key, value in _factorize_number(divisor).items():
+            self._factors[int(key)] += value * p
 
     def factorize(self):
         """Factorize all not factorized divisors
         """
-        for x in self._factors.keys():
+        for x in list(self._factors.keys()):  # list creates a copy
             self._factorize_divisor(x)
         return self._factors
 
@@ -486,7 +472,7 @@ class Integer(object):
 PRIME = 1
 PRIME_POWER = 2
 
-class Constraints(object):
+class Constraints:
     """Class representing numeric constraints, e.g. for dimension and
     characteristic of classical group. Minimal value must fit the constraints.
     """

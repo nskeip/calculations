@@ -41,12 +41,12 @@ class ObjectCache(type):
         return instance
 
 
-class DocInherit(object):
+class DocInherit:
     """doc_inherit decorator
 
     Usage:
 
-    class Foo(object):
+    class Foo:
         def foo(self):
             "Frobber"
             pass
@@ -92,7 +92,7 @@ class DocInherit(object):
 
     def use_parent_doc(self, func, source):
         if source is None:
-            raise NameError, ("Can't find '%s' in parents" % self.name)
+            raise NameError("Can't find '%s' in parents" % self.name)
         func.__doc__ = source.__doc__
         return func
 
