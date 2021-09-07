@@ -160,7 +160,7 @@ class RootSystem:
 
 def _e8_spectrum(field: 'Field') -> Iterable[int]:
     """
-    [3, main theorem]
+    [1, main theorem]
     """
     q = field.order
     p = field.char
