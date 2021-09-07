@@ -164,7 +164,93 @@ def _e7_spectrum(field: 'Field') -> Iterable[int]:
     """
     [1, Theorem 2]
     """
-    raise NotImplemented()
+    q = field.order
+    p = field.char
+    d = gcd(2, q - 1)
+
+    return [  # 1)
+        (q ** 2 - q + 1) * (q ** 5 + 1) // d,
+        (q ** 2 + q + 1) * (q ** 5 - 1) // d,
+
+        (q + 1) * (q ** 6 - q ** 3 + 1) // d,
+        (q - 1) * (q ** 6 + q ** 3 + 1) // d,
+
+        (q ** 7 + 1) // d,
+        (q ** 7 - 1) // d,
+
+        (q ** 3 - 1) * (q ** 4 - q ** 2 + 1) // d,
+        (q ** 3 + 1) * (q ** 4 - q ** 2 + 1) // d,
+
+        (q ** 2 - q + 1) * (q ** 4 - 1),
+        (q ** 2 + q + 1) * (q ** 4 - 1),
+
+        (q + 1) * (q ** 5 - 1),
+        (q - 1) * (q ** 5 + 1),
+
+        (q ** 8 - 1) // ((q - 1) * gcd(4, q - 1)),
+        (q ** 8 - 1) // ((q + 1) * gcd(4, q + 1)),
+
+        (q ** 4 + 1) * (q ** 2 - 1),
+        q ** 6 - 1,
+    ] + [  # 2)
+        p * x for x in [
+            (q ** 6 - 1) // d,
+
+            q ** 5 - 1,
+            q ** 5 + 1,
+
+            (q ** 4 + 1) * (q ** 2 + 1) // d,
+            (q ** 4 + 1) * (q ** 2 - 1) // d,
+
+            (q ** 3 + 1) * (q ** 2 + 1) * (q - 1) // d,
+            (q ** 3 - 1) * (q ** 2 + 1) * (q + 1) // d,
+
+            q ** 4 - q ** 2 + 1,
+        ]
+    ] + [  # 3)
+        RootSystem('A', 2).p(p) * x for x in [
+            (q ** 6 - 1) // ((q - 1) * d),
+            (q ** 6 - 1) // ((q + 1) * d),
+
+            (q ** 5 - 1) // d,
+            (q ** 5 + 1) // d,
+
+            q ** 4 - 1,
+
+            (q ** 3 + 1) * (q - 1),
+            (q ** 3 - 1) * (q + 1),
+        ]
+    ] + [  # 4)
+        RootSystem('A', 3).p(p) * x for x in [
+            (q ** 4 - 1) // d,
+            (q ** 3 + 1) * (q - 1) // d,
+            (q ** 3 - 1) * (q + 1) // d,
+        ]
+    ] + [  # 5)
+        RootSystem('D', 4).p(p) * x for x in [
+            (q ** 3 - 1) // d,
+            (q ** 3 + 1) // d,
+
+            (q ** 2 + 1) * (q + 1) // d,
+            (q ** 2 + 1) * (q - 1) // d,
+
+            q ** 2 - 1,
+        ]
+    ] + [  # 6)
+        RootSystem('D', 5).p(p) * (q ** 2 - 1) // d,
+    ] + [  # 7)
+        RootSystem('D', 6).p(p) * x for x in [
+            q - 1,
+            q + 1,
+        ]
+    ] + [  # 8)
+        RootSystem('E', 6).p(p) * x for x in [
+            (q - 1) // d,
+            (q + 1) // d,
+        ]
+    ] + [  # 9)
+        RootSystem('E', 7).p(p)
+    ]
 
 
 def _e8_spectrum(field: 'Field') -> Iterable[int]:
@@ -305,6 +391,7 @@ exceptional_spectra = {
     '2G2': _2g2_spectrum,
     '2B2': _2b2_spectrum,
     'E6': _e6_spectrum(1),
+    'E7': _e7_spectrum,
     '2E6': _e6_spectrum(-1),
     'E8': _e8_spectrum,
 }
