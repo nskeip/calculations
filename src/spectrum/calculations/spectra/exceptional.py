@@ -1,6 +1,8 @@
 """
 Bibliography:
-[1] Buturlakin A. A., “Spectra of Groups E_8(Q)”, Algebra and Logic, Vol. 57, No. 1, (2018).
+[1] Buturlakin A. A., “Spectra of Finite Simple Groups E_7(Q)”, Siberian math journal,
+    Vol. 57, No. 5, (2016) DOI 10.17377/smzh.2016.57.505
+[2] Buturlakin A. A., “Spectra of Groups E_8(Q)”, Algebra and Logic, Vol. 57, No. 1, (2018).
 
 Copyright 2012 Daniel Lytkin.
 
@@ -158,9 +160,16 @@ class RootSystem:
         return p ** ceil(log(self.mh() + 1, p))
 
 
+def _e7_spectrum(field: 'Field') -> Iterable[int]:
+    """
+    [1, Theorem 2]
+    """
+    raise NotImplemented()
+
+
 def _e8_spectrum(field: 'Field') -> Iterable[int]:
     """
-    [1, main theorem]
+    [2, main theorem]
     """
     q = field.order
     p = field.char
