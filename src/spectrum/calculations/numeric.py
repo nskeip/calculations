@@ -47,7 +47,7 @@ def lcm(a, b):
     Returns:
         LCM(a, b)
     """
-    return a / gcd(a, b) * b
+    return a // gcd(a, b) * b
 
 
 def prime_part(n, b):
