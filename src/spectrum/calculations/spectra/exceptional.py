@@ -46,6 +46,33 @@ def _g2_spectrum(field: 'Field') -> Iterable[int]:
             q ** 2 + q + 1]
 
 
+def _3d4_spectrum(field: 'Field'):
+    """
+    [3, Theorem 3.2]
+    """
+    q = field.order
+    p = field.char
+
+    result = [  # (1)
+        (q ** 3 - 1) * (q + 1),
+        (q ** 3 + 1) * (q - 1),
+        q ** 4 - q ** 2 + 1,
+    ] + [  # (2)
+        p * (q ** 3 + 1),
+        p * (q ** 3 - 1),
+    ]
+
+    if p == 2:  # (3)
+        result += [
+            4 * (q ** 2 + q + 1),
+            4 * (q ** 2 - q + 1),
+            8,
+        ]
+    elif p in [3, 5]:  # (4)
+        result.append(p ** 2)
+
+    return result
+
 def _f4_spectrum(field: 'Field'):
     """
     [3, Theorem 3.1]
@@ -446,6 +473,7 @@ def _e8_spectrum(field: 'Field') -> Iterable[int]:
 
 
 exceptional_spectra = {
+    '3D4': _3d4_spectrum,
     'F4': _f4_spectrum,
     '2F4': _2f4_spectrum,
     'G2': _g2_spectrum,
