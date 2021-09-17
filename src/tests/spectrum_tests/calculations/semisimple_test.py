@@ -15,13 +15,14 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
-import math
 import unittest
 from functools import reduce
 
+from spectrum_tests.parametric import parameters, parametrized
+
+from spectrum.calculations import numeric
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.semisimple import SemisimpleElements, MixedElements, SpectraElement
-from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
 
@@ -35,10 +36,10 @@ def evaluate(q, ni, ei=-1):
     """
     try:
     # for integer ei
-        return reduce(math.lcm, (q ** n + ei for n in ni))
+        return reduce(numeric.lcm, (q ** n + ei for n in ni))
     except TypeError:
     # for sequence ei
-        return reduce(math.lcm, (q ** n + e for (n, e) in zip(ni, ei)))
+        return reduce(numeric.lcm, (q ** n + e for (n, e) in zip(ni, ei)))
 
 
 class Signs:

@@ -14,13 +14,13 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-import math
 from functools import reduce
 
+from .partition import Partitions
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit, ObjectCache
-from .partition import Partitions
+
 
 __author__ = 'Daniel Lytkin'
 
@@ -155,7 +155,7 @@ class AlternatingGroup(Group):
             n = self._degree
             partitions = [x for x in Partitions(n) if (len(x) + n) % 2 == 0]
             self._apex = numeric.sort_and_filter(
-                [reduce(math.lcm, partition) for partition in partitions])
+                [reduce(numeric.lcm, partition) for partition in partitions])
         return self._apex
 
     @doc_inherit
