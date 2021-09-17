@@ -22,7 +22,6 @@ Copyright 2012 Daniel Lytkin.
 """
 import itertools
 import typing
-from math import gcd, lcm
 from typing import Iterable
 
 if typing.TYPE_CHECKING:
