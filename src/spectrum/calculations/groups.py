@@ -14,7 +14,6 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-import math
 from functools import reduce
 
 from spectrum.calculations import orders, spectra, numeric
@@ -155,7 +154,7 @@ class AlternatingGroup(Group):
             n = self._degree
             partitions = [x for x in Partitions(n) if (len(x) + n) % 2 == 0]
             self._apex = numeric.sort_and_filter(
-                [reduce(math.lcm, partition) for partition in partitions])
+                [reduce(numeric.lcm, partition) for partition in partitions])
         return self._apex
 
     @doc_inherit

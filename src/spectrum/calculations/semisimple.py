@@ -15,9 +15,9 @@ Copyright 2012 Daniel Lytkin.
 
 """
 import itertools
-import math
 from functools import reduce
 
+from spectrum.calculations import numeric
 from spectrum.calculations.numeric import Integer
 from spectrum.calculations.set import MaximalBoundedSets, FullBoundedSets, BoundedSets
 from spectrum.tools.tools import ObjectCache
@@ -40,7 +40,7 @@ class SpectraElement(int):
         if signs is None:
             signs = []
         class_ = SpectraElement if verbose else int
-        return int.__new__(class_, quotient * reduce(math.lcm,
+        return int.__new__(class_, quotient * reduce(numeric.lcm,
                                                      (q ** ni + ei for (ni, ei) in zip(partition, signs)), 1))
 
     def __init__(self, quotient=1, q=0, partition=None, signs=None,
@@ -113,7 +113,7 @@ class SpectraElement(int):
         """Returns lcm of this and other. 'q' must be the same. Quotients are
         multiplied.
         """
-        elem = int.__new__(SpectraElement, math.lcm(self, other))
+        elem = int.__new__(SpectraElement, numeric.lcm(self, other))
         quotient = self._quotient * other._quotient
         elem.__init__(quotient=quotient, q=self._q,
                       partition=list(self._partition) + list(other._partition),

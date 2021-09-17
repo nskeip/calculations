@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
     from spectrum.calculations.groups import Field
 
 from spectrum.calculations import numeric
+from spectrum.calculations.numeric import gcd, lcm
 from spectrum.calculations.semisimple import MixedElements, SemisimpleElements, SpectraElement
 from spectrum.calculations.set import FullBoundedSets
 

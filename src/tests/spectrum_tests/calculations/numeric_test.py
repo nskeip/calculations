@@ -16,7 +16,6 @@ Copyright 2012 Daniel Lytkin.
 """
 import itertools
 import unittest
-from math import gcd, lcm
 
 from spectrum.calculations.numeric import *
 from spectrum_tests.parametric import parametrized, parameters
