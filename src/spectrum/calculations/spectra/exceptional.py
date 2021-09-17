@@ -3,6 +3,9 @@ Bibliography:
 [1] Buturlakin A. A., “Spectra of Finite Simple Groups E_7(Q)”, Siberian math journal,
     Vol. 57, No. 5, (2016) DOI 10.17377/smzh.2016.57.505
 [2] Buturlakin A. A., “Spectra of Groups E_8(Q)”, Algebra and Logic, Vol. 57, No. 1, (2018).
+[3] Grechkoseeva M. A., Zvezdina M. A., “On Spectra of Automorphic Extensions
+    of Finite Simple Groups F_4(q) and ^3D_4(q)”, Journal of Algebra and Its Applications,
+    Vol. 15, No. 9 (2016) DOI 10.1142/S0219498816501681
 
 Copyright 2012 Daniel Lytkin.
 
@@ -41,6 +44,63 @@ def _g2_spectrum(field: 'Field') -> Iterable[int]:
                 q ** 2 + q + 1]
     return [p * (q - 1), p * (q + 1), q ** 2 - 1, q ** 2 - q + 1,
             q ** 2 + q + 1]
+
+
+def _f4_spectrum(field: 'Field'):
+    """
+    [3, Theorem 3.1]
+    """
+    q = field.order
+    p = field.char
+
+    result = [  # (1)
+        q ** 4 - q ** 2 + 1,
+        q ** 4 + 1,
+
+        (q ** 2 + q + 1) * (q ** 2 - 1),
+        (q ** 2 - q + 1) * (q ** 2 - 1),
+
+        (q ** 4 - 1) // gcd(2, q - 1),
+    ] + [  # (2)
+        p * (q ** 3 + 1),
+        p * (q ** 3 - 1),
+
+        p * (q ** 2 + 1) * (q + 1),
+        p * (q ** 2 + 1) * (q - 1),
+
+        p * (q ** 2 - 1),
+    ]
+
+    if p == 2:  # (3)
+        result += [
+            4 * (q ** 2 + 1),
+            4 * (q ** 2 - 1),
+
+            4 * (q ** 2 + q + 1),
+            4 * (q ** 2 - q + 1),
+
+            8 * (q + 1),
+            8 * (q - 1),
+
+            16
+        ]
+    elif p == 3:  # (4)
+        result += [
+            9 * (q ** 2 + 1),
+            9 * (q ** 2 - 1),
+            27,
+        ]
+    elif p == 5:  # (5)
+        result += [
+            25 * (q + 1),
+            25 * (q - 1),
+        ]
+    elif p == 7:  # (6)
+        result.append(49 * 2)
+    elif p == 11:  # (7)
+        result.append(121)
+
+    return result
 
 
 def _2f4_spectrum(field: 'Field') -> Iterable[int]:
@@ -386,6 +446,7 @@ def _e8_spectrum(field: 'Field') -> Iterable[int]:
 
 
 exceptional_spectra = {
+    'F4': _f4_spectrum,
     '2F4': _2f4_spectrum,
     'G2': _g2_spectrum,
     '2G2': _2g2_spectrum,
