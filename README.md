@@ -45,6 +45,13 @@ Group name, order and apex numbers can be copied to clipboard using right-button
 Fast graph algorithm is described [here](https://raw.github.com/aikoven/calculations/master/doc/fastgraph.pdf) (Russian)
 
 
+Running Web API
+---------------
+To run a web API, you should do the following (from `src/`):
+ 1. Install required packages via `pip install -r spectrum/web/requirements.txt`.
+ 2. Run `uvicorn spectrum.web:app`.
+
+
 Running tests
 -------------
 The whole project is covered with unit-tests, except for gui.
