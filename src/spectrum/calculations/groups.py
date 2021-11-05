@@ -14,6 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
+from enum import Enum
 from functools import reduce
 
 from spectrum.calculations import orders, spectra, numeric
@@ -317,3 +318,14 @@ class ExceptionalGroup(Group):
                                                  lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
+
+
+class GroupType(Enum):
+    ALTERNATING = 'alternating'
+    CLASSICAL = 'classical'
+    EXCEPTIONAL = 'exceptional'
+    SPORADIC = 'sporadic'
+
+    @property
+    def caption(self):
+        return self.value.capitalize()
