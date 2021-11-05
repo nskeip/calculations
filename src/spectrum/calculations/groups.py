@@ -320,7 +320,7 @@ class ExceptionalGroup(Group):
         return self._order
 
 
-class GroupType(Enum):
+class GroupType(Enum):  # TODO: use in spectrum.gui.group_select
     ALTERNATING = 'alternating'
     CLASSICAL = 'classical'
     EXCEPTIONAL = 'exceptional'
