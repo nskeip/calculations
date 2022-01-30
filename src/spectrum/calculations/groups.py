@@ -279,6 +279,13 @@ class ExceptionalGroup(Group):
               "F4": 'F_4', "2F4": '{}^2F_4', "G2": 'G_2', "2G2": '{}^2G_2',
               "2B2": '{}^2B_2', "3D4": '{}^3D_4'}
 
+    # constraints for field order
+    _field_constraints = {
+        '2F4': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 2 in odd
+        '2B2': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 2 in odd
+        '2G2': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 3 in odd
+    }
+
     def __init__(self, name, *field):
         super(ExceptionalGroup, self).__init__()
         self._name = name
@@ -317,3 +324,7 @@ class ExceptionalGroup(Group):
                                                  lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
+
+    @classmethod
+    def field_constraints(cls, name):
+        return cls._field_constraints.get(name, Constraints(min=2, primality=numeric.PRIME_POWER))
