@@ -147,3 +147,8 @@ class SpectraTest(unittest.TestCase):
 
         # for all p > 7, it equals p
         self.assertEqual(RootSystem('D', 8).p(101), 101)
+
+    @parameters([(g_name, 4, 2) for g_name in ['PSL', 'PSU', 'SL', 'SU']])
+    def test_apex_nums_are_integers(self, params):
+        g = ClassicalGroup(*params)
+        self.assertTrue(all(isinstance(i, int) for i in g.apex()), g.apex())

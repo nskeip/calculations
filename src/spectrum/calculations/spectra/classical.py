@@ -472,7 +472,7 @@ def _special_linear_spectrum(sign: int):
             if n1 < 1:
                 break
             eps = 1 if n1 % 2 == 0 else e
-            a3.append(p ** k * (q ** n1 - eps) / gcd(d, n1))
+            a3.append(p ** k * (q ** n1 - eps) // gcd(d, n1))
             k += 1
 
         # (4)
@@ -526,7 +526,7 @@ def _projective_special_linear_spectrum(sign: int):
             if n1 < 1:
                 break
             eps = 1 if n1 % 2 == 0 else e
-            a4.append(p ** k * (q ** n1 - eps) / d)
+            a4.append(p ** k * (q ** n1 - eps) // d)
             k += 1
 
         # (5)
