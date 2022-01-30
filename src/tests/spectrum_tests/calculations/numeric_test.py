@@ -164,6 +164,26 @@ class NumericTest(unittest.TestCase):
         for key, value in values.items():
             self.assertEqual(value, is_power_of_two(key))
 
+    def test_closest_odd_power_of_two(self):
+        self.assertEqual(2, closest_odd_power_of_two(1))
+        self.assertEqual(2, closest_odd_power_of_two(2))
+        self.assertEqual(2, closest_odd_power_of_two(3))
+        self.assertEqual(2, closest_odd_power_of_two(4))
+        self.assertEqual(8, closest_odd_power_of_two(5))
+        self.assertEqual(8, closest_odd_power_of_two(6))
+        self.assertEqual(8, closest_odd_power_of_two(7))
+        self.assertEqual(8, closest_odd_power_of_two(8))
+        self.assertEqual(8, closest_odd_power_of_two(9))
+
+        self.assertEqual(8, closest_odd_power_of_two(16))
+    
+    def test_closest_odd_power_of_three(self):
+        for n in range(1, 15):
+            self.assertEqual(3, closest_odd_power_of_three(n), f'trouble with n={n}')
+        self.assertEqual(27, closest_odd_power_of_three(15))
+        self.assertEqual(27, closest_odd_power_of_three(26))
+        self.assertEqual(27, closest_odd_power_of_three(27))
+
     def test_constraints(self):
         c = Constraints(min=5, primality=PRIME)
         self.assertTrue(c.is_valid(5))

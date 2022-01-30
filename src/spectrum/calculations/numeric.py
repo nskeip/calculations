@@ -14,6 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
+import functools
 import math
 import operator
 from collections import Counter
@@ -228,6 +229,49 @@ def closest_power_of_two(n):
     if 2 * k - n > n - k:
         return k
     return k * 2
+
+
+def _nearest_odd_or_even(a, greater=True, is_even=True):
+    op = operator.add if greater else operator.sub
+    b = (a % 2) if is_even else (a + 1) % 2
+    return op(a, b)
+
+
+def _math_round_in_0_1(x):
+    """"Python round works incorrectly when rounding 0.5"""
+    return 0 if x < 0.5 else 1
+
+
+def _closest_power_of(is_even, base, n):
+    """Returns the closest power of base two to n
+
+    Args:
+        is_even: bool
+        base: int
+        n: Integer
+
+    Returns:
+        Closest power of base two to n
+    """
+    p = math.log(n, base)
+    prev_p = _nearest_odd_or_even(math.floor(p), False, is_even)
+    next_p = _nearest_odd_or_even(math.ceil(p), True, is_even)
+
+    if prev_p == p == next_p:
+        return n
+
+    is_p_closer_to_prev_p = 0 == _math_round_in_0_1((n - base ** prev_p) / (base ** next_p - base ** prev_p))
+
+    closest_exponent = max(
+        0 if is_even else 1,
+        prev_p if is_p_closer_to_prev_p else next_p
+    )
+
+    return base ** max(1, closest_exponent)
+
+
+closest_odd_power_of_two = functools.partial(_closest_power_of, False, 2)
+closest_odd_power_of_three = functools.partial(_closest_power_of, False, 3)
 
 
 def is_power_of_two(n):
@@ -497,6 +541,9 @@ class Integer:
 
 PRIME = 1
 PRIME_POWER = 2
+ODD_POWER_OF_2 = 3
+ODD_POWER_OF_3 = 4
+
 
 class Constraints:
     """Class representing numeric constraints, e.g. for dimension and
@@ -529,6 +576,10 @@ class Constraints:
                 value = closest_odd_prime_power(value)
             else:
                 value = closest_prime_power(value)
+        elif self._primality == ODD_POWER_OF_2:
+            value = closest_odd_power_of_two(value)
+        elif self._primality == ODD_POWER_OF_3:
+            value = closest_odd_power_of_three(value)
         else:
             if self._parity == 1:
                 value -= value % 2
@@ -549,5 +600,9 @@ class Constraints:
         if self._primality == PRIME and not is_prime(value):
             return False
         if self._primality == PRIME_POWER and not is_prime_power(value):
+            return False
+        if self._primality == ODD_POWER_OF_2 and math.log(value, 2) % 2 != 1:
+            return False
+        if self._primality == ODD_POWER_OF_3 and math.log(value, 3) % 2 != 1:
             return False
         return True

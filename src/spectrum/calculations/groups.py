@@ -281,9 +281,9 @@ class ExceptionalGroup(Group):
 
     # constraints for field order
     _field_constraints = {
-        '2F4': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 2 in odd
-        '2B2': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 2 in odd
-        '2G2': Constraints(min=2, primality=numeric.PRIME_POWER),  # TODO: 3 in odd
+        '2F4': Constraints(min=2, primality=numeric.ODD_POWER_OF_2),
+        '2B2': Constraints(min=2, primality=numeric.ODD_POWER_OF_2),
+        '2G2': Constraints(min=2, primality=numeric.ODD_POWER_OF_3),
     }
 
     def __init__(self, name, *field):
