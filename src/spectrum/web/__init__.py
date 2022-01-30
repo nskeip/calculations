@@ -1,5 +1,6 @@
 """
-Copyright 2021 Nikita Hismatov.
+Copyright 2012 Daniel Lytkin.
+Modified work Copyright 2021-20202 Nikita Hismatov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,24 +15,15 @@ Copyright 2021 Nikita Hismatov.
    limitations under the License.
 
 """
-from enum import Enum
 from typing import List
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, conlist
 
 from spectrum.calculations.graphs import PrimeGraph
-from spectrum.calculations.groups import SporadicGroup, ClassicalGroup, ExceptionalGroup
+from spectrum.calculations.groups import SporadicGroup, ClassicalGroup, ExceptionalGroup, GroupType
 
-
-class GroupType(Enum):  # TODO: probably should be used in all project
-    ALTERNATING = 'alternating'
-    CLASSICAL = 'classical'
-    EXCEPTIONAL = 'exceptional'
-    SPORADIC = 'sporadic'
-
-
-GROUP_TYPES = {
+GROUP_TYPES_LISTS = {
     GroupType.ALTERNATING: [],
     GroupType.CLASSICAL: ClassicalGroup.types(),
     GroupType.EXCEPTIONAL: ExceptionalGroup.types(),
@@ -43,12 +35,7 @@ app = FastAPI()
 
 @app.get('/groups/')
 async def groups():
-    return GROUP_TYPES
-
-
-# @app.get('/groups/{group_type}/{group_name}/')  # TODO: separate method for each type, separate Enums for group_names?
-# async def group_gk(group_type: GroupType, group_name: str):
-#     pass
+    return GROUP_TYPES_LISTS
 
 
 class GraphResponseModel(BaseModel):
@@ -57,10 +44,13 @@ class GraphResponseModel(BaseModel):
 
 
 @app.get('/groups/sporadic/{group_name}/gk/', response_model=GraphResponseModel)
-async def sporadic_graph_gk(group_name: str):
-    if group_name not in GROUP_TYPES[GroupType.SPORADIC]:
+async def sporadic_gk_graph(group_name: str):
+    if group_name not in GROUP_TYPES_LISTS[GroupType.SPORADIC]:  # TODO: extract common logic
         raise HTTPException(status_code=404, detail="Item not found")
-    g = SporadicGroup(group_name)
+
+    g = SporadicGroup(group_name)  # TODO: only this one differs
+
+    # TODO: common
     graph = PrimeGraph(g)
     return {
         'vertices': graph.vertices,
