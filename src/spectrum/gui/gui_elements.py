@@ -261,7 +261,11 @@ class NumberBox(Entry):
             self._var.set(filtered)
         else:
             # remove any non-decimal character
-            value = int(''.join([c for c in self._var.get() if c in string.digits]))
+            str_value = ''.join([c for c in self._var.get() if c in string.digits])
+            if str_value:
+                value = int(str_value)
+            else:
+                value = 0
 
             value = self._constraints.closest_valid(value)
 
