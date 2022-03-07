@@ -51,3 +51,13 @@ The whole project is covered with unit-tests, except for gui.
 Use `tests/run_all_tests.py` to run them all.
 
 Or you can use `pytest` and run `python -m pytest` or just `py.test` from `src/`.
+
+
+Using as a library
+------------------
+
+To install the program as a python package, run `pip install` after
+cloning the repository:
+```shell
+pip install /path/to/calculations
+```
