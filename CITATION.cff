@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Grechkoseeva
+    given-names: Maria
+    orcid: https://orcid.org/0000-0001-9908-6462
+  - family-names: Lytkin
+    given-names: Daniel
+title: "Calculations - Finite groups spectra and prime graphs calculator"
+version: 1.0.0
+date-released: 2011-12-20
+
