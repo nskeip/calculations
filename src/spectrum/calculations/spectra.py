@@ -3,7 +3,9 @@
 Bibliography:
 [1] Buturlakin A. A., “Spectra of finite symplectic and orthogonal groups”, Siberian Adv. in Math., 21, No. 3, 176–210
     (2011).
-[2] Buturlakin A. A., “Spectra of finite linear and unitary groups”, Algebra and Logic, Vol. 47, No. 2, (2008).
+[2] Buturlakin A. A., “Spectra of finite linear and unitary groups“, Algebra and Logic, Vol. 47, No. 2, (2008).
+[3] Grechkoseeva, M. A. “On spectra of almost simple groups with symplectic or orthogonal socle.“
+    Siberian Mathematical Journal, Vol. 57, No. 4, (2016), 582-588.
 
 
 Copyright 2012 Daniel Lytkin.
@@ -205,7 +207,9 @@ def _omega_spectrum(n, field):
 
 def _omega_pm_spectrum_odd_c(n, field, sign):
     """Spectra of Omega^e_{2n}(q) for odd q.
-    [1, Corollary 8]
+    Based on [1, Corollary 8] and [3, Lemma 2.3]
+    Point 3 of [1, Corollary 8] contains an error
+    that was corrected in [3, Lemma 2.3]
     """
     n //= 2
     q = field.order
