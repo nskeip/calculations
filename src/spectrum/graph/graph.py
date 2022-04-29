@@ -25,7 +25,7 @@ def ordered_pair(a, b):
     return a, b
 
 
-class Graph(object):
+class Graph:
     """Class representing graph. Vertices are indexed by numbers 0, 1, ...
     Values are stored in 'vertices' array.
     """
@@ -66,8 +66,8 @@ class Graph(object):
         """Returns list o graph's edges.
         """
         edges = list()
-        for i in xrange(len(self._adjacency)):
-            for j in xrange(len(self._adjacency[i])):
+        for i in range(len(self._adjacency)):
+            for j in range(len(self._adjacency[i])):
                 if self._adjacency[i][j]:
                     edges.append(
                         ordered_pair(self._vertices[i], self._vertices[j]))
@@ -118,10 +118,10 @@ class Graph(object):
         """Returns indices of neighbors of vertex with specified index.
         """
         neighbors = []
-        for i in xrange(index):
+        for i in range(index):
             if self._adjacency[index][i]:
                 neighbors.append(i)
-        for j in xrange(index + 1, len(self._adjacency)):
+        for j in range(index + 1, len(self._adjacency)):
             if self._adjacency[j][index]:
                 neighbors.append(j)
         return neighbors
@@ -136,14 +136,14 @@ class Graph(object):
         new_row = (list(self._adjacency[index]) +
                   [True] +
                   [self._adjacency[j][index]
-                   for j in xrange(index + 1, len(self._adjacency))])
+                   for j in range(index + 1, len(self._adjacency))])
         v_index = self.index(value)
         if v_index is None:
             self._adjacency.append(new_row)
             self._vertices.append(value)
             return len(self._adjacency) - 1
         else:
-            for i in xrange(len(self._adjacency)):
+            for i in range(len(self._adjacency)):
                 if i != v_index and new_row[i]:
                     self._set_adjacency(v_index, i, True)
 
@@ -164,17 +164,19 @@ class Graph(object):
     def _max_cocliques_between_indices(self, indices):
         """Searches for largest cocliques among vertices with specified indices
         """
-        if len(indices) == 1:
+        if sum(1 for _ in indices) == 1:
             return [list(indices)]
 
         limit = 0
         cocliques = [[]]
+        len_indices = sum(1 for _ in indices)
 
-        for j in xrange(len(indices) - limit - 1):
+        for j in range(len_indices - limit - 1):
             i = indices[j]
             # candidates for the next vertex in coclique:
-            t = filter(lambda x: (x > i and not self._adjacency[x][i]), indices)
-            if len(t) < limit:
+            t = [x for x in indices if (x > i and not self._adjacency[x][i])]
+            len_t = sum(1 for _ in t)
+            if len_t < limit:
                 continue
             next_cocliques = self._max_cocliques_between_indices(t)
             for coclique in next_cocliques:
@@ -192,9 +194,10 @@ class Graph(object):
     def max_cocliques(self):
         """Returns set of cocliques of maximal size (slow)
         """
+        # TODO: iterator-based version?
         cocliquesIndices = self._max_cocliques_between_indices(
-            range(len(self._adjacency)))
-        return [map(lambda i: self._vertices[i], coclique)
+            list(range(len(self._adjacency))))
+        return [[self._vertices[i] for i in coclique]
                 for coclique in cocliquesIndices]
 
 
@@ -202,7 +205,7 @@ def full_graph(n):
     """Creates full graph on n vertices
     """
     g = Graph()
-    for i in xrange(n):
+    for i in range(n):
         g._vertices.append(i)
         g._adjacency.append([True] * len(g._adjacency))
     return g

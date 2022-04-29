@@ -16,11 +16,10 @@ Copyright 2012 Daniel Lytkin.
 """
 import unittest
 
-from spectrum_tests.parametric import parametrized, parameters
-
 from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup
 from spectrum.modules import max_orders
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
@@ -36,7 +35,7 @@ def maximal_orders(group, num_elements=1):
 
 @parametrized
 class MaxOrdersTest(unittest.TestCase):
-    @parameters(xrange(3, 26))
+    @parameters(list(range(3, 26)))
     def test_symplectic(self, n):
         group = ClassicalGroup("Sp", 2 * n, 2)
         max_elems = max_orders.maximal_orders(group)
@@ -44,7 +43,7 @@ class MaxOrdersTest(unittest.TestCase):
         self.assertEqual(max_elems[0], max_elems_2[0])
         self.assertEqual(max_elems[1], max_elems_2[1])
 
-    @parameters(xrange(3, 100))
+    @parameters(list(range(3, 100)))
     def test_symplectic_gcd(self, n):
         max_elems = max_orders.symplectic_2(n)
         expected = numeric.gcd(*max_elems)

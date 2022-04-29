@@ -17,9 +17,8 @@ Copyright 2012 Daniel Lytkin.
 import itertools
 import unittest
 
-from spectrum_tests.parametric import parametrized, parameters
-
 from spectrum.calculations.numeric import *
+from spectrum_tests.parametric import parametrized, parameters
 
 __author__ = 'Daniel Lytkin'
 
@@ -149,7 +148,7 @@ class NumericTest(unittest.TestCase):
                   (13, 13): 1,
                   (1, 42): 0
         }
-        for key, value in values.iteritems():
+        for key, value in values.items():
             self.assertTrue(get_exponent(*key) == value)
 
     def test_is_power_of_two(self):
@@ -162,8 +161,28 @@ class NumericTest(unittest.TestCase):
                   8: True,
                   1024: True,
                   2050: False}
-        for key, value in values.iteritems():
+        for key, value in values.items():
             self.assertEqual(value, is_power_of_two(key))
+
+    def test_closest_odd_power_of_two(self):
+        self.assertEqual(2, closest_odd_power_of_two(1))
+        self.assertEqual(2, closest_odd_power_of_two(2))
+        self.assertEqual(2, closest_odd_power_of_two(3))
+        self.assertEqual(2, closest_odd_power_of_two(4))
+        self.assertEqual(8, closest_odd_power_of_two(5))
+        self.assertEqual(8, closest_odd_power_of_two(6))
+        self.assertEqual(8, closest_odd_power_of_two(7))
+        self.assertEqual(8, closest_odd_power_of_two(8))
+        self.assertEqual(8, closest_odd_power_of_two(9))
+
+        self.assertEqual(8, closest_odd_power_of_two(16))
+    
+    def test_closest_odd_power_of_three(self):
+        for n in range(1, 15):
+            self.assertEqual(3, closest_odd_power_of_three(n), f'trouble with n={n}')
+        self.assertEqual(27, closest_odd_power_of_three(15))
+        self.assertEqual(27, closest_odd_power_of_three(26))
+        self.assertEqual(27, closest_odd_power_of_three(27))
 
     def test_constraints(self):
         c = Constraints(min=5, primality=PRIME)

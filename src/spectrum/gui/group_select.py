@@ -14,7 +14,7 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
+from tkinter import Frame, StringVar, Radiobutton, LabelFrame, Label
 
 from spectrum.calculations import numeric
 from spectrum.calculations.groups import ClassicalGroup, SporadicGroup, AlternatingGroup, ExceptionalGroup
@@ -92,11 +92,13 @@ class GroupSelect(Frame):
         Label(self._ex_params, text="Type").grid(row=0, sticky='w')
         self._ex_type = OptionList(self._ex_params, values=ExceptionalGroup.types())
         self._ex_type.setvar(value=ExceptionalGroup.types()[0])
+        self._ex_type.variable.trace("w", lambda n, i, m: self._exceptional_group_type_selection())
         self._ex_type.grid(row=0, column=1, sticky='we')
 
         Label(self._ex_params, text="Field order").grid(row=1, sticky='w')
         self._ex_field = NumberBox(self._ex_params, constraints=Constraints(primality=numeric.PRIME_POWER))
         self._ex_field.grid(row=1, column=1, sticky='we')
+        self._exceptional_group_type_selection()
 
         # sporadic
         self._spor_params = Frame(group_params_frame)
@@ -144,3 +146,7 @@ class GroupSelect(Frame):
         name = self._clas_type.variable.get()
         self._clas_dim.set_constraints(ClassicalGroup.dim_constraints(name))
         self._clas_field.set_constraints(ClassicalGroup.field_constraints(name))
+
+    def _exceptional_group_type_selection(self):
+        name = self._ex_type.variable.get()
+        self._ex_field.set_constraints(ExceptionalGroup.field_constraints(name))

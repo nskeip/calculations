@@ -14,11 +14,12 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from partition import Partitions
+from functools import reduce
+
 from spectrum.calculations import orders, spectra, numeric
 from spectrum.calculations.numeric import Constraints, Integer
 from spectrum.tools.tools import doc_inherit, ObjectCache
-
+from .partition import Partitions
 
 __author__ = 'Daniel Lytkin'
 
@@ -28,7 +29,7 @@ _CACHE = True  # whether group caching is enabled
 #LATEX_OPERATORNAME = True
 
 
-class Field(object):
+class Field:
     """Finite field.
     Can be created as Field(order) or Field(base, pow) where base**pow is the
     order of the field. `order' must be a prime power, otherwise the wrong
@@ -70,7 +71,7 @@ class Field(object):
         return "F({}^{})".format(self._base, self._pow)
 
 
-class Group(object):
+class Group:
     """Abstract class for finite groups.
     """
 
@@ -151,7 +152,7 @@ class AlternatingGroup(Group):
     def apex(self):
         if self._apex is None:
             n = self._degree
-            partitions = filter(lambda x: (len(x) + n) % 2 == 0, Partitions(n))
+            partitions = [x for x in Partitions(n) if (len(x) + n) % 2 == 0]
             self._apex = numeric.sort_and_filter(
                 [reduce(numeric.lcm, partition) for partition in partitions])
         return self._apex
@@ -160,7 +161,7 @@ class AlternatingGroup(Group):
     def order(self):
         if self._order is None:
             # n!/2
-            self._order = numeric.prod(xrange(3, self._degree + 1))
+            self._order = numeric.prod(range(3, self._degree + 1))
         return Integer(self._order)
 
     def __str__(self):
@@ -278,6 +279,13 @@ class ExceptionalGroup(Group):
               "F4": 'F_4', "2F4": '{}^2F_4', "G2": 'G_2', "2G2": '{}^2G_2',
               "2B2": '{}^2B_2', "3D4": '{}^3D_4'}
 
+    # constraints for field order
+    _field_constraints = {
+        '2F4': Constraints(min=2, primality=numeric.ODD_POWER_OF_2),
+        '2B2': Constraints(min=2, primality=numeric.ODD_POWER_OF_2),
+        '2G2': Constraints(min=2, primality=numeric.ODD_POWER_OF_3),
+    }
+
     def __init__(self, name, *field):
         super(ExceptionalGroup, self).__init__()
         self._name = name
@@ -316,3 +324,7 @@ class ExceptionalGroup(Group):
                                                  lambda *arg: Integer())
             self._order = func(self._field)
         return self._order
+
+    @classmethod
+    def field_constraints(cls, name):
+        return cls._field_constraints.get(name, Constraints(min=2, primality=numeric.PRIME_POWER))

@@ -66,7 +66,7 @@ def winSetClipboard(text):
     except TypeError:
         # works on Python 3 (bytes() requires an encoding)
         hCd = ctypes.windll.kernel32.GlobalAlloc(GMEM_DDESHARE,
-            len(unicode(text, 'ascii')) + 1)
+            len(str(text, 'ascii')) + 1)
     pchData = ctypes.windll.kernel32.GlobalLock(hCd)
     try:
         # works on Python 2 (bytes() only takes one argument)
@@ -74,7 +74,7 @@ def winSetClipboard(text):
     except TypeError:
         # works on Python 3 (bytes() requires an encoding)
         ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData),
-            unicode(text, 'ascii'))
+            str(text, 'ascii'))
     ctypes.windll.kernel32.GlobalUnlock(hCd)
     ctypes.windll.user32.SetClipboardData(1, hCd)
     ctypes.windll.user32.CloseClipboard()

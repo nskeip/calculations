@@ -16,10 +16,10 @@ Copyright 2012 Daniel Lytkin.
 """
 import unittest
 
+from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
+from spectrum.calculations.spectra.exceptional import RootSystem
 from spectrum_tests.calculations import orders_data, spectra_data
 from spectrum_tests.parametric import parametrized, parameters
-
-from spectrum.calculations.groups import Field, SporadicGroup, AlternatingGroup, ClassicalGroup, ExceptionalGroup, Group
 
 __author__ = 'Daniel Lytkin'
 
@@ -82,13 +82,13 @@ class OrdersTest(unittest.TestCase):
         g = AlternatingGroup(15)
         self.assertEqual(expected, g.order())
 
-    @parameters(orders_data.classical_orders_data.keys())
+    @parameters(list(orders_data.classical_orders_data.keys()))
     def test_classical_orders(self, params):
         g = ClassicalGroup(*params)
         order = orders_data.classical_orders_data[params]
         self.assertEqual(order, g.order())
 
-    @parameters(orders_data.exceptional_orders_data.keys())
+    @parameters(list(orders_data.exceptional_orders_data.keys()))
     def test_exceptional_orders(self, params):
         g = ExceptionalGroup(*params)
         order = orders_data.exceptional_orders_data[params]
@@ -123,8 +123,32 @@ class SpectraTest(unittest.TestCase):
     #     apex = spectra_data.classical[params]
     #     self.assertSetEqual(set(apex), set(g.apex()))
 
-    @parameters(spectra_data.exceptional.keys())
+    @parameters(list(spectra_data.exceptional.keys()))
     def test_exceptional_spectra(self, params):
         g = ExceptionalGroup(*params)
         apex = spectra_data.exceptional[params]
         self.assertSetEqual(set(apex), set(g.apex()))
+
+    def test_mh(self):
+        # maximal height of a root system
+        self.assertEqual(RootSystem('D', 6).mh(), 9)
+        self.assertEqual(RootSystem('E', 6).mh(), 11)
+
+    def test_p(self):
+        # if p is 2, then p(D_6) is 16, because 2^3 = 8 <= 9 < 16
+        self.assertEqual(RootSystem('D', 6).p(2), 16)
+
+        # by analogy:
+        self.assertEqual(RootSystem('D', 6).p(3), 27)
+
+        # if p is 5 or 7, then p(D_6) = p^2;
+        for p in (5, 7,):
+            self.assertEqual(RootSystem('D', 6).p(p), p**2)
+
+        # for all p > 7, it equals p
+        self.assertEqual(RootSystem('D', 8).p(101), 101)
+
+    @parameters([(g_name, 4, 2) for g_name in ['PSL', 'PSU', 'SL', 'SU']])
+    def test_apex_nums_are_integers(self, params):
+        g = ClassicalGroup(*params)
+        self.assertTrue(all(isinstance(i, int) for i in g.apex()), g.apex())

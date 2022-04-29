@@ -14,13 +14,13 @@ Copyright 2012 Daniel Lytkin.
    limitations under the License.
 
 """
-from Tkinter import Canvas
+from tkinter import Canvas
 
-from shapes import EdgeShape
 from spectrum.graph import graph
 from spectrum.graph.geometry import Point
 from spectrum.gui.graph import shapes
 from spectrum.tools.observers import Observable
+from .shapes import EdgeShape
 
 __author__ = 'Daniel Lytkin'
 
@@ -79,7 +79,7 @@ class PickedState(Observable):
         return self._picked  # .copy()
 
 
-class MousePlugin(object):
+class MousePlugin:
     """Class responsible for all mouse manipulations with graph on canvas.
     """
 
@@ -142,7 +142,7 @@ class MousePlugin(object):
             self._selection = None
 
 
-class IterationsPlugin(object):
+class IterationsPlugin:
     """This plugin enables animation for iterable graph layouts
     """
 
@@ -159,7 +159,7 @@ class IterationsPlugin(object):
         self._event_id = self._canvas.after(self.time_step, self._step)
 
     def iterate(self, times):
-        for i in xrange(times):
+        for i in range(times):
             self._canvas.layout.step()
         self._canvas.reset()
 
@@ -170,7 +170,7 @@ class IterationsPlugin(object):
         self._canvas.after_cancel(self._event_id)
 
 
-class Vertex(object):
+class Vertex:
     """This class connects graph vertex with its shape on the canvas.
     """
 
@@ -206,7 +206,7 @@ class Vertex(object):
         return self._incident
 
 
-class Edge(object):
+class Edge:
     """This class connects graph edge with its shape on the canvas
     """
 
@@ -274,8 +274,8 @@ class GraphCanvas(Canvas, object):
         self.bind("<Configure>", lambda event: self._on_configure())
 
     def create_caption(self, caption_text):
-        import tkFont
-        font = tkFont.Font(family='Helvetica', size=28)
+        from tkinter.font import Font
+        font = Font(family='Helvetica', size=28)
         label_id = self.create_text(0, 0, text=caption_text, fill='#888888', font=font, anchor='sw')
         self.tag_lower(label_id)
         return label_id
@@ -303,7 +303,7 @@ class GraphCanvas(Canvas, object):
     def vertices(self):
         """Returns set of vertices on the canvas.
         """
-        return self._vertices.viewvalues()
+        return self._vertices.values()
 
     @property
     def picked_vertex_state(self):
@@ -354,7 +354,7 @@ class GraphCanvas(Canvas, object):
         """
         self.layout.update()
         graph_vertices = set(self.graph.vertices)
-        local_vertices = self._vertices.viewkeys()
+        local_vertices = self._vertices.keys()
         # deleted vertices:
         for value in local_vertices - graph_vertices:
             del self._vertices[value]
@@ -447,7 +447,7 @@ class GraphCanvas(Canvas, object):
     def _move_edge(self, edge, start, end):
         new = start.x, start.y, end.x, end.y
         current = self.coords(edge.shape.id)
-        self.coords(edge.shape.id, *map(lambda x, y: x + y, current, new))
+        self.coords(edge.shape.id, *list(map(lambda x, y: x + y, current, new)))
 
     def _convert_layout_location(self, location):
         """Converts layout coordinates to canvas coordinates
@@ -463,7 +463,7 @@ class GraphCanvas(Canvas, object):
         return Point(x - margin, y - margin)
 
     def _get_vertex_by_shape_id(self, id):
-        for vertex in self._vertices.itervalues():
+        for vertex in self._vertices.values():
             if vertex.shape.id == id:
                 return vertex
         return None
@@ -497,6 +497,6 @@ class GraphCanvas(Canvas, object):
                     vertex = self._vertices[value]
                     vertex.shape.configure(fill=color)
                     colored.append(value)
-        for value, vertex in self._vertices.iteritems():
+        for value, vertex in self._vertices.items():
             if value not in colored:
                 vertex.shape.configure(fill='white')

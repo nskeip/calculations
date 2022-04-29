@@ -16,12 +16,12 @@ Copyright 2012 Daniel Lytkin.
 """
 import itertools
 import unittest
-
-from spectrum_tests.parametric import parameters, parametrized
+from functools import reduce
 
 from spectrum.calculations import numeric
 from spectrum.calculations.partition import Partitions
 from spectrum.calculations.semisimple import SemisimpleElements, MixedElements, SpectraElement
+from spectrum_tests.parametric import parameters, parametrized
 
 __author__ = 'Daniel Lytkin'
 

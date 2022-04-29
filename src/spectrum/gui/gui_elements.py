@@ -16,9 +16,9 @@ Copyright 2012 Daniel Lytkin.
 """
 import math
 import string
-import tkFont
-from Tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
+from tkinter import (Frame, Button, Listbox, Entry, StringVar, OptionMenu, Checkbutton, IntVar, Label, Menu, Scrollbar,
                      LabelFrame)
+from tkinter.font import Font
 
 from spectrum.calculations.numeric import Integer, Constraints
 from spectrum.calculations.semisimple import SpectraElement
@@ -124,7 +124,7 @@ class ApexList(Listbox):
     def reprint(self):
         """Updates list elements' text
         """
-        for i in xrange(len(self._apex)):
+        for i in range(len(self._apex)):
             self._update_text(i)
 
     def expand(self, indices=None):
@@ -159,8 +159,7 @@ class ApexList(Listbox):
                 number = Integer(number)
             return MultiModeStringFormatter.mixin_to(number)
 
-        self._apex = [transform_number(number) for number in apex]
-        self._apex.sort(reverse=True)
+        self._apex = [transform_number(number) for number in sorted(apex, reverse=True)]
         self.delete(0, "END")
         self.insert(0, *self._apex)
 
@@ -253,7 +252,7 @@ class NumberBox(Entry):
 
     def refresh_input(self):
         if self._allow_expression:
-            filtered = filter(lambda c: c in _expression_symbols, self._var.get())
+            filtered = ''.join([c for c in self._var.get() if c in _expression_symbols])
             try:
                 value = eval(filtered.replace('^', '**'))
             except Exception:
@@ -262,7 +261,11 @@ class NumberBox(Entry):
             self._var.set(filtered)
         else:
             # remove any non-decimal character
-            value = int(filter(lambda c: c in string.digits, self._var.get()))
+            str_value = ''.join([c for c in self._var.get() if c in string.digits])
+            if str_value:
+                value = int(str_value)
+            else:
+                value = 0
 
             value = self._constraints.closest_valid(value)
 
@@ -401,7 +404,7 @@ class GroupNameLabel(Label):
         self._group = group
         kw['text'] = str(group)
         #        kw.setdefault('anchor', 'w')
-        kw.setdefault('font', tkFont.Font(size=20))
+        kw.setdefault('font', Font(size=20))
         Label.__init__(self, parent, **kw)
         self._init_menu()
 
