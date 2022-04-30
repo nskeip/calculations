@@ -59,5 +59,5 @@ Using as a library
 To install the program as a python package, run `pip install` after
 cloning the repository:
 ```shell
-pip install /path/to/calculations
+pip install git+https://github.com/nskeip/calculations.git#egg=calculations
 ```
